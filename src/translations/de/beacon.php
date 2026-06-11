@@ -187,7 +187,7 @@ return [
     'Create redirect' => 'Weiterleitung erstellen',
     'Create your first schema mapping to generate JSON-LD for entries.' => 'Erstellen Sie Ihr erstes Schema-Mapping, um JSON-LD für Einträge zu generieren.',
     'Created' => 'Erstellt',
-    'Credentials' => 'Anmeldedaten',
+    'Credentials' => 'Qualifikationen',
     'Custom Script' => 'Benutzerdefiniertes Skript',
     'Custom fields' => 'Benutzerdefinierte Felder',
     'Custom front matter' => 'Benutzerdefiniertes Front Matter',
