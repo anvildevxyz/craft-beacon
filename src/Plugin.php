@@ -736,7 +736,7 @@ class Plugin extends BasePlugin
                 }
                 $url = $entry->getUrl();
                 if (is_string($url) && $url !== '' && (int) $entry->siteId > 0) {
-                    $dedupeKey = sprintf('beacon-indexnow-dedupe:%d:%s', (int) $entry->siteId, md5($url));
+                    $dedupeKey = sprintf('beacon-indexnow-dedupe:%d:%s', (int) $entry->siteId, hash('sha256', $url));
                     $cache = Craft::$app->getCache();
                     if ($cache->get($dedupeKey) !== false) {
                         return;

@@ -12,6 +12,7 @@ use yii\web\Response;
 class MaintenanceController extends Controller
 {
     use BeaconCpPermissionTrait;
+    use SiteScopedCpControllerTrait;
 
     protected const BEACON_PERMISSION = BeaconPermissions::EDIT_SETTINGS;
 
@@ -35,24 +36,26 @@ class MaintenanceController extends Controller
     public function actionRegenerateSitemap(): Response
     {
         $this->requirePostRequest();
-        Plugin::$plugin->renderCache->flush($this->primarySiteId(), RenderCacheType::Sitemap);
+        $siteId = $this->resolveSiteIdFromPost();
+        Plugin::$plugin->renderCache->flush($siteId, RenderCacheType::Sitemap);
         return $this->done(Craft::t('beacon', 'Sitemap cache flushed. Next request will regenerate.'));
     }
 
     /**
-     * Invalidates the primary site's llms.txt cache so the next request regenerates it.
+     * Invalidates the current site's llms.txt cache so the next request regenerates it.
      *
      * @throws \yii\web\BadRequestHttpException when the request is not a POST
      */
     public function actionRegenerateLlmsTxt(): Response
     {
         $this->requirePostRequest();
-        Plugin::$plugin->renderCache->invalidate($this->primarySiteId(), RenderCacheType::LlmsTxt);
+        $siteId = $this->resolveSiteIdFromPost();
+        Plugin::$plugin->renderCache->invalidate($siteId, RenderCacheType::LlmsTxt);
         return $this->done(Craft::t('beacon', 'llms.txt cache invalidated. Next request will regenerate.'));
     }
 
     /**
-     * Invalidates the primary site's sitemap, llms.txt, humans.txt, and ads.txt
+     * Invalidates the current site's sitemap, llms.txt, humans.txt, and ads.txt
      * caches so the next requests regenerate them.
      *
      * @throws \yii\web\BadRequestHttpException when the request is not a POST
@@ -60,18 +63,13 @@ class MaintenanceController extends Controller
     public function actionRegenerateAll(): Response
     {
         $this->requirePostRequest();
+        $siteId = $this->resolveSiteIdFromPost();
         $cache = Plugin::$plugin->renderCache;
-        $primary = $this->primarySiteId();
-        $cache->flush($primary, RenderCacheType::Sitemap);
+        $cache->flush($siteId, RenderCacheType::Sitemap);
         foreach ([RenderCacheType::LlmsTxt, RenderCacheType::Humans, RenderCacheType::Ads] as $type) {
-            $cache->invalidate($primary, $type);
+            $cache->invalidate($siteId, $type);
         }
         return $this->done(Craft::t('beacon', 'All Beacon text/sitemap caches invalidated. Use `craft beacon/cache/regenerate-all` to warm them.'));
-    }
-
-    private function primarySiteId(): int
-    {
-        return Craft::$app->getSites()->getPrimarySite()->id;
     }
 
     private function done(string $message): Response

@@ -58,7 +58,7 @@ class GeoMarkdownStore extends Component
             return;
         }
 
-        $hash = sha1($markdown);
+        $hash = hash('sha256', $markdown);
         $now = Db::now();
 
         $record = GeoMarkdownRecord::findOne(['siteId' => $siteId, 'elementId' => $elementId])

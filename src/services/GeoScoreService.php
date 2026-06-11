@@ -353,7 +353,7 @@ class GeoScoreService extends Component
             'factMode' => $settings->geoScoreFactDetectionMode,
             'authorityOverrides' => $settings->geoScoreAuthorityDomainOverrides,
         ];
-        return sha1(Json::encode($inputs));
+        return hash('sha256', Json::encode($inputs));
     }
 
     private function persist(GeoScore $score, int $elementId, int $siteId, string $sourceHash): void

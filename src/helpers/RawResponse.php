@@ -12,7 +12,7 @@ use yii\web\Response;
  * already set. Centralises the "txt-like endpoint" tail repeated across the
  * sitemap/robots/llms/humans/ads/geo controllers.
  *
- * Always emits a strong ETag (sha1 of body) and honours `If-None-Match` /
+ * Always emits a strong ETag (sha256 of body) and honours `If-None-Match` /
  * `If-Modified-Since` with a 304 response when the client already has the
  * current representation.
  */
@@ -44,7 +44,7 @@ final class RawResponse
             $h->set('Last-Modified', gmdate('D, d M Y H:i:s', $lastModified->getTimestamp()) . ' GMT');
         }
 
-        $etag ??= '"' . sha1($body) . '"';
+        $etag ??= '"' . hash('sha256', $body) . '"';
         $h->set('ETag', $etag);
 
         if ($cacheTags !== []) {

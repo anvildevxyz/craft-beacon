@@ -191,9 +191,9 @@ class MetaResolverService extends Component
         $updated = $entry->dateUpdated?->format('U') ?? '0';
         $payload = $updated
             . '|' . ($entryUrl ?? '')
-            . '|' . md5(serialize($entryFieldValue))
+            . '|' . hash('sha256', serialize($entryFieldValue))
             . '|' . implode(',', $bundleSchemaTypes);
-        return $entry->id . ':' . $entry->siteId . ':' . md5($payload);
+        return $entry->id . ':' . $entry->siteId . ':' . hash('sha256', $payload);
     }
 
     /**

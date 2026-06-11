@@ -106,7 +106,7 @@ class SeoFieldController extends Controller
 
         $entryId = (int) $request->getRequiredBodyParam('entryId');
         $siteId = (int) ($request->getBodyParam('siteId') ?: 0) ?: null;
-        $entryTitle = (string) ($request->getBodyParam('entryTitle') ?? '');
+        $entryTitle = mb_substr((string) ($request->getBodyParam('entryTitle') ?? ''), 0, 500);
         $fieldValue = $request->getBodyParam('fieldValue');
         if (!is_array($fieldValue)) {
             $fieldValue = [];

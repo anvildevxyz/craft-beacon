@@ -189,7 +189,7 @@ class Install extends Migration
             'siteId' => $this->integer()->notNull(),
             'score' => $this->tinyInteger()->unsigned()->notNull(),
             'pillars' => $this->json()->notNull(),
-            'sourceHash' => $this->char(40)->notNull(),
+            'sourceHash' => $this->char(64)->notNull(),
             'computedAt' => $this->dateTime()->notNull(),
             'PRIMARY KEY([[elementId]], [[siteId]])',
         ]);

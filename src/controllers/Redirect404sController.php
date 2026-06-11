@@ -21,6 +21,7 @@ use yii\web\Response;
 class Redirect404sController extends Controller
 {
     use BeaconCpPermissionTrait;
+    use SiteScopedCpControllerTrait;
 
     protected const BEACON_PERMISSION = BeaconPermissions::EDIT_REDIRECTS;
 
@@ -60,6 +61,7 @@ class Redirect404sController extends Controller
         $request = Http::request();
         $session = Craft::$app->getSession();
         $siteId = Craft::$app->getSites()->getCurrentSite()->id;
+        $this->requireEditableSite($siteId);
 
         /** @var list<int|string> $raw */
         $raw = (array) $request->getRequiredBodyParam('ids');
