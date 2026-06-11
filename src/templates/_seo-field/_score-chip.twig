@@ -1,0 +1,31 @@
+{# @var score \anvildev\beacon\models\GeoScore|null #}
+{# @var weakestLabel string|null #}
+{# @var elementId int #}
+{# @var siteId int #}
+{% if score is not null %}
+    {% set band = score.score >= 80 ? 'top' : score.score >= 60 ? 'good' : score.score >= 30 ? 'low' : 'stale' %}
+    <a class="beacon-geo-score-chip beacon-geo-score-chip--{{ band }}"
+       href="{{ cpUrl('beacon/geo-score/drill-down', { elementId: elementId, siteId: siteId }) }}"
+       aria-label="{{ 'GEO score {n} of 100 — open details'|t('beacon', { n: score.score }) }}">
+        <span class="beacon-geo-score-chip__label">{{ 'GEO'|t('beacon') }}</span>
+        <span class="beacon-geo-score-chip__value">{{ score.score }}<span class="beacon-geo-score-chip__total">/100</span></span>
+        {% if weakestLabel %}
+            <span class="beacon-geo-score-chip__weakest" title="{{ 'Lowest-scoring pillar — fix first.'|t('beacon') }}">
+                {{ 'Weakest: {pillar}'|t('beacon', { pillar: weakestLabel }) }}
+            </span>
+        {% endif %}
+        <span class="beacon-geo-score-chip__details" aria-hidden="true">{{ 'Details →'|t('beacon') }}</span>
+    </a>
+{% else %}
+    <span class="beacon-geo-score-chip beacon-geo-score-chip--pending"
+          data-beacon-geo-chip
+          data-element-id="{{ elementId }}"
+          data-site-id="{{ siteId }}"
+          data-idle-label="{{ 'Computes on next save'|t('beacon') }}">
+        <span class="beacon-geo-score-chip__label">{{ 'GEO'|t('beacon') }}</span>
+        <span class="beacon-geo-score-chip__value">—</span>
+        <span class="beacon-geo-score-chip__pending">
+            {{ 'Computing…'|t('beacon') }}
+        </span>
+    </span>
+{% endif %}

@@ -1,0 +1,34 @@
+{% import '_includes/forms.twig' as forms %}
+
+<input type="hidden" name="action" value="beacon/ads-settings/save">
+<input type="hidden" name="siteId" value="{{ site.id }}">
+{{ redirectInput('beacon/crawlers/ads-txt?site=' ~ site.handle) }}
+{{ csrfInput() }}
+
+{% include 'beacon/_includes/site-selector' with { sites, site, baseUrl: cpUrl('beacon/crawlers/ads-txt') } only %}
+
+{{ forms.lightswitchField({
+    label: 'Enabled'|t('beacon'),
+    instructions: 'When disabled, /ads.txt returns 404.'|t('beacon'),
+    name: 'enabled',
+    on: settings.enabled,
+    first: true,
+}) }}
+
+{{ forms.elementSelectField({
+    label: 'Source asset'|t('beacon'),
+    instructions: "Optional. If set, the asset's file contents are served verbatim. Falls back to the body field below."|t('beacon'),
+    name: 'assetId',
+    elementType: 'craft\\elements\\Asset',
+    elements: currentAsset ? [currentAsset] : [],
+    limit: 1,
+}) }}
+
+{{ forms.textareaField({
+    label: 'Body (fallback)'|t('beacon'),
+    instructions: 'Used when no asset is set. Format per IAB Tech Lab ads.txt specification.'|t('beacon'),
+    name: 'body',
+    value: settings.body,
+    rows: 12,
+    class: 'fontMono',
+}) }}

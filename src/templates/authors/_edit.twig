@@ -1,0 +1,119 @@
+{% extends '_layouts/cp.twig' %}
+{% set selectedSubnavItem = 'authors' %}
+{% import '_includes/forms.twig' as forms %}
+{% set title = author.id ? author.title : 'New author'|t('beacon') %}
+{% set fullPageForm = true %}
+{% set crumbs = [
+    { label: 'Beacon'|t('beacon'), url: cpUrl('beacon') },
+    { label: 'Authors'|t('beacon'), url: cpUrl('beacon/authors') },
+] %}
+
+{% block content %}
+    <input type="hidden" name="action" value="beacon/authors/save">
+    <input type="hidden" name="authorId" value="{{ author.id }}">
+    {{ redirectInput('beacon/authors') }}
+    {{ csrfInput() }}
+
+    {{ forms.textField({
+        label: 'Name'|t('beacon'),
+        id: 'title',
+        name: 'title',
+        value: author.title,
+        required: true,
+        first: true,
+    }) }}
+
+    {{ forms.textField({
+        label: 'Job title'|t('beacon'),
+        id: 'jobTitle',
+        name: 'jobTitle',
+        value: author.jobTitle,
+    }) }}
+
+    {{ forms.textareaField({
+        label: 'Description'|t('beacon'),
+        instructions: 'A short bio paragraph for the author.'|t('beacon'),
+        id: 'description',
+        name: 'description',
+        value: author.description,
+        rows: 3,
+        maxlength: 2000,
+    }) }}
+
+    {{ forms.elementSelectField({
+        label: 'Headshot'|t('beacon'),
+        instructions: 'A single photo of the author. A square image works best.'|t('beacon'),
+        id: 'imageAssetId',
+        name: 'imageAssetId',
+        elementType: 'craft\\elements\\Asset',
+        selectionLabel: 'Choose headshot'|t('beacon'),
+        limit: 1,
+        elements: author.imageAssetId ? [craft.app.elements.getElementById(author.imageAssetId)] : [],
+    }) }}
+
+    <hr>
+
+    <h2 class="heading">{{ 'E-E-A-T signals'|t('beacon') }}</h2>
+    <p class="light">{{ 'One entry per line in each box. Capped at 50 entries each.'|t('beacon') }}</p>
+
+    {{ forms.textareaField({
+        label: 'Expertise topics'|t('beacon'),
+        instructions: 'Subjects the author writes about.'|t('beacon'),
+        id: 'expertise',
+        name: 'expertise',
+        value: author.expertise|join("\n"),
+        rows: 4,
+        placeholder: 'machine learning\nepidemiology\nsupply-chain logistics'|t('beacon'),
+    }) }}
+
+    {{ forms.textareaField({
+        label: 'Credentials'|t('beacon'),
+        instructions: 'Degrees, certifications, and professional memberships.'|t('beacon'),
+        id: 'credentials',
+        name: 'credentials',
+        value: author.credentials|join("\n"),
+        rows: 4,
+        placeholder: 'PhD MIT\nIEEE Senior Member'|t('beacon'),
+    }) }}
+
+    {{ forms.textareaField({
+        label: 'sameAs URLs'|t('beacon'),
+        instructions: 'Verified social and professional profiles. One URL per line.'|t('beacon'),
+        id: 'sameAs',
+        name: 'sameAs',
+        value: author.sameAs|join("\n"),
+        rows: 4,
+        placeholder: 'https://www.linkedin.com/in/jane-researcher\nhttps://orcid.org/0000-0002-1825-0097'|t('beacon'),
+    }) }}
+
+    <hr>
+
+    <h2 class="heading">{{ 'Org references'|t('beacon') }}</h2>
+
+    {{ forms.textareaField({
+        label: 'Affiliation'|t('beacon'),
+        instructions: 'Organizations the author is affiliated with.'|t('beacon'),
+        id: 'affiliation',
+        name: 'affiliation',
+        value: author.affiliation|join("\n"),
+        rows: 3,
+    }) }}
+
+    {{ forms.textareaField({
+        label: 'Works for'|t('beacon'),
+        instructions: 'Employers.'|t('beacon'),
+        id: 'worksFor',
+        name: 'worksFor',
+        value: author.worksFor|join("\n"),
+        rows: 3,
+    }) }}
+
+    {{ forms.textareaField({
+        label: 'Alumni of'|t('beacon'),
+        instructions: 'Schools and universities the author attended.'|t('beacon'),
+        id: 'alumniOf',
+        name: 'alumniOf',
+        value: author.alumniOf|join("\n"),
+        rows: 3,
+    }) }}
+{% endblock %}

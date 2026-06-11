@@ -1,0 +1,277 @@
+{% import "_includes/forms.twig" as forms %}
+
+{% set advanced = settings.identityAdvanced %}
+{% set primarySiteName = craft.app.sites.primarySite.name %}
+
+<h2 class="heading first">{{ 'Organization identity'|t('beacon') }}</h2>
+<p class="light">{{ 'Drives the global JSON-LD identity emitted on every page. All fields are optional — the more you fill in, the richer the entity.'|t('beacon') }}</p>
+<hr>
+
+{{ forms.selectField({
+    label: 'Identity type'|t('beacon'),
+    instructions: 'The schema.org type for this site — an organization (pick a subtype if it fits) or a single Person. Controls which fields below apply.'|t('beacon'),
+    id: 'beacon-identity-type',
+    name: 'identityType',
+    value: settings.identityType,
+    options: identityTypeOptions,
+}) }}
+
+{{ forms.textField({
+    label: 'Name'|t('beacon'),
+    instructions: 'Defaults to the primary site\'s name when empty.'|t('beacon'),
+    name: 'organizationName',
+    value: settings.organizationName ?? '',
+    placeholder: primarySiteName,
+}) }}
+
+{{ forms.textField({
+    label: 'Alternate name'|t('beacon'),
+    instructions: 'Common abbreviation or alias. Example: "IBM" alongside "International Business Machines".'|t('beacon'),
+    name: 'identityAdvanced[alternateName]',
+    value: advanced.alternateName ?? '',
+}) }}
+
+{{ forms.textareaField({
+    label: 'Description'|t('beacon'),
+    instructions: 'Short blurb about the organization or person. Appears in Knowledge Graph cards.'|t('beacon'),
+    name: 'identityAdvanced[description]',
+    value: advanced.description ?? '',
+    rows: 2,
+}) }}
+
+{{ forms.elementSelectField({
+    label: 'Logo asset'|t('beacon'),
+    instructions: 'Used as `logo.url` on the Organization schema. Square or near-square works best for Knowledge Graph.'|t('beacon'),
+    name: 'organizationLogoAssetId',
+    elementType: 'craft\\elements\\Asset',
+    selectionLabel: 'Choose logo'|t('beacon'),
+    limit: 1,
+    elements: settings.organizationLogoAssetId ? [craft.app.elements.getElementById(settings.organizationLogoAssetId)] : [],
+}) }}
+
+{{ forms.elementSelectField({
+    label: 'Entity image'|t('beacon'),
+    instructions: 'Distinct from the logo — emitted as `image` rather than `logo`. Use a representative photo (storefront, headshot, brand artwork) that Google can show in entity cards.'|t('beacon'),
+    name: 'organizationImageAssetId',
+    elementType: 'craft\\elements\\Asset',
+    selectionLabel: 'Choose image'|t('beacon'),
+    limit: 1,
+    elements: settings.organizationImageAssetId ? [craft.app.elements.getElementById(settings.organizationImageAssetId)] : [],
+}) }}
+
+<hr>
+
+<h2 class="heading">{{ 'Contact'|t('beacon') }}</h2>
+
+{{ forms.textField({
+    label: 'Email'|t('beacon'),
+    name: 'identityAdvanced[email]',
+    value: advanced.email ?? '',
+    type: 'email',
+}) }}
+
+{{ forms.textField({
+    label: 'Telephone'|t('beacon'),
+    instructions: 'Include the country code in international format, e.g. +1-555-867-5309.'|t('beacon'),
+    name: 'identityAdvanced[telephone]',
+    value: advanced.telephone ?? '',
+}) }}
+
+<hr>
+
+<h2 class="heading">{{ 'Postal address'|t('beacon') }}</h2>
+<p class="light">{{ 'All five fields render as a single `PostalAddress` node. Leave blank if not applicable.'|t('beacon') }}</p>
+
+{{ forms.textField({
+    label: 'Street address'|t('beacon'),
+    name: 'identityAdvanced[streetAddress]',
+    value: advanced.streetAddress ?? '',
+}) }}
+
+{{ forms.textField({
+    label: 'City'|t('beacon'),
+    name: 'identityAdvanced[addressLocality]',
+    value: advanced.addressLocality ?? '',
+}) }}
+
+{{ forms.textField({
+    label: 'Region / state'|t('beacon'),
+    name: 'identityAdvanced[addressRegion]',
+    value: advanced.addressRegion ?? '',
+}) }}
+
+{{ forms.textField({
+    label: 'Postal code'|t('beacon'),
+    name: 'identityAdvanced[postalCode]',
+    value: advanced.postalCode ?? '',
+}) }}
+
+{{ forms.textField({
+    label: 'Country'|t('beacon'),
+    instructions: 'ISO 3166-1 alpha-2 country code preferred (e.g. `US`, `DE`, `GB`).'|t('beacon'),
+    name: 'identityAdvanced[addressCountry]',
+    value: advanced.addressCountry ?? '',
+}) }}
+
+<hr>
+
+<h2 class="heading">{{ 'Geo coordinates'|t('beacon') }}</h2>
+<p class="light">{{ 'Optional — only emitted when both lat and lng are set. Useful for local-business / map-pin entities.'|t('beacon') }}</p>
+
+{{ forms.textField({
+    label: 'Latitude'|t('beacon'),
+    name: 'identityAdvanced[geoLatitude]',
+    value: advanced.geoLatitude ?? '',
+    placeholder: '47.376888',
+}) }}
+
+{{ forms.textField({
+    label: 'Longitude'|t('beacon'),
+    name: 'identityAdvanced[geoLongitude]',
+    value: advanced.geoLongitude ?? '',
+    placeholder: '8.541694',
+}) }}
+
+<div class="beacon-identity-org-only">
+<hr>
+
+<h2 class="heading">{{ 'Founding'|t('beacon') }} <span class="light">({{ 'Organization only'|t('beacon') }})</span></h2>
+
+{{ forms.textField({
+    label: 'Founding date'|t('beacon'),
+    instructions: 'ISO 8601 (YYYY or YYYY-MM-DD).'|t('beacon'),
+    name: 'identityAdvanced[foundingDate]',
+    value: advanced.foundingDate ?? '',
+    placeholder: '1999-04-23',
+}) }}
+
+{{ forms.textField({
+    label: 'Founding location'|t('beacon'),
+    name: 'identityAdvanced[foundingLocation]',
+    value: advanced.foundingLocation ?? '',
+}) }}
+
+{{ forms.textareaField({
+    label: 'Founder(s)'|t('beacon'),
+    instructions: 'One name per line. Each becomes a `Person` node under `founder`.'|t('beacon'),
+    name: 'identityAdvanced[founder]',
+    value: (advanced.founder ?? '') is iterable ? (advanced.founder ?? '')|join("\n") : (advanced.founder ?? ''),
+    rows: 3,
+}) }}
+
+<hr>
+
+<h2 class="heading">{{ 'Contact point'|t('beacon') }} <span class="light">({{ 'Organization only'|t('beacon') }})</span></h2>
+<p class="light">{{ 'Adds a `contactPoint` node, useful for customer-service / sales endpoints distinct from the main email/phone.'|t('beacon') }}</p>
+
+{{ forms.textField({
+    label: 'Contact type'|t('beacon'),
+    instructions: 'Free-form label, e.g. customer service, sales, technical support.'|t('beacon'),
+    name: 'identityAdvanced[contactType]',
+    value: advanced.contactType ?? '',
+}) }}
+
+{{ forms.textField({
+    label: 'Contact email'|t('beacon'),
+    name: 'identityAdvanced[contactEmail]',
+    value: advanced.contactEmail ?? '',
+    type: 'email',
+}) }}
+
+{{ forms.textField({
+    label: 'Contact telephone'|t('beacon'),
+    name: 'identityAdvanced[contactTelephone]',
+    value: advanced.contactTelephone ?? '',
+}) }}
+
+</div>
+
+<div class="beacon-identity-person-only">
+<hr>
+
+<h2 class="heading">{{ 'Person details'|t('beacon') }} <span class="light">({{ 'Person only'|t('beacon') }})</span></h2>
+
+{{ forms.textField({
+    label: 'Given name'|t('beacon'),
+    name: 'identityAdvanced[givenName]',
+    value: advanced.givenName ?? '',
+}) }}
+
+{{ forms.textField({
+    label: 'Family name'|t('beacon'),
+    name: 'identityAdvanced[familyName]',
+    value: advanced.familyName ?? '',
+}) }}
+
+{{ forms.textField({
+    label: 'Job title'|t('beacon'),
+    name: 'identityAdvanced[jobTitle]',
+    value: advanced.jobTitle ?? '',
+}) }}
+
+{{ forms.textField({
+    label: 'Birth place'|t('beacon'),
+    name: 'identityAdvanced[birthPlace]',
+    value: advanced.birthPlace ?? '',
+}) }}
+
+</div>
+
+<hr>
+
+<h2 class="heading">{{ 'Legal'|t('beacon') }}</h2>
+
+{{ forms.textField({
+    label: 'Legal name'|t('beacon'),
+    instructions: 'Full registered legal name when it differs from the display name above.'|t('beacon'),
+    name: 'identityAdvanced[legalName]',
+    value: advanced.legalName ?? '',
+}) }}
+
+{{ forms.textField({
+    label: 'Tax ID'|t('beacon'),
+    instructions: 'VAT ID, EIN, ABN, etc. Emitted as `taxID`.'|t('beacon'),
+    name: 'identityAdvanced[taxID]',
+    value: advanced.taxID ?? '',
+}) }}
+
+{{ forms.textField({
+    label: 'NAICS code'|t('beacon'),
+    instructions: 'North American Industry Classification System code.'|t('beacon'),
+    name: 'identityAdvanced[naics]',
+    value: advanced.naics ?? '',
+}) }}
+
+{{ forms.textField({
+    label: 'DUNS number'|t('beacon'),
+    instructions: 'Dun & Bradstreet identifier (9 digits).'|t('beacon'),
+    name: 'identityAdvanced[duns]',
+    value: advanced.duns ?? '',
+}) }}
+
+{{ forms.textField({
+    label: 'ISO 6523 identifier'|t('beacon'),
+    instructions: 'International identifier scheme — e.g. EU LEI, Belgian KBO.'|t('beacon'),
+    name: 'identityAdvanced[iso6523Code]',
+    value: advanced.iso6523Code ?? '',
+}) }}
+
+<hr>
+
+<h2 class="heading">{{ 'Topics & languages'|t('beacon') }}</h2>
+
+{{ forms.textareaField({
+    label: 'Topics / expertise'|t('beacon'),
+    instructions: 'One topic per line. Emitted as `knowsAbout` on the identity node — Schema.org\'s hint to search engines about subject expertise.'|t('beacon'),
+    name: 'identityAdvanced[knowsAbout]',
+    value: (advanced.knowsAbout ?? [])|join("\n"),
+    rows: 4,
+}) }}
+
+{{ forms.textareaField({
+    label: 'Known languages'|t('beacon'),
+    instructions: 'One BCP-47 tag per line (en, en-US, de, fr-CA). Emitted as `knowsLanguage` — particularly useful when identityType is Person.'|t('beacon'),
+    name: 'identityAdvanced[knowsLanguage]',
+    value: (advanced.knowsLanguage ?? [])|join("\n"),
+    rows: 3,
+}) }}

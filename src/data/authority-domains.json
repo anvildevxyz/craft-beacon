@@ -1,0 +1,48 @@
+{
+  "_meta": {
+    "version": "2026-05-26",
+    "purpose": "Authority-weighted domain list for the GEO outbound-citation-density pillar. Tier 1 = academic / governmental / Wikidata-shaped reference corpora the Princeton GEO paper (arXiv 2311.09735) identified as highest-leverage citation sources. Tier 2 = curated tier-1 publishers from the same paper's training-corpus analysis.",
+    "source": "docs/GEO_CONTENT_SCORING.md (PR-D section)"
+  },
+  "domains": [
+    { "domain": "wikipedia.org", "tier": 1, "addedAt": "2026-05-26", "source": "Princeton GEO arXiv:2311.09735 — top citation surface in AI training data" },
+    { "domain": "*.wikipedia.org", "tier": 1, "addedAt": "2026-05-26", "source": "All Wikipedia language editions (de.wikipedia.org, fr.wikipedia.org, etc.)" },
+    { "domain": "wikidata.org", "tier": 1, "addedAt": "2026-05-26", "source": "Wikipedia sister project — entity graph backbone" },
+
+    { "domain": "*.edu", "tier": 1, "addedAt": "2026-05-26", "source": "US academic TLD — universally treated as authoritative by AI engines" },
+    { "domain": "*.gov", "tier": 1, "addedAt": "2026-05-26", "source": "US federal/state gov TLD" },
+    { "domain": "*.gov.uk", "tier": 1, "addedAt": "2026-05-26", "source": "UK gov TLD" },
+    { "domain": "*.gov.ch", "tier": 1, "addedAt": "2026-05-26", "source": "Swiss federal/cantonal gov TLD" },
+    { "domain": "*.ac.uk", "tier": 1, "addedAt": "2026-05-26", "source": "UK academic TLD" },
+    { "domain": "*.edu.au", "tier": 1, "addedAt": "2026-05-26", "source": "Australian academic TLD" },
+    { "domain": "europa.eu", "tier": 1, "addedAt": "2026-05-26", "source": "EU institutional umbrella" },
+    { "domain": "*.europa.eu", "tier": 1, "addedAt": "2026-05-26", "source": "EU institutional subdomains (ec.europa.eu, eur-lex, etc.)" },
+
+    { "domain": "nytimes.com", "tier": 2, "addedAt": "2026-05-26", "source": "Princeton corpus tier-1 publisher" },
+    { "domain": "theguardian.com", "tier": 2, "addedAt": "2026-05-26", "source": "Princeton corpus tier-1 publisher" },
+    { "domain": "ft.com", "tier": 2, "addedAt": "2026-05-26", "source": "Princeton corpus tier-1 publisher" },
+    { "domain": "reuters.com", "tier": 2, "addedAt": "2026-05-26", "source": "Princeton corpus tier-1 publisher" },
+    { "domain": "apnews.com", "tier": 2, "addedAt": "2026-05-26", "source": "Princeton corpus tier-1 publisher" },
+    { "domain": "bbc.com", "tier": 2, "addedAt": "2026-05-26", "source": "Princeton corpus tier-1 publisher" },
+    { "domain": "bbc.co.uk", "tier": 2, "addedAt": "2026-05-26", "source": "Princeton corpus tier-1 publisher (UK domain)" },
+    { "domain": "economist.com", "tier": 2, "addedAt": "2026-05-26", "source": "Princeton corpus tier-1 publisher" },
+    { "domain": "wsj.com", "tier": 2, "addedAt": "2026-05-26", "source": "Princeton corpus tier-1 publisher" },
+    { "domain": "washingtonpost.com", "tier": 2, "addedAt": "2026-05-26", "source": "Princeton corpus tier-1 publisher" },
+
+    { "domain": "nature.com", "tier": 2, "addedAt": "2026-05-26", "source": "Tier-1 scientific journal" },
+    { "domain": "science.org", "tier": 2, "addedAt": "2026-05-26", "source": "AAAS Science journal" },
+    { "domain": "nejm.org", "tier": 2, "addedAt": "2026-05-26", "source": "NEJM (New England Journal of Medicine)" },
+    { "domain": "thelancet.com", "tier": 2, "addedAt": "2026-05-26", "source": "The Lancet" },
+    { "domain": "cell.com", "tier": 2, "addedAt": "2026-05-26", "source": "Cell Press" },
+    { "domain": "pnas.org", "tier": 2, "addedAt": "2026-05-26", "source": "Proceedings of the National Academy of Sciences" },
+
+    { "domain": "nih.gov", "tier": 1, "addedAt": "2026-05-26", "source": "Already matched by *.gov; explicit entry simplifies audit" },
+    { "domain": "who.int", "tier": 2, "addedAt": "2026-05-26", "source": "World Health Organization" },
+    { "domain": "cdc.gov", "tier": 1, "addedAt": "2026-05-26", "source": "Already matched by *.gov; explicit entry for audit" },
+
+    { "domain": "ietf.org", "tier": 2, "addedAt": "2026-05-26", "source": "Internet Engineering Task Force — RFC home" },
+    { "domain": "w3.org", "tier": 2, "addedAt": "2026-05-26", "source": "World Wide Web Consortium" },
+    { "domain": "iso.org", "tier": 2, "addedAt": "2026-05-26", "source": "ISO standards body" },
+    { "domain": "iana.org", "tier": 2, "addedAt": "2026-05-26", "source": "IANA — root naming authority" }
+  ]
+}

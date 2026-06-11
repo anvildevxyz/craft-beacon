@@ -1,0 +1,85 @@
+{# Dashboard widget body for GeoScoreWidget. Reads from beacon_geo_score only;
+   no recompute happens here — saves on entries kick off async jobs. #}
+
+{% if not hasScores %}
+    <p class="light">
+        {{ 'No GEO scores yet. Save an entry in a section covered by the GEO score allowlist (Settings → GEO score) to trigger the first computation.'|t('beacon') }}
+    </p>
+{% else %}
+    <ul class="bullets">
+        <li>
+            <strong>{{ average }}/100</strong>
+            {{ 'site average composite'|t('beacon') }}
+            <span class="light">({{ distribution.total }} {{ 'scored entries'|t('beacon') }})</span>
+        </li>
+    </ul>
+
+    {# Distribution histogram: 5 bands rendered as labeled bars proportional
+       to share of total. Kept template-side (no JS) so it survives Cache. #}
+    <hr>
+    <h2 class="heading">{{ 'Distribution'|t('beacon') }}</h2>
+    <table class="data fullwidth beacon-geo-score-widget-distribution">
+        <tbody>
+            {% set bands = [
+                { key: 'top',   label: '80–100'|t('beacon'),  cls: 'top' },
+                { key: 'good',  label: '60–79'|t('beacon'),   cls: 'good' },
+                { key: 'fair',  label: '40–59'|t('beacon'),   cls: 'fair' },
+                { key: 'low',   label: '20–39'|t('beacon'),   cls: 'low' },
+                { key: 'stale', label: '0–19'|t('beacon'),    cls: 'stale' },
+            ] %}
+            {% for band in bands %}
+                {% set count = attribute(distribution, band.key) %}
+                {% set pct = distribution.total > 0 ? (count / distribution.total * 100)|round : 0 %}
+                <tr>
+                    <th class="thin">{{ band.label }}</th>
+                    <td>
+                        <div class="beacon-geo-score-widget-bar beacon-geo-score-widget-bar--{{ band.cls }}" style="--beacon-bar-width: {{ pct }}%; --beacon-bar-min-width: {{ count > 0 ? '2%' : '0%' }};" aria-hidden="true"></div>
+                    </td>
+                    <td class="thin right"><strong>{{ count }}</strong> <span class="light">({{ pct }}%)</span></td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if weakest %}
+        <hr>
+        <h2 class="heading">{{ 'Worst-scoring entries'|t('beacon') }}</h2>
+        <p class="light">{{ 'Triage these first — the weakest pillar is the highest-leverage single fix.'|t('beacon') }}</p>
+        <table class="data fullwidth beacon-geo-score-widget-entries">
+            <thead>
+                <tr>
+                    <th>{{ 'Entry'|t('beacon') }}</th>
+                    <th>{{ 'Weakest pillar'|t('beacon') }}</th>
+                    <th class="right">{{ 'Score'|t('beacon') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in weakest %}
+                    {% set entry = craft.entries().id(row.elementId).siteId(row.siteId).status(null).one() %}
+                    {% set editUrl = entry ? entry.cpEditUrl : null %}
+                    <tr>
+                        <td>
+                            {% if editUrl %}
+                                <a href="{{ editUrl }}">{{ row.title ?: ('Untitled #'|t('beacon') ~ row.elementId) }}</a>
+                            {% else %}
+                                {{ row.title ?: ('Untitled #'|t('beacon') ~ row.elementId) }}
+                            {% endif %}
+                            {% if row.url %}
+                                <span class="light"><br><code>{{ row.url|replace({ 'https://': '', 'http://': '' }) }}</code></span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if row.weakestPillarLabel %}
+                                {{ row.weakestPillarLabel }}
+                                <span class="light">({{ row.weakestPillarScore }}/10)</span>
+                            {% else %}
+                                <span class="light">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="right"><strong>{{ row.score }}</strong>/100</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+{% endif %}

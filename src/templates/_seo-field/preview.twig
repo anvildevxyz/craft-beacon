@@ -1,0 +1,208 @@
+{# Beacon SEO field — live multi-platform preview.
+
+   Server seeds initial values (so a non-JS render still shows something
+   sensible); BeaconSeoFieldAsset's JS rewires the preview to mirror the
+   editor inputs in real time, including pixel-accurate truncation per
+   platform. #}
+{% set preview = preview ?? {} %}
+{% set canonical = preview.canonical ?? '' %}
+{% set host = canonical|split('://') | last | split('/') | first %}
+{% set path = canonical|split('://') | last | split('/') | slice(1) | join('/') %}
+{% set previewId = 'beacon-seo-preview-' ~ random() %}
+{% set ogImage = preview.ogImage ?? '' %}
+{% set siteName = preview.siteName ?? '' %}
+{% set twitterCard = preview.twitterCard ?: 'summary_large_image' %}
+
+<div
+    class="beacon-preview"
+    id="{{ previewId }}"
+    data-beacon-preview
+    data-bp-field-name="{{ name ?? '' }}"
+    data-bp-site-name="{{ siteName }}"
+    data-bp-host="{{ host }}"
+    data-bp-path="{{ path }}"
+    data-bp-canonical="{{ canonical }}"
+    data-bp-og-image="{{ ogImage }}"
+    data-bp-twitter-card="{{ twitterCard }}"
+>
+    <div class="beacon-preview-toolbar">
+        <button type="button" class="beacon-preview-toggle" data-bp-hide-image aria-pressed="false">{{ 'Hide image'|t('beacon') }}</button>
+        <span class="light beacon-preview-toolbar-help">{{ 'See how cards look without a social image.'|t('beacon') }}</span>
+    </div>
+    <div class="beacon-preview-tabs" role="tablist">
+        <button type="button" class="beacon-preview-tab is-active" data-bp-tab="google" role="tab" aria-selected="true">
+            <span class="beacon-preview-tab-glyph" aria-hidden="true">G</span>
+            <span>{{ 'Google'|t('beacon') }}</span>
+        </button>
+        <button type="button" class="beacon-preview-tab" data-bp-tab="google-mobile" role="tab" aria-selected="false">
+            <span class="beacon-preview-tab-glyph" aria-hidden="true">📱</span>
+            <span>{{ 'Mobile'|t('beacon') }}</span>
+        </button>
+        <button type="button" class="beacon-preview-tab" data-bp-tab="facebook" role="tab" aria-selected="false">
+            <span class="beacon-preview-tab-glyph" aria-hidden="true">f</span>
+            <span>{{ 'Facebook'|t('beacon') }}</span>
+        </button>
+        <button type="button" class="beacon-preview-tab" data-bp-tab="linkedin" role="tab" aria-selected="false">
+            <span class="beacon-preview-tab-glyph" aria-hidden="true">in</span>
+            <span>{{ 'LinkedIn'|t('beacon') }}</span>
+        </button>
+        <button type="button" class="beacon-preview-tab" data-bp-tab="twitter" role="tab" aria-selected="false">
+            <span class="beacon-preview-tab-glyph" aria-hidden="true">𝕏</span>
+            <span>{{ 'X / Twitter'|t('beacon') }}</span>
+        </button>
+        <button type="button" class="beacon-preview-tab" data-bp-tab="slack" role="tab" aria-selected="false">
+            <span class="beacon-preview-tab-glyph" aria-hidden="true">#</span>
+            <span>{{ 'Slack / Discord'|t('beacon') }}</span>
+        </button>
+        <button type="button" class="beacon-preview-tab" data-bp-tab="pinterest" role="tab" aria-selected="false">
+            <span class="beacon-preview-tab-glyph" aria-hidden="true">P</span>
+            <span>{{ 'Pinterest'|t('beacon') }}</span>
+        </button>
+    </div>
+
+    <div class="beacon-preview-panels">
+        <div class="beacon-preview-panel is-active" data-bp-panel="google" role="tabpanel">
+            <div class="beacon-preview-meta">
+                <span class="beacon-preview-meta-label">{{ 'Google search — desktop'|t('beacon') }}</span>
+                <span class="beacon-preview-budget" data-bp-budget="google" data-bp-budget-title-px="580" data-bp-budget-desc-px="990"></span>
+            </div>
+            <div class="beacon-google-card">
+                <div class="beacon-google-card__url">
+                    <span class="beacon-google-card__favicon" data-bp-favicon></span>
+                    <div>
+                        <div class="beacon-google-card__host" data-bp-host-display>{{ host ?: '—' }}</div>
+                        <div class="beacon-google-card__breadcrumb" data-bp-path-display>{{ path|replace({'/': ' › '}) }}</div>
+                    </div>
+                </div>
+                <div class="beacon-google-card__title" data-bp-truncate="title" data-bp-budget-px="580" data-bp-font="20px arial, sans-serif">
+                    <span data-bp-text="title">{{ preview.title ?? '' }}</span>
+                </div>
+                <div class="beacon-google-card__desc" data-bp-truncate="description" data-bp-budget-px="990" data-bp-font="14px arial, sans-serif">
+                    <span data-bp-text="description">{{ preview.description ?? '' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="beacon-preview-panel" data-bp-panel="google-mobile" role="tabpanel" hidden>
+            <div class="beacon-preview-meta">
+                <span class="beacon-preview-meta-label">{{ 'Google search — mobile'|t('beacon') }}</span>
+                <span class="beacon-preview-budget" data-bp-budget="google-mobile"></span>
+            </div>
+            <div class="beacon-google-card beacon-google-card--mobile">
+                <div class="beacon-google-card__url">
+                    <span class="beacon-google-card__favicon" data-bp-favicon></span>
+                    <div>
+                        <div class="beacon-google-card__host" data-bp-host-display>{{ host ?: '—' }}</div>
+                    </div>
+                </div>
+                <div class="beacon-google-card__title" data-bp-truncate="title" data-bp-budget-px="350" data-bp-font="18px arial, sans-serif">
+                    <span data-bp-text="title">{{ preview.title ?? '' }}</span>
+                </div>
+                <div class="beacon-google-card__desc" data-bp-truncate="description" data-bp-budget-px="750" data-bp-font="13px arial, sans-serif">
+                    <span data-bp-text="description">{{ preview.description ?? '' }}</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="beacon-preview-panel" data-bp-panel="facebook" role="tabpanel" hidden>
+            <div class="beacon-preview-meta">
+                <span class="beacon-preview-meta-label">{{ 'Facebook share'|t('beacon') }}</span>
+                <span class="beacon-preview-budget" data-bp-budget="facebook"></span>
+            </div>
+            <div class="beacon-og-card beacon-og-card--facebook">
+                <div class="beacon-og-card__image" data-bp-image></div>
+                <div class="beacon-og-card__meta">
+                    <div class="beacon-og-card__domain" data-bp-host-display>{{ host|upper ?: '—' }}</div>
+                    <div class="beacon-og-card__title" data-bp-truncate="title" data-bp-budget-chars="88">
+                        <span data-bp-text="title">{{ preview.title ?? '' }}</span>
+                    </div>
+                    <div class="beacon-og-card__desc" data-bp-truncate="description" data-bp-budget-chars="200">
+                        <span data-bp-text="description">{{ preview.description ?? '' }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="beacon-preview-panel" data-bp-panel="linkedin" role="tabpanel" hidden>
+            <div class="beacon-preview-meta">
+                <span class="beacon-preview-meta-label">{{ 'LinkedIn share'|t('beacon') }}</span>
+                <span class="beacon-preview-budget" data-bp-budget="linkedin"></span>
+            </div>
+            <div class="beacon-og-card beacon-og-card--linkedin">
+                <div class="beacon-og-card__image" data-bp-image></div>
+                <div class="beacon-og-card__meta">
+                    <div class="beacon-og-card__title" data-bp-truncate="title" data-bp-budget-chars="120">
+                        <span data-bp-text="title">{{ preview.title ?? '' }}</span>
+                    </div>
+                    <div class="beacon-og-card__domain" data-bp-host-display>{{ host ?: '—' }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="beacon-preview-panel" data-bp-panel="twitter" role="tabpanel" hidden>
+            <div class="beacon-preview-meta">
+                <span class="beacon-preview-meta-label">{{ 'X / Twitter card'|t('beacon') }}</span>
+                <span class="beacon-preview-budget" data-bp-budget="twitter"></span>
+            </div>
+            <div class="beacon-twitter-card" data-bp-twitter-layout>
+                <div class="beacon-twitter-card__image" data-bp-image></div>
+                <div class="beacon-twitter-card__meta">
+                    <div class="beacon-twitter-card__title" data-bp-truncate="title" data-bp-budget-chars="70">
+                        <span data-bp-text="title">{{ preview.title ?? '' }}</span>
+                    </div>
+                    <div class="beacon-twitter-card__desc" data-bp-truncate="description" data-bp-budget-chars="200">
+                        <span data-bp-text="description">{{ preview.description ?? '' }}</span>
+                    </div>
+                    <div class="beacon-twitter-card__domain" data-bp-host-display>{{ host ?: '—' }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="beacon-preview-panel" data-bp-panel="slack" role="tabpanel" hidden>
+            <div class="beacon-preview-meta">
+                <span class="beacon-preview-meta-label">{{ 'Slack / Discord unfurl'|t('beacon') }}</span>
+                <span class="beacon-preview-budget" data-bp-budget="slack"></span>
+            </div>
+            <div class="beacon-slack-card">
+                <div class="beacon-slack-card__bar" aria-hidden="true"></div>
+                <div class="beacon-slack-card__body">
+                    <div class="beacon-slack-card__source">
+                        <span class="beacon-slack-card__favicon" data-bp-favicon></span>
+                        <span data-bp-site-display>{{ siteName ?: host ?: '—' }}</span>
+                    </div>
+                    <div class="beacon-slack-card__title">
+                        <span data-bp-text="title">{{ preview.title ?? '' }}</span>
+                    </div>
+                    <div class="beacon-slack-card__desc" data-bp-truncate="description" data-bp-budget-chars="300">
+                        <span data-bp-text="description">{{ preview.description ?? '' }}</span>
+                    </div>
+                    <div class="beacon-slack-card__thumb" data-bp-image></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="beacon-preview-panel" data-bp-panel="pinterest" role="tabpanel" hidden>
+            <div class="beacon-preview-meta">
+                <span class="beacon-preview-meta-label">{{ 'Pinterest pin'|t('beacon') }}</span>
+                <span class="beacon-preview-budget" data-bp-budget="pinterest"></span>
+            </div>
+            <div class="beacon-pinterest-card">
+                <div class="beacon-pinterest-card__image" data-bp-image></div>
+                <div class="beacon-pinterest-card__body">
+                    <div class="beacon-pinterest-card__title" data-bp-truncate="title" data-bp-budget-chars="100">
+                        <span data-bp-text="title">{{ preview.title ?? '' }}</span>
+                    </div>
+                    <div class="beacon-pinterest-card__desc" data-bp-truncate="description" data-bp-budget-chars="500">
+                        <span data-bp-text="description">{{ preview.description ?? '' }}</span>
+                    </div>
+                    <div class="beacon-pinterest-card__source" data-bp-host-display>{{ host ?: '—' }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="beacon-preview-image-meta" data-bp-image-meta hidden>
+        <span class="beacon-preview-image-dot" data-bp-image-dot></span>
+        <span data-bp-image-msg></span>
+    </div>
+</div>

@@ -1,0 +1,60 @@
+includes:
+    - vendor/craftcms/phpstan/phpstan.neon
+
+parameters:
+    level: 7
+    paths:
+        - src
+        - tests
+    excludePaths:
+        - vendor
+        # Codeception-backed integration suite + its support/bootstrap: the actor
+        # pattern (\IntegrationTester, _generated), global-namespace helpers, and
+        # craft\test framework magic aren't statically analysable. The unit suite
+        # (tests/unit) stays analysed.
+        - tests/integration
+        - tests/_support
+        - tests/_craft
+        - tests/_bootstrap.php
+    bootstrapFiles:
+        - vendor/autoload.php
+        - vendor/craftcms/cms/bootstrap/console.php
+    ignoreErrors:
+        - '#Plugin::\$plugin#'
+        # craftcms/commerce is an optional runtime dep (in `suggest`, guarded by
+        # class_exists). Not installed during static analysis, so suppress
+        # references in the integration boundary file only.
+        -
+            message: '#unknown class#'
+            path: src/integrations/CommerceIntegration.php
+        -
+            message: '#STATUS_LIVE on an unknown class#'
+            path: src/integrations/CommerceIntegration.php
+        # Craft convention: migrations call `addColumn($table, $name, $this->string())`
+        # where `$this->string()` returns a ColumnSchemaBuilder. Yii's runtime
+        # accepts both string and ColumnSchemaBuilder (via __toString), but the
+        # phpstub is stricter. Suppress the consistent false positive.
+        -
+            message: '#Parameter \#3 \$type of method yii\\db\\Migration::addColumn\(\) expects string, yii\\db\\ColumnSchemaBuilder given#'
+            path: src/migrations/
+        # RegisterGqlTypesEvent::$types is annotated array<class-string<SingularTypeInterface>>,
+        # but Craft's own gql base ObjectType does not implement SingularTypeInterface — the
+        # runtime registers any ObjectType-based class. The annotation is stricter than reality.
+        -
+            message: '#Property craft\\events\\RegisterGqlTypesEvent::\$types .* does not accept array<string>#'
+            path: src/Plugin.php
+        # geoScorePillarWeights is persisted config (project config / DB), so the
+        # is_string()/is_numeric() guard against malformed keys/values is real
+        # defensive code. The property's array<string, float> phpdoc makes PHPStan
+        # consider the check redundant ("always true") — annotation stricter than
+        # persisted-data reality, like the GqlTypes/migrations cases above.
+        -
+            message: '#Result of && is always true.#'
+            path: src/services/GeoScoreService.php
+        # Craft::$app is typed non-nullable in the stubs but IS null when Craft is
+        # not bootstrapped (unit-test context). The ?-> guards are correct defensive
+        # code; the stub annotation is stricter than the runtime contract.
+        -
+            message: '#Using nullsafe method call on non-nullable type#'
+            path: src/variables/BeaconVariable.php
+    reportUnmatchedIgnoredErrors: false

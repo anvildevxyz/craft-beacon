@@ -1,0 +1,41 @@
+{% import "_includes/forms.twig" as forms %}
+
+<h2 class="heading first">{{ 'General defaults'|t('beacon') }}</h2>
+<p class="light">{{ 'Global title/description fallbacks used when entries do not define SEO values.'|t('beacon') }}</p>
+<hr>
+
+{{ forms.textField({
+    label: 'Title template'|t('beacon'),
+    instructions: 'Used when an entry has no SEO Title set. Tokens: {title}, {siteName}.'|t('beacon'),
+    name: 'titleTemplate',
+    value: settings.titleTemplate,
+    first: true,
+}) }}
+
+{{ forms.textareaField({
+    label: 'Default description template'|t('beacon'),
+    instructions: 'Used when an entry has no SEO Description set. Tokens: {title}, {siteName}.'|t('beacon'),
+    name: 'descriptionTemplate',
+    value: settings.descriptionTemplate,
+    rows: 2,
+}) }}
+
+<hr>
+
+<h2 class="heading">{{ 'Default social image'|t('beacon') }}</h2>
+<p class="light">{{ 'Fallback Open Graph / Twitter image when entries do not set their own.'|t('beacon') }}</p>
+
+{% set defaultSocialImage = settings.defaultSocialImageId
+    ? craft.assets().id(settings.defaultSocialImageId).status(null).one()
+    : null %}
+{{ forms.elementSelectField({
+    label: 'Default social image'|t('beacon'),
+    instructions: 'Used when an entry has no per-entry image. Recommended 1200×630.'|t('beacon'),
+    id: 'defaultSocialImageId',
+    name: 'defaultSocialImageId',
+    elementType: 'craft\\elements\\Asset',
+    elements: defaultSocialImage ? [defaultSocialImage] : [],
+    limit: 1,
+    viewMode: 'large',
+    criteria: { kind: 'image' },
+}) }}

@@ -1,0 +1,125 @@
+{% extends '_layouts/cp.twig' %}
+{% set selectedSubnavItem = 'schemas' %}
+{% import '_includes/forms.twig' as forms %}
+{% set title = schema.id ? ('Edit schema'|t('beacon')) : ('New schema'|t('beacon')) %}
+{% set fullPageForm = true %}
+{% set crumbs = [
+    { label: 'Beacon'|t('beacon'), url: cpUrl('beacon') },
+    { label: 'Schemas'|t('beacon'), url: cpUrl('beacon/schemas') },
+] %}
+
+{% set formActions = [{
+    label: 'Save and continue editing'|t('beacon'),
+    redirect: 'beacon/schemas/{id}'|hash,
+    shortcut: true,
+    retainScroll: true,
+}] %}
+
+{# Build the dropdown from SchemaService::registeredTypes() so adding a type
+   in Plugin.php (or via the `config/beacon.php` `schemaTypes` extension)
+   automatically shows up here — no twig edit needed. #}
+{% set schemaTypeOptions = {} %}
+{% for type in schemaTypes %}
+    {% set schemaTypeOptions = schemaTypeOptions|merge({ (type): type }) %}
+{% endfor %}
+
+{% block content %}
+    <input type="hidden" name="action" value="beacon/schemas/save">
+    <input type="hidden" name="schemaId" value="{{ schema.id }}">
+    {{ redirectInput('beacon/schemas') }}
+    {{ csrfInput() }}
+
+    <h2 class="heading first">{{ 'Match'|t('beacon') }}</h2>
+    <p class="light">{{ 'Pick the entry type this schema applies to.'|t('beacon') }}</p>
+
+    {{ forms.selectField({
+        label: 'Entry type'|t('beacon'),
+        id: 'entryTypeHandle',
+        name: 'entryTypeHandle',
+        value: schema.entryTypeHandle,
+        options: entryTypes,
+        required: true,
+        first: true,
+    }) }}
+
+    <hr>
+
+    <h2>{{ 'Schema output'|t('beacon') }}</h2>
+    <p class="light">{{ 'Choose the schema.org type and define how its properties are populated from the entry.'|t('beacon') }}</p>
+
+    {{ forms.selectField({
+        label: 'Schema type'|t('beacon'),
+        id: 'schemaType',
+        name: 'schemaType',
+        value: schema.schemaType,
+        options: schemaTypeOptions,
+        required: true,
+    }) }}
+
+    {# Guided property-mapping builder. Progressive enhancement: the raw JSON
+       textarea below is the canonical posted field and works without JS; the
+       builder (beacon-cp.js) hides it, renders one input per schema.org property
+       from the SchemaPropertyRegistry, and keeps the textarea in sync. #}
+    <div class="field">
+        <div class="heading">
+            <label>{{ 'Property mapping'|t('beacon') }}</label>
+        </div>
+        <div class="instructions">
+            <p>{{ 'Fill in the value for each schema.org property. Reference entry fields with {handle} placeholders — e.g. {title} or {seo.description}. Leave a property blank to omit it.'|t('beacon') }}</p>
+        </div>
+
+        <div id="beacon-schema-builder"
+             data-beacon-schema-builder
+             data-registry="{{ schemaProperties|json_encode|e('html_attr') }}"
+             data-mapping="{{ (schema.mapping ?? '{}')|e('html_attr') }}"
+             data-type-select="#schemaType"
+             data-entry-type-select="#entryTypeHandle"
+             data-suggest-action="{{ suggestUrl }}"
+             data-preview-action="{{ previewUrl }}"></div>
+
+        {# Fallback / advanced raw-JSON editor. #}
+        {{ forms.textarea({
+            name: 'mapping',
+            id: 'mapping',
+            value: schema.mapping ?? '{}',
+            rows: 10,
+            class: 'code',
+            placeholder: '{}',
+        }) }}
+        <div class="instructions" data-bsb-raw-help>
+            <p>{{ 'JSON object mapping each schema.org property to a template string. Example: {"headline": "{title}", "description": "{seo.description}"}'|t('beacon') }}</p>
+        </div>
+    </div>
+{% endblock %}
+
+{% block details %}
+    <div class="meta">
+        {{ forms.lightswitchField({
+            label: 'Enabled'|t('beacon'),
+            id: 'enabled',
+            name: 'enabled',
+            on: schema.enabled ?? true,
+        }) }}
+    </div>
+
+    {% if schema.id %}
+        <div class="meta read-only">
+            <div class="data">
+                <h5 class="heading">{{ 'Sort order'|t('beacon') }}</h5>
+                <div class="value">{{ schema.sortOrder }}</div>
+            </div>
+            {% if schema.dateCreated %}
+                <div class="data">
+                    <h5 class="heading">{{ 'Created'|t('beacon') }}</h5>
+                    <div class="value">{{ schema.dateCreated|datetime('short') }}</div>
+                </div>
+            {% endif %}
+            {% if schema.dateUpdated %}
+                <div class="data">
+                    <h5 class="heading">{{ 'Updated'|t('beacon') }}</h5>
+                    <div class="value">{{ schema.dateUpdated|datetime('short') }}</div>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+{% endblock %}

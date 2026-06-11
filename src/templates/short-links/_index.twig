@@ -1,0 +1,11 @@
+{% extends '_layouts/elementindex' %}
+
+{% set title = 'Short links'|t('beacon') %}
+{% set elementType = 'anvildev\\beacon\\elements\\ShortLinkElement' %}
+{% set selectedSubnavItem = 'shortLinks' %}
+
+{% block actionButton %}
+    <a href="{{ url('beacon/short-links/new') }}" class="btn submit add icon">
+        {{ 'New short link'|t('beacon') }}
+    </a>
+{% endblock %}

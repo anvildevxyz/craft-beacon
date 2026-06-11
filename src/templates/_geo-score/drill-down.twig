@@ -1,0 +1,65 @@
+{% extends '_layouts/cp' %}
+
+{% set title = ('GEO score for {title}'|t('beacon', { title: element ? element.title : ('#' ~ elementId) })) %}
+{% set crumbs = [
+    { label: 'Beacon'|t('beacon'), url: cpUrl('beacon') },
+    { label: 'GEO score'|t('beacon'), url: cpUrl('beacon') },
+] %}
+
+{% block actionButton %}
+    <div class="beacon-geo-score-drilldown__actions">
+        <div class="btngroup">
+            {% if element and element.cpEditUrl %}
+                <a class="btn" href="{{ element.cpEditUrl }}">{{ 'Open entry'|t('beacon') }}</a>
+            {% endif %}
+            {% if canRecompute %}
+                <button type="button"
+                        class="btn submit"
+                        data-beacon-recompute
+                        data-element-id="{{ elementId }}"
+                        data-site-id="{{ siteId }}">
+                    {{ 'Recompute now'|t('beacon') }}
+                </button>
+            {% endif %}
+        </div>
+        {% if canRecompute %}
+            <span class="beacon-geo-score-drilldown__status" data-beacon-recompute-status></span>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block content %}
+    <h2>{{ 'Per-pillar breakdown'|t('beacon') }}</h2>
+    <p class="light">{{ 'Pillars sorted weakest first. Focus on the top 1–2 for the highest-leverage edits.'|t('beacon') }}</p>
+
+    {% set sortedPillars = score.pillars|sort((a, b) => a.score <=> b.score) %}
+
+    <table class="data fullwidth beacon-geo-score-drilldown__pillars">
+        <thead>
+            <tr>
+                <th>{{ 'Pillar'|t('beacon') }}</th>
+                <th class="thin right">{{ 'Score'|t('beacon') }}</th>
+                <th>{{ 'Notes'|t('beacon') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pillar in sortedPillars %}
+                <tr class="beacon-geo-score-drilldown__row beacon-geo-score-drilldown__row--{{ pillar.band }}">
+                    <td><strong>{{ pillar.label }}</strong></td>
+                    <td class="thin right"><strong>{{ pillar.score }}</strong>/10</td>
+                    <td>
+                        {% if pillar.notes %}
+                            <ul class="beacon-geo-score-drilldown__notes">
+                                {% for note in pillar.notes %}
+                                    <li>{{ note }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <span class="light">{{ 'No actionable feedback — this pillar is at the top band.'|t('beacon') }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

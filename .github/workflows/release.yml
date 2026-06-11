@@ -1,0 +1,83 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  validate-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: mbstring, pdo, pdo_mysql, intl, gd
+          tools: composer:v2
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      # Full pipeline must be green before the tag is considered a release.
+      # Mirror CI exactly so the release gate matches what main is held to.
+      - name: ECS
+        run: vendor/bin/ecs check
+
+      - name: PHPStan
+        run: vendor/bin/phpstan analyse --memory-limit=1G
+
+      - name: PHPUnit
+        run: vendor/bin/phpunit
+
+      - name: PHPBench (budget enforcement)
+        run: vendor/bin/phpbench run tests/bench/RedirectMatcherBench.php --report=aggregate
+
+      # Pick the version-specific release-notes file when one exists
+      # (e.g. tag `v1.0.0` → `docs/RELEASE_v1.0.0.md`). Fall back to the
+      # general CHANGELOG when no matching file is present.
+      - name: Resolve release notes
+        id: notes
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG#v}"
+          NOTES_FILE="docs/RELEASE_v${VERSION}.md"
+          if [ -f "$NOTES_FILE" ]; then
+            echo "file=$NOTES_FILE" >> "$GITHUB_OUTPUT"
+          else
+            echo "file=CHANGELOG.md" >> "$GITHUB_OUTPUT"
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+
+      - name: Confirm composer.json version matches the tag
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG#v}"
+          COMPOSER_VERSION=$(php -r 'echo json_decode(file_get_contents("composer.json"))->version;')
+          if [ "$VERSION" != "$COMPOSER_VERSION" ]; then
+            echo "::error::tag $TAG does not match composer.json version $COMPOSER_VERSION"
+            exit 1
+          fi
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.notes.outputs.tag }}
+          name: ${{ steps.notes.outputs.tag }}
+          body_path: ${{ steps.notes.outputs.file }}
+          draft: false
+          prerelease: ${{ contains(steps.notes.outputs.tag, '-') }}
+
+      # Packagist auto-pulls on tag via webhook; no explicit publish step
+      # needed for a composer-distributed plugin. Document this here so the
+      # release flow is self-explanatory.
+      - name: Packagist auto-publish reminder
+        run: |
+          echo "Packagist will pull this tag automatically via its GitHub webhook."
+          echo "If publication doesn't appear within a few minutes, manually update at https://packagist.org/packages/anvildev/craft-beacon"

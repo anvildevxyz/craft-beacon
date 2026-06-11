@@ -1,0 +1,13 @@
+{% import '_includes/forms.twig' as forms %}
+<div class="warning">
+    {{ 'This script is emitted verbatim. Only enter trusted code.'|t('beacon') }}
+</div>
+{{ forms.textareaField({
+    label: 'HTML'|t('beacon'),
+    name: 'config[html]',
+    value: script.config.html ?? '',
+    rows: 8,
+    placeholder: '<script>...</script>'|t('beacon'),
+    required: true,
+    errors: script.getErrors('config.html'),
+}) }}

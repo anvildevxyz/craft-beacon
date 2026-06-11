@@ -1,0 +1,26 @@
+actor: Tester
+paths:
+  tests: tests
+  output: tests/_output
+  data: tests/_data
+  support: tests/_support
+  envs: tests/_envs
+bootstrap: _bootstrap.php
+settings:
+  params:
+    - tests/.env
+modules:
+  config:
+    \craft\test\Craft:
+      configFile: 'tests/_craft/config/test.php'
+      entryUrl: 'https://craft-plugin-dev.ddev.site/index.php'
+      projectConfig: {}
+      migrations: []
+      plugins:
+        - handle: beacon
+          class: anvildev\beacon\Plugin
+      cleanup: true
+      transaction: true
+      dbSetup:
+        clean: true
+        setupCraft: true

@@ -1,0 +1,36 @@
+{% if bots is empty %}
+    <p>{{ 'No AI bot activity in this time range.'|t('beacon') }}</p>
+{% else %}
+    <table class="data fullwidth">
+        <thead>
+            <tr>
+                <th>{{ 'Bot'|t('beacon') }}</th>
+                <th>{{ 'Hits'|t('beacon') }}</th>
+                <th>{{ 'Last seen'|t('beacon') }}</th>
+                <th>{{ 'Top paths'|t('beacon') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for bot in bots %}
+            <tr>
+                <td><strong>{{ bot.name }}</strong></td>
+                <td>{{ bot.hits|number }}</td>
+                <td>{{ bot.lastSeen|datetime('short') }}</td>
+                <td>
+                    <ul class="beacon-widget-path-list">
+                    {% for p in bot.paths %}
+                        <li>{{ p.path }} ({{ p.hits }})</li>
+                    {% endfor %}
+                    </ul>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+{% if silentBots %}
+    <p class="beacon-widget-footnote">
+        <small>{{ 'No activity from'|t('beacon') }}: {{ silentBots|join(', ') }}</small>
+    </p>
+{% endif %}

@@ -1,0 +1,81 @@
+{% extends '_layouts/cp.twig' %}
+{% set selectedSubnavItem = 'tracking' %}
+{% import '_includes/forms.twig' as forms %}
+
+{% set title = script.uid ? 'Edit Script'|t('beacon') : 'New Script'|t('beacon') %}
+{% set fullPageForm = true %}
+{% set crumbs = [
+    { label: 'Beacon'|t('beacon'), url: cpUrl('beacon') },
+    { label: 'Tracking Scripts'|t('beacon'), url: cpUrl('beacon/tracking') },
+] %}
+{% set fixed = provider.fixedPlacements %}
+
+{% block content %}
+    {{ csrfInput() }}
+    {{ actionInput('beacon/tracking/save') }}
+    {{ redirectInput('beacon/tracking') }}
+    {% if script.uid %}{{ hiddenInput('uid', script.uid) }}{% endif %}
+    {{ hiddenInput('provider', script.provider) }}
+
+    {{ forms.textField({
+        label: 'Name'|t('beacon'),
+        id: 'name',
+        name: 'name',
+        value: script.name,
+        required: true,
+        errors: script.getErrors('name'),
+        first: true,
+    }) }}
+
+    {{ forms.textField({
+        label: 'Sort Order'|t('beacon'),
+        instructions: 'Lower numbers render first within the same placement.'|t('beacon'),
+        id: 'sortOrder',
+        name: 'sortOrder',
+        value: script.sortOrder,
+        type: 'number',
+    }) }}
+
+    {% set fieldsTemplate = provider.fieldsTemplate %}
+    {% if fieldsTemplate %}
+        <hr>
+        <h2>{{ 'Configuration'|t('beacon') }}</h2>
+        {% include fieldsTemplate ignore missing with { script: script, provider: provider } %}
+    {% endif %}
+
+    {% if not fixed %}
+        {{ forms.selectField({
+            label: 'Placement'|t('beacon'),
+            instructions: 'Where the script tag is injected on the rendered page.'|t('beacon'),
+            id: 'placement',
+            name: 'placement',
+            value: script.placement,
+            options: [
+                { label: '<head>'|t('beacon'), value: 'head' },
+                { label: '<body> start'|t('beacon'), value: 'bodyStart' },
+                { label: '<body> end'|t('beacon'), value: 'bodyEnd' },
+            ],
+        }) }}
+    {% endif %}
+
+    {% if sites|length > 1 %}
+        <hr>
+        <h2>{{ 'Per-Site Overrides'|t('beacon') }}</h2>
+        <p class="light beacon-site-overrides__help">
+            {{ 'Tick a site to disable this script there. Unticked sites load it normally.'|t('beacon') }}
+        </p>
+        <div class="beacon-site-overrides__grid" role="group" aria-label="{{ 'Sites to disable this script on'|t('beacon') }}">
+            {% for site in sites %}
+                {% set ovr = script.siteOverrides[site.uid] ?? null %}
+                <div class="beacon-site-overrides__item">
+                    {{ forms.checkbox({
+                        label: site.name,
+                        name: 'siteOverrides[' ~ site.uid ~ '][enabled]',
+                        value: '0',
+                        checked: (ovr.enabled ?? null) is same as(false),
+                    }) }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+{% endblock %}

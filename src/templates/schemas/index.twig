@@ -1,0 +1,98 @@
+{% extends '_layouts/cp.twig' %}
+{% set selectedSubnavItem = 'schemas' %}
+{% import '_includes/forms.twig' as forms %}
+{% set title = 'Schemas'|t('beacon') %}
+{% set crumbs = [{ label: 'Beacon'|t('beacon'), url: cpUrl('beacon') }] %}
+
+{% set total = 0 %}
+{% for _, entryRows in grouped %}{% set total = total + entryRows|length %}{% endfor %}
+
+{% block actionButton %}
+    <a href="{{ url('beacon/schemas/new') }}" class="btn submit add icon">{{ 'New schema'|t('beacon') }}</a>
+{% endblock %}
+
+{% block content %}
+    {% if not total %}
+        <div class="beacon-empty">
+            <div class="beacon-empty__icon" aria-hidden="true">{}</div>
+            <h3>{{ 'No schemas defined yet'|t('beacon') }}</h3>
+            <p>{{ 'Create your first schema mapping to generate JSON-LD for entries.'|t('beacon') }}</p>
+            <div class="beacon-empty__actions">
+                <a href="{{ url('beacon/schemas/new') }}" class="btn submit">{{ 'Add first schema'|t('beacon') }}</a>
+            </div>
+        </div>
+    {% else %}
+        {% do view.registerJsFile('https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js') %}
+
+        {% for entryTypeHandle, entryRows in grouped %}
+            <div class="beacon-schema-group">
+                <h2 class="beacon-schema-group__heading">
+                    <code>{{ entryTypeHandle }}</code>
+                    <span class="light">{{ '{n, plural, =1{# schema} other{# schemas}}'|t('beacon', { n: entryRows|length }) }}</span>
+                </h2>
+
+                <table class="data fullwidth beacon-schema-table" data-entry-type="{{ entryTypeHandle }}">
+                    <thead>
+                        <tr>
+                            <th class="thin"></th>
+                            <th scope="col">{{ 'Schema type'|t('beacon') }}</th>
+                            <th scope="col">{{ 'Mapping'|t('beacon') }}</th>
+                            <th scope="col" class="thin">{{ 'Enabled'|t('beacon') }}</th>
+                            <th scope="col" class="thin"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for r in entryRows %}
+                        {% set mappingDecoded = r.mapping|json_decode %}
+                        {% set keys = mappingDecoded is iterable ? mappingDecoded|keys : [] %}
+                        {% set visibleKeys = keys|slice(0, 4) %}
+                        {% set extraCount = keys|length - visibleKeys|length %}
+                        <tr data-id="{{ r.id }}">
+                            <td class="thin beacon-schema-cell-drag">
+                                <span class="beacon-drag-handle move icon" aria-label="{{ 'Drag to reorder'|t('beacon') }}" title="{{ 'Drag to reorder'|t('beacon') }}"></span>
+                            </td>
+                            <th scope="row" data-title="{{ 'Schema type'|t('beacon') }}">
+                                <a href="{{ url('beacon/schemas/' ~ r.id) }}">{{ r.schemaType }}</a>
+                            </th>
+                            <td data-title="{{ 'Mapping'|t('beacon') }}">
+                                {% if keys|length %}
+                                    <span class="beacon-chip-list" title="{{ r.mapping }}">
+                                        {% for k in visibleKeys %}<span class="beacon-chip"><code>{{ k }}</code></span>{% endfor %}
+                                        {% if extraCount > 0 %}<span class="beacon-chip beacon-chip--more">+{{ extraCount }}</span>{% endif %}
+                                    </span>
+                                {% else %}
+                                    <span class="light">{{ 'No fields mapped'|t('beacon') }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="thin" data-title="{{ 'Enabled'|t('beacon') }}">
+                                {{ forms.lightswitch({
+                                    on: r.enabled,
+                                    small: true,
+                                    containerAttributes: {
+                                        data: {
+                                            'beacon-toggle': 'schema',
+                                            'beacon-id': r.id,
+                                        },
+                                    },
+                                }) }}
+                            </td>
+                            <td class="thin">
+                                <button type="button"
+                                        class="delete icon beacon-schema-delete"
+                                        data-schema-id="{{ r.id }}"
+                                        data-schema-label="{{ r.schemaType }}"
+                                        title="{{ 'Delete'|t('beacon') }}"
+                                        aria-label="{{ 'Delete'|t('beacon') }}"></button>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endfor %}
+
+        <div class="beacon-redirects-count meta beacon-schema-summary">
+            {{ '{total, plural, =1{# schema} other{# schemas}} across {groups, plural, =1{# entry type} other{# entry types}}'|t('beacon', { total: total, groups: grouped|length }) }}
+        </div>
+    {% endif %}
+{% endblock %}

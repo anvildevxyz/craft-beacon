@@ -1,0 +1,43 @@
+{% if not data.hasCache %}
+    <p>{{ 'No sitemap has been generated yet. Visit /sitemap.xml to prime the cache.'|t('beacon') }}</p>
+{% else %}
+    <div class="beacon-widget-stats">
+        <div>
+            <strong class="beacon-widget-stat__value">{{ data.totalUrls|number }}</strong>
+            <div class="light"><small>{{ 'URLs in cache'|t('beacon') }}</small></div>
+        </div>
+        <div>
+            <strong>{{ data.mode == 'chunked' ? 'Chunked'|t('beacon') : 'Single'|t('beacon') }}</strong>
+            {% if data.mode == 'chunked' %}
+                <div class="light"><small>{{ '{n} parts'|t('beacon', { n: data.parts }) }}</small></div>
+            {% endif %}
+        </div>
+        {% if data.lastRegen %}
+            <div>
+                <strong>{{ data.lastRegen|datetime('short') }}</strong>
+                <div class="light"><small>{{ 'last regenerated'|t('beacon') }}</small></div>
+            </div>
+        {% endif %}
+    </div>
+
+    <table class="data fullwidth">
+        <thead>
+            <tr>
+                <th>{{ 'Chunk'|t('beacon') }}</th>
+                <th>{{ 'URLs'|t('beacon') }}</th>
+                <th>{{ 'Size'|t('beacon') }}</th>
+                <th>{{ 'Generated'|t('beacon') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for c in data.chunks %}
+            <tr>
+                <td><code>{{ c.key }}</code></td>
+                <td>{{ c.urls|number }}</td>
+                <td>{{ (c.bytes / 1024)|number_format(1) }}{{ ' KB'|t('beacon') }}</td>
+                <td>{{ c.generatedAt ? c.generatedAt|datetime('short') : '—'|t('beacon') }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endif %}

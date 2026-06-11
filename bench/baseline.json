@@ -1,0 +1,13 @@
+{
+    "version": "1.0.0-beta.1",
+    "phpVersion": "8.2+",
+    "description": "Baseline performance numbers for Beacon's RedirectMatcher (pure-PHP). Craft-bootstrapped benchmarks (meta render, sitemap, widget query) are deferred to beta integration test setup.",
+    "benchmarks": {
+        "RedirectMatcherBench::benchExactMatch": { "median_us": 0.5, "budget_ms": 1.0 },
+        "RedirectMatcherBench::benchExactMiss": { "median_us": 0.5, "budget_ms": 1.0 },
+        "RedirectMatcherBench::benchGlobSingleSegment": { "median_us": 2.0, "budget_ms": 5.0 },
+        "RedirectMatcherBench::benchGlobMultiSegment": { "median_us": 2.0, "budget_ms": 5.0 },
+        "RedirectMatcherBench::benchRegexMatch": { "median_us": 2.0, "budget_ms": 5.0 }
+    },
+    "regressionThresholdMs": 5
+}

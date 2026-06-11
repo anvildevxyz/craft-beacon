@@ -1,0 +1,52 @@
+{% extends '_layouts/cp.twig' %}
+{% set selectedSubnavItem = 'crawlers' %}
+{% import '_includes/forms.twig' as forms %}
+{% set title = (rule ? 'Edit rule' : 'New rule')|t('beacon') %}
+{% set fullPageForm = true %}
+{% set crumbs = [
+    { label: 'Beacon'|t('beacon'), url: cpUrl('beacon') },
+    { label: 'Crawlers'|t('beacon'), url: cpUrl('beacon/crawlers/ai-crawlers') },
+    { label: 'AI crawlers'|t('beacon'), url: cpUrl('beacon/crawlers/ai-crawlers') },
+] %}
+
+{% block content %}
+    <input type="hidden" name="action" value="beacon/ai-crawlers/save-rule">
+    {% if rule %}
+        <input type="hidden" name="ruleId" value="{{ rule.id }}">
+    {% endif %}
+    {{ redirectInput('beacon/crawlers/ai-crawlers') }}
+    {{ csrfInput() }}
+
+    {{ forms.lightswitchField({
+        label: 'Enabled'|t('beacon'),
+        name: 'enabled',
+        on: rule ? rule.enabled : true,
+        first: true,
+    }) }}
+
+    {{ forms.textField({
+        label: 'Bot name'|t('beacon'),
+        instructions: 'Name of the bot this rule applies to (e.g., GPTBot, ClaudeBot).'|t('beacon'),
+        name: 'botName',
+        value: rule.botName|default(''),
+        required: true,
+    }) }}
+
+    {{ forms.textareaField({
+        label: 'Allow paths'|t('beacon'),
+        instructions: 'One path per line.'|t('beacon'),
+        name: 'allowPaths',
+        value: rule.allowPaths|default([])|join('\n'),
+        rows: 5,
+        class: 'fontMono',
+    }) }}
+
+    {{ forms.textareaField({
+        label: 'Disallow paths'|t('beacon'),
+        instructions: 'One path per line.'|t('beacon'),
+        name: 'disallowPaths',
+        value: rule.disallowPaths|default([])|join('\n'),
+        rows: 5,
+        class: 'fontMono',
+    }) }}
+{% endblock %}

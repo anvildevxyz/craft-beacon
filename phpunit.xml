@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         bootstrap="tests/bootstrap.php"
+         colors="true"
+         cacheDirectory=".phpunit.cache">
+    <!-- Unit suite only. The Craft-backed integration suite (tests/integration)
+         runs under Codeception with DB-transaction isolation — see codeception.yml
+         and `composer test:integration`. -->
+    <testsuites>
+        <testsuite name="unit">
+            <directory>tests/unit</directory>
+        </testsuite>
+    </testsuites>
+    <source restrictDeprecations="true" restrictNotices="true" restrictWarnings="true">
+        <include>
+            <directory>src</directory>
+        </include>
+        <exclude>
+            <!-- Generated data file (~65k lines); skews coverage, not hand-written logic. -->
+            <file>src/schemas/GeneratedSchemaCatalogue.php</file>
+        </exclude>
+    </source>
+    <groups>
+        <exclude>
+            <group>requires-craft</group>
+        </exclude>
+    </groups>
+</phpunit>

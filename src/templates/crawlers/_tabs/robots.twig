@@ -1,0 +1,25 @@
+{% import '_includes/forms.twig' as forms %}
+
+<input type="hidden" name="action" value="beacon/robots-settings/save">
+<input type="hidden" name="siteId" value="{{ site.id }}">
+{{ redirectInput('beacon/crawlers/robots?site=' ~ site.handle) }}
+{{ csrfInput() }}
+
+{% include 'beacon/_includes/site-selector' with { sites, site, baseUrl: cpUrl('beacon/crawlers/robots') } only %}
+
+{{ forms.textField({
+    label: 'Sitemap URL'|t('beacon'),
+    instructions: 'Use "auto" to derive from the site URL, or enter a full URL.'|t('beacon'),
+    name: 'sitemapUrl',
+    value: settings.sitemapUrl,
+    first: true,
+}) }}
+
+{{ forms.textareaField({
+    label: 'User-agent rules'|t('beacon'),
+    instructions: 'Standard robots.txt syntax. Each block starts with `User-agent:` followed by `Allow:` and/or `Disallow:` lines.'|t('beacon'),
+    name: 'userAgentRulesText',
+    value: userAgentRulesText,
+    rows: 12,
+    class: 'fontMono',
+}) }}

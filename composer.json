@@ -1,0 +1,79 @@
+{
+    "name": "anvildev/craft-beacon",
+    "description": "SEO and GEO for Craft 5 — meta, schema, redirects, llms.txt, AI crawler controls. API-first, with PHPBench-enforced performance budgets.",
+    "version": "1.0.0",
+    "type": "craft-plugin",
+    "license": "proprietary",
+    "keywords": ["craft", "cms", "craftcms", "seo", "geo", "schema", "llms.txt"],
+    "authors": [
+        {
+            "name": "Anvil Dev",
+            "homepage": "https://anvildev.xyz"
+        }
+    ],
+    "support": {
+        "email": "hello@anvildev.xyz",
+        "docs": "https://github.com/anvildevxyz/craft-beacon"
+    },
+    "require": {
+        "php": "^8.2",
+        "craftcms/cms": "^5.0",
+        "league/html-to-markdown": "^5.1"
+    },
+    "suggest": {
+        "craftcms/commerce": "Enable optional product sitemap integration (`beacon.sitemap.commerce.enabled`)."
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^10.5",
+        "phpstan/phpstan": "^1.11",
+        "craftcms/phpstan": "dev-main",
+        "craftcms/ecs": "dev-main",
+        "phpbench/phpbench": "^1.2",
+        "codeception/codeception": "^5.2",
+        "codeception/module-asserts": "^3.0",
+        "codeception/module-yii2": "^1.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "anvildev\\beacon\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "anvildev\\beacon\\tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "handle": "beacon",
+        "name": "Beacon",
+        "developer": "Anvil Dev",
+        "developerUrl": "https://anvildev.xyz",
+        "documentationUrl": "https://github.com/anvildevxyz/craft-beacon",
+        "changelogUrl": "https://raw.githubusercontent.com/anvildevxyz/craft-beacon/main/CHANGELOG.md",
+        "class": "anvildev\\beacon\\Plugin",
+        "installer-name": "beacon"
+    },
+    "config": {
+        "allow-plugins": {
+            "yiisoft/yii2-composer": true,
+            "craftcms/plugin-installer": true
+        },
+        "platform": {
+            "php": "8.2"
+        }
+    },
+    "scripts": {
+        "test": "phpunit",
+        "test:coverage": "phpunit --coverage-text --coverage-clover=coverage.xml",
+        "test:integration": "codecept run integration",
+        "test:all": ["@test", "@test:integration"],
+        "ecs": "ecs check",
+        "ecs-fix": "ecs check --fix",
+        "phpstan": "phpstan analyse --memory-limit=1G",
+        "check": ["@ecs", "@phpstan", "@test"],
+        "bench": "phpbench run tests/bench --report=aggregate",
+        "bench:baseline": "phpbench run tests/bench --report=aggregate --tag=baseline --store"
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}

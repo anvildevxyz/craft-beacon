@@ -1,0 +1,14 @@
+{% extends "_layouts/cp" %}
+
+{% set selectedSubnavItem = 'crawlers' %}
+{% set fullPageForm = selectedCrawlerTab != 'ai-crawlers' %}
+{% set title = 'Crawlers'|t('beacon') %}
+{% set crumbs = [{ label: 'Beacon'|t('beacon'), url: cpUrl('beacon') }] %}
+
+{% block sidebar %}
+    {% include 'beacon/crawlers/_sidebar' %}
+{% endblock %}
+
+{% block content %}
+    {% include 'beacon/crawlers/_tabs/' ~ selectedCrawlerTab %}
+{% endblock %}

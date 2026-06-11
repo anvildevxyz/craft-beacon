@@ -1,0 +1,53 @@
+{% set siteHandles = {} %}
+{% for s in sites %}{% set siteHandles = siteHandles|merge({(s.id): s.handle}) %}{% endfor %}
+
+<div class="beacon-indexnow-widget">
+    <div class="beacon-widget-stats">
+        <div>
+            <strong class="beacon-widget-stat__value beacon-widget-stat__value--lg">{{ counts.total|number }}</strong>
+            <div class="light"><small>{{ 'Submissions'|t('beacon') }}</small></div>
+        </div>
+        <div>
+            <strong class="beacon-widget-stat__value beacon-widget-stat__value--lg beacon-widget-stat__value--ok">{{ counts.ok|number }}</strong>
+            <div class="light"><small>{{ 'Accepted'|t('beacon') }}</small></div>
+        </div>
+        <div>
+            <strong class="beacon-widget-stat__value beacon-widget-stat__value--lg{{ counts.failed > 0 ? ' beacon-widget-stat__value--danger' : ' beacon-widget-stat__value--muted' }}">{{ counts.failed|number }}</strong>
+            <div class="light"><small>{{ 'Rejected'|t('beacon') }}</small></div>
+        </div>
+    </div>
+
+    {% if rows is empty %}
+        <p class="light">{{ 'No IndexNow submissions in this time range. Set `indexNowEnabled` to true to auto-submit on entry save, then add a per-site key with `craft beacon/index-now/generate-key` (or in config/beacon.php under `indexNowKeys`).'|t('beacon') }}</p>
+    {% else %}
+        <table class="data fullwidth">
+            <thead>
+                <tr>
+                    <th>{{ 'When'|t('beacon') }}</th>
+                    <th>{{ 'Site'|t('beacon') }}</th>
+                    <th>{{ 'URL'|t('beacon') }}</th>
+                    <th>{{ 'Status'|t('beacon') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for r in rows %}
+                <tr>
+                    <td>{{ r.submittedAt|datetime('short') }}</td>
+                    <td><code>{{ siteHandles[r.siteId] ?? r.siteId }}</code></td>
+                    <td>
+                        {% if r.firstUrl %}<small><a href="{{ r.firstUrl }}" target="_blank" rel="noopener">{{ r.firstUrl|slice(0, 70) }}{% if r.firstUrl|length > 70 %}…{% endif %}</a></small>{% else %}<span class="light">—</span>{% endif %}
+                        {% if r.urlCount > 1 %}<span class="light"> (+{{ r.urlCount - 1 }})</span>{% endif %}
+                    </td>
+                    <td>
+                        {% if r.succeeded %}
+                            <span class="beacon-status--ok">✓ {{ r.statusCode ?? 'ok'|t('beacon') }}</span>
+                        {% else %}
+                            <span class="beacon-status--danger" title="{{ r.note ?? '' }}">✗ {{ r.statusCode ?? 'err'|t('beacon') }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+</div>

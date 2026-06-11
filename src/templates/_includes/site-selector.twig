@@ -1,0 +1,30 @@
+{# Renders a CSP-friendly per-site selector for CP pages that scope state by `?site=<handle>`.
+   Usage: {% include 'beacon/_includes/site-selector' with { sites, site, baseUrl } %}
+   - `sites`: list<\craft\models\Site>
+   - `site`: current Site
+   - `baseUrl`: cpUrl(...) without query string
+#}
+{% import '_includes/forms.twig' as forms %}
+
+{% if sites|length > 1 %}
+    {% set siteOptions = [] %}
+    {% for s in sites %}
+        {% set siteOptions = siteOptions|merge([{ label: s.name, value: s.handle }]) %}
+    {% endfor %}
+    {# No `name` on purpose: this select only drives client-side navigation
+       (the JS below reads its value directly). Giving it a name would pull it
+       into the surrounding full-page form's serialized state, so Craft's
+       confirm-unload guard would treat a site switch as an unsaved change and
+       prompt "Leave this screen?" on every selection. #}
+    {{ forms.selectField({
+        label: 'Site'|t('beacon'),
+        id: 'site-selector',
+        options: siteOptions,
+        value: site.handle,
+        first: true,
+        inputAttributes: {
+            'data-beacon-site-selector': baseUrl,
+        },
+    }) }}
+    <hr>
+{% endif %}

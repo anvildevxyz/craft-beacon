@@ -1,0 +1,13 @@
+/vendor/
+/.phpunit.cache/
+/.phpunit.integration.cache/
+.phpunit.result.cache
+.DS_Store
+/.phpbench/
+/bench/.phpbench/
+/bench/reports/
+/storage/
+/tests/_output/
+/tests/_craft/storage/
+/tests/_support/_generated/
+/tests/.env

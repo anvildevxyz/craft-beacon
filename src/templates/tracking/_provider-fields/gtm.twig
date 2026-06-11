@@ -1,0 +1,10 @@
+{% import '_includes/forms.twig' as forms %}
+{{ forms.textField({
+    label: 'Container ID'|t('beacon'),
+    name: 'config[containerId]',
+    value: script.config.containerId ?? '',
+    placeholder: 'GTM-XXXXX'|t('beacon'),
+    required: true,
+    errors: script.getErrors('config.containerId'),
+    first: true,
+}) }}

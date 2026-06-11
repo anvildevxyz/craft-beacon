@@ -1,0 +1,42 @@
+{% set d = data %}
+
+{% if not d.enabled %}
+    <p class="light">{{ 'GEO Markdown is disabled. Enable it in Settings → GEO export and provenance.'|t('beacon') }}</p>
+{% else %}
+    <ul class="bullets">
+        <li>
+            <strong>{{ d.coveragePercent }}%</strong>
+            {{ 'coverage'|t('beacon') }}
+            <span class="light">({{ d.totalGenerated }}/{{ d.totalEligible }} {{ 'elements'|t('beacon') }})</span>
+        </li>
+        <li>{{ 'Queue depth'|t('beacon') }}: <strong>{{ d.queueDepth }}</strong></li>
+        {% if d.lastGenerated %}
+            <li>{{ 'Last generated'|t('beacon') }}: <span class="light">{{ d.lastGenerated }}</span></li>
+        {% endif %}
+    </ul>
+
+    {% if d.bySection %}
+        <hr>
+        <table class="data fullwidth">
+            <thead>
+                <tr>
+                    <th>{{ 'Section'|t('beacon') }}</th>
+                    <th class="right">{{ 'Generated'|t('beacon') }}</th>
+                    <th class="right">{{ 'Total'|t('beacon') }}</th>
+                    <th class="right">{{ '%'|t('beacon') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in d.bySection %}
+                    {% set pct = row.total > 0 ? (row.generated / row.total * 100)|round : 0 %}
+                    <tr>
+                        <td><code>{{ row.handle }}</code></td>
+                        <td class="right">{{ row.generated }}</td>
+                        <td class="right">{{ row.total }}</td>
+                        <td class="right">{{ pct }}%</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+{% endif %}

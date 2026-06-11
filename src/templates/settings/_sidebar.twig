@@ -1,0 +1,21 @@
+{% set settingsSubnavItems = {
+    'general': { label: 'General'|t('beacon'), url: cpUrl('beacon/settings/general') },
+    'robots': { label: 'Robots'|t('beacon'), url: cpUrl('beacon/settings/robots') },
+    'content': { label: 'Content defaults'|t('beacon'), url: cpUrl('beacon/settings/content') },
+    'organization': { label: 'Organization'|t('beacon'), url: cpUrl('beacon/settings/organization') },
+    'social': { label: 'Social'|t('beacon'), url: cpUrl('beacon/settings/social') },
+    'authors': { label: 'Authors'|t('beacon'), url: cpUrl('beacon/settings/authors') },
+    'geo': { label: 'GEO'|t('beacon'), url: cpUrl('beacon/settings/geo') },
+} %}
+
+<nav id="settings-nav">
+    <ul>
+        {% for key, item in settingsSubnavItems %}
+            <li>
+                <a href="{{ item.url }}" class="{% if key == selectedSettingsSubnavItem %}sel{% endif %}">
+                    {{ item.label }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+</nav>

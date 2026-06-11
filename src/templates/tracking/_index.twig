@@ -1,0 +1,103 @@
+{% extends '_layouts/cp.twig' %}
+{% import '_includes/forms.twig' as forms %}
+{% set selectedSubnavItem = 'tracking' %}
+{% set title = 'Tracking Scripts'|t('beacon') %}
+{% set crumbs = [{ label: 'Beacon'|t('beacon'), url: cpUrl('beacon') }] %}
+
+{% block actionButton %}
+    <div class="btngroup submit">
+        <a class="btn submit add icon" href="{{ url('beacon/tracking/new') }}">{{ 'New Script'|t('beacon') }}</a>
+        <div class="btn submit menubtn"></div>
+        <div class="menu">
+            <ul>
+                {% for handle, provider in providers %}
+                    <li><a href="{{ url('beacon/tracking/new', {provider: handle}) }}">{{ provider.displayName }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    {% if scripts is empty %}
+        <div class="zilch">{{ 'No tracking scripts configured.'|t('beacon') }}</div>
+    {% else %}
+        {% set providerOptions = [{ label: 'All providers'|t('beacon'), value: '' }] %}
+        {% for handle, provider in providers %}
+            {% set providerOptions = providerOptions|merge([{ label: provider.displayName, value: handle }]) %}
+        {% endfor %}
+        {% set placementOptions = [
+            { label: 'All placements'|t('beacon'), value: '' },
+            { label: '<head>'|t('beacon'), value: 'head' },
+            { label: '<body> start'|t('beacon'), value: 'bodyStart' },
+            { label: '<body> end'|t('beacon'), value: 'bodyEnd' },
+        ] %}
+
+        <div class="toolbar flex beacon-tracking-filters">
+            <label class="flex flex-nowrap beacon-filter-group">
+                <span class="light">{{ 'Provider'|t('beacon') }}</span>
+                {# Nameless on purpose: client-side filter only, never submitted. #}
+                {{ forms.select({
+                    id: 'tracking-filter-provider',
+                    options: providerOptions,
+                    inputAttributes: { 'data-tracking-filter': 'provider' },
+                }) }}
+            </label>
+            <label class="flex flex-nowrap beacon-filter-group">
+                <span class="light">{{ 'Placement'|t('beacon') }}</span>
+                {{ forms.select({
+                    id: 'tracking-filter-placement',
+                    options: placementOptions,
+                    inputAttributes: { 'data-tracking-filter': 'placement' },
+                }) }}
+            </label>
+            {{ forms.text({
+                id: 'tracking-filter-search',
+                placeholder: 'Search by name…'|t('beacon'),
+                inputAttributes: { 'data-tracking-filter': 'search', autocomplete: 'off' },
+            }) }}
+            <button type="button" class="btn" data-tracking-clear hidden>{{ 'Clear filters'|t('beacon') }}</button>
+            <div class="flex-grow"></div>
+            <span class="light" data-tracking-count></span>
+        </div>
+
+        <table class="data fullwidth" id="tracking-scripts-table">
+            <thead>
+                <tr>
+                    <th>{{ 'Name'|t('beacon') }}</th>
+                    <th>{{ 'Provider'|t('beacon') }}</th>
+                    <th>{{ 'Placement'|t('beacon') }}</th>
+                    <th class="thin"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for script in scripts %}
+                    {% set provider = providers[script.provider] ?? null %}
+                    {% set fixed = provider ? provider.fixedPlacements : null %}
+                    {% set placements = fixed ? fixed|map(p => p.value) : [script.placement] %}
+                    <tr data-provider="{{ script.provider }}"
+                        data-placement="{{ placements|join(' ') }}"
+                        data-name="{{ script.name|lower }}">
+                        <td><a href="{{ url('beacon/tracking/' ~ script.uid) }}">{{ script.name }}</a></td>
+                        <td>{{ provider ? provider.displayName : script.provider }}</td>
+                        <td>{{ placements|join('/') }}</td>
+                        <td class="thin">
+                            <div class="beacon-tracking-row-actions">
+                                <form method="post">
+                                    {{ csrfInput() }}
+                                    {{ actionInput('beacon/tracking/delete') }}
+                                    {{ hiddenInput('uid', script.uid) }}
+                                    <button type="submit" class="btn small submit error" data-confirm="{{ 'Delete this script?'|t('beacon') }}">{{ 'Delete'|t('beacon') }}</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <p class="light beacon-tracking-empty" data-tracking-empty hidden>
+            {{ 'No scripts match the selected filters.'|t('beacon') }}
+        </p>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,19 @@
+{% extends "_layouts/cp" %}
+{% import "_includes/forms.twig" as forms %}
+
+{% set fullPageForm = true %}
+{% set title = 'Beacon Settings'|t('beacon') %}
+{% set selectedSubnavItem = 'settings' %}
+
+{% block sidebar %}
+    {% include 'beacon/settings/_sidebar' %}
+{% endblock %}
+
+{% block content %}
+    <input type="hidden" name="action" value="beacon/settings/save">
+    <input type="hidden" name="tab" value="{{ selectedSettingsSubnavItem }}">
+    {{ redirectInput('beacon/settings/' ~ selectedSettingsSubnavItem) }}
+    {{ csrfInput() }}
+
+    {% include 'beacon/settings/_tabs/' ~ selectedSettingsSubnavItem %}
+{% endblock %}

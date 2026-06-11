@@ -1,0 +1,25 @@
+{% import '_includes/forms.twig' as forms %}
+
+<input type="hidden" name="action" value="beacon/humans-settings/save">
+<input type="hidden" name="siteId" value="{{ site.id }}">
+{{ redirectInput('beacon/crawlers/humans-txt?site=' ~ site.handle) }}
+{{ csrfInput() }}
+
+{% include 'beacon/_includes/site-selector' with { sites, site, baseUrl: cpUrl('beacon/crawlers/humans-txt') } only %}
+
+{{ forms.lightswitchField({
+    label: 'Enabled'|t('beacon'),
+    instructions: 'When disabled, /humans.txt returns 404.'|t('beacon'),
+    name: 'enabled',
+    on: settings.enabled,
+    first: true,
+}) }}
+
+{{ forms.textareaField({
+    label: 'Body'|t('beacon'),
+    instructions: 'Free-form humans.txt content. See https://humanstxt.org for the format.'|t('beacon'),
+    name: 'body',
+    value: settings.body,
+    rows: 16,
+    class: 'fontMono',
+}) }}

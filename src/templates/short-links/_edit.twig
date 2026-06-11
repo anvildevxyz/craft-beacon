@@ -1,0 +1,124 @@
+{% extends '_layouts/cp.twig' %}
+{% set selectedSubnavItem = 'shortLinks' %}
+{% import '_includes/forms.twig' as forms %}
+{% set title = shortLink.id ? ('Edit short link'|t('beacon')) : ('New short link'|t('beacon')) %}
+{% set fullPageForm = true %}
+{% set crumbs = [
+    { label: 'Beacon'|t('beacon'), url: cpUrl('beacon') },
+    { label: 'Short links'|t('beacon'), url: cpUrl('beacon/short-links') },
+] %}
+
+{% set statusOptions = [
+    { value: 301, label: '301 — Moved permanently'|t('beacon') },
+    { value: 302, label: '302 — Found (temporary)'|t('beacon') },
+    { value: 307, label: '307 — Temporary redirect'|t('beacon') },
+    { value: 308, label: '308 — Permanent redirect'|t('beacon') },
+] %}
+
+{% block content %}
+	<input type="hidden" name="action" value="beacon/short-links/save">
+	<input type="hidden" name="shortLinkId" value="{{ shortLink.id }}">
+	<input type="hidden" name="siteId" value="{{ currentSite.id }}">
+	{{ redirectInput('beacon/short-links') }}
+	{{ csrfInput() }}
+
+	{% if craft.app.isMultiSite %}
+		<div class="field first">
+			{{ forms.selectField({
+            label: 'Sites'|t('beacon'),
+            instructions: 'Which sites this short link is available on. All link data is shared across them.'|t('beacon'),
+            id: 'propagationMethod',
+            name: 'propagationMethod',
+            value: shortLink.propagationMethod.value ?? 'all',
+            options: [
+                { value: 'all', label: 'All sites'|t('beacon') },
+                { value: 'siteGroup', label: 'Sites in the same group'|t('beacon') },
+                { value: 'language', label: 'Sites with the same language'|t('beacon') },
+                { value: 'none', label: 'Only this site'|t('beacon') ~ ' (' ~ currentSite.name ~ ')' },
+            ],
+        }) }}
+		</div>
+	{% endif %}
+
+	{{ forms.textField({
+        label: 'Slug'|t('beacon'),
+        instructions: 'The vanity path, without a leading slash (e.g. <code>blackfriday</code>).'|t('beacon'),
+        id: 'slug',
+        name: 'slug',
+        value: shortLink.slug,
+        required: true,
+        errors: shortLink.getErrors('slug'),
+    }) }}
+
+	{{ forms.textField({
+        label: 'Destination'|t('beacon'),
+        instructions: 'Where the slug redirects to — an absolute URL or a relative path.'|t('beacon'),
+        id: 'destination',
+        name: 'destination',
+        value: shortLink.destination,
+        required: true,
+        errors: shortLink.getErrors('destination'),
+    }) }}
+
+	{{ forms.selectField({
+        label: 'Status code'|t('beacon'),
+        id: 'statusCode',
+        name: 'statusCode',
+        value: shortLink.statusCode,
+        options: statusOptions,
+    }) }}
+
+	{{ forms.lightswitchField({
+        label: 'Enabled'|t('beacon'),
+        id: 'enabled',
+        name: 'enabled',
+        on: shortLink.enabled,
+    }) }}
+
+	{{ forms.dateTimeField({
+        label: 'Expires at'|t('beacon'),
+        instructions: 'Optional. The short link stops resolving after this date and time. Leave blank for no expiry.'|t('beacon'),
+        id: 'expiresAt',
+        name: 'expiresAt',
+        value: shortLink.expiresAt,
+    }) }}
+
+	{{ forms.textareaField({
+        label: 'Note'|t('beacon'),
+        instructions: 'Optional internal note for editors (max 500 characters).'|t('beacon'),
+        id: 'note',
+        name: 'note',
+        value: shortLink.note,
+        rows: 2,
+        errors: shortLink.getErrors('note'),
+    }) }}
+
+	{% if shortLink.id %}
+		<hr>
+		<div class="beacon-shortlink-summary">
+			<div>
+				<p>
+					<strong>{{ 'Short URL'|t('beacon') }}</strong>
+				</p>
+				<p>
+					<a href="{{ siteUrl }}/{{ shortLink.slug }}" rel="noopener" target="_blank">
+						<code>{{ siteUrl }}/{{ shortLink.slug }}</code>
+					</a>
+				</p>
+				<p>
+					<strong>{{ 'Clicks'|t('beacon') }}:</strong>
+					{{ shortLink.clicks|number }}</p>
+				<p>
+					<strong>{{ 'Last clicked'|t('beacon') }}:</strong>
+					{{ shortLink.lastClicked ? shortLink.lastClicked|datetime('short') : ('—'|t('beacon')) }}</p>
+			</div>
+			<div class="beacon-shortlink-qr" id="beacon-shortlink-qr" data-url="{{ siteUrl }}/{{ shortLink.slug }}">
+				<p class="light">
+					<small>{{ 'QR preview'|t('beacon') }}</small>
+				</p>
+			</div>
+		</div>
+
+		{% do view.registerJsFile('https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js') %}
+	{% endif %}
+{% endblock %}

@@ -1,0 +1,90 @@
+{% import '_includes/forms.twig' as forms %}
+
+<input type="hidden" name="action" value="beacon/llms-settings/save">
+<input type="hidden" name="siteId" value="{{ site.id }}">
+{{ redirectInput('beacon/crawlers/llms-txt?site=' ~ site.handle) }}
+{{ csrfInput() }}
+
+{% include 'beacon/_includes/site-selector' with { sites, site, baseUrl: cpUrl('beacon/crawlers/llms-txt') } only %}
+
+{{ forms.lightswitchField({
+    label: 'Enabled'|t('beacon'),
+    instructions: 'When disabled, /llms.txt will return a 404.'|t('beacon'),
+    name: 'enabled',
+    on: settings.enabled,
+    first: true,
+}) }}
+
+{{ forms.textField({
+    label: 'Title'|t('beacon'),
+    instructions: 'The heading at the top of llms.txt (the `# …` line). Defaults to the Craft site name — override it when that name isn\'t a good public title (e.g. a language name like "English").'|t('beacon'),
+    name: 'siteNameOverride',
+    value: settings.siteNameOverride,
+    placeholder: site.name,
+}) }}
+
+{{ forms.textareaField({
+    label: 'Summary'|t('beacon'),
+    instructions: 'A brief description of this site for AI assistants, shown as a quote under the title. Leave blank to omit.'|t('beacon'),
+    name: 'summary',
+    value: settings.summary,
+    rows: 4,
+}) }}
+
+{{ forms.checkboxSelectField({
+    label: 'Sections to include'|t('beacon'),
+    instructions: 'Entries from these sections will be listed in the llms.txt file.'|t('beacon'),
+    name: 'sections',
+    options: allSections,
+    values: settings.sections,
+}) }}
+
+<hr>
+<h2>{{ 'Trust block'|t('beacon') }}</h2>
+<p class="instructions">{{ 'Optional usage-policy lines appended to llms.txt for AI consumers. Leave blank to omit.'|t('beacon') }}</p>
+
+{{ forms.textField({
+    label: 'Policy URL'|t('beacon'),
+    instructions: 'URL to your AI/content usage policy.'|t('beacon'),
+    name: 'policyUrl',
+    value: settings.policyUrl,
+    placeholder: 'https://example.com/ai-policy'|t('beacon'),
+    first: true,
+}) }}
+
+{{ forms.textField({
+    label: 'License URL'|t('beacon'),
+    instructions: 'URL to a license document (e.g. CC-BY).'|t('beacon'),
+    name: 'licenseUrl',
+    value: settings.licenseUrl,
+    placeholder: 'https://creativecommons.org/licenses/by/4.0/'|t('beacon'),
+}) }}
+
+{{ forms.textField({
+    label: 'Contact email'|t('beacon'),
+    instructions: 'Address for permission requests, takedowns, etc.'|t('beacon'),
+    name: 'contactEmail',
+    type: 'email',
+    value: settings.contactEmail,
+}) }}
+
+{{ forms.textareaField({
+    label: 'Preferred attribution'|t('beacon'),
+    instructions: 'How AI assistants should credit your content when cited.'|t('beacon'),
+    name: 'preferredAttribution',
+    value: settings.preferredAttribution,
+    rows: 3,
+}) }}
+
+<hr>
+<h2>{{ 'llms-full.txt'|t('beacon') }}</h2>
+<p class="instructions">{{ 'Long-form companion to llms.txt. Served at /llms-full.txt; returns 404 when blank.'|t('beacon') }}</p>
+
+{{ forms.textareaField({
+    label: 'Full body'|t('beacon'),
+    instructions: 'Markdown body served verbatim at /llms-full.txt.'|t('beacon'),
+    name: 'fullBody',
+    value: settings.fullBody,
+    rows: 16,
+    class: 'fullwidth code',
+}) }}

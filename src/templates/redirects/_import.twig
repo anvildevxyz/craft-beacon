@@ -1,0 +1,55 @@
+{% extends '_layouts/cp.twig' %}
+{% set selectedSubnavItem = 'redirects' %}
+{% import '_includes/forms.twig' as forms %}
+{% set title = 'Import redirects'|t('beacon') %}
+{% set fullPageForm = true %}
+{# Craft's full-page <form> defaults to enctype="application/x-www-form-urlencoded";
+   the CSV file input below requires multipart/form-data or the file payload is dropped. #}
+{% set mainFormAttributes = { enctype: 'multipart/form-data' } %}
+{% set crumbs = [
+    { label: 'Beacon'|t('beacon'), url: cpUrl('beacon') },
+    { label: 'Redirects'|t('beacon'), url: cpUrl('beacon/redirects') },
+] %}
+
+{% block content %}
+    <input type="hidden" name="action" value="beacon/redirects/import">
+    {{ redirectInput('beacon/redirects') }}
+    {{ csrfInput() }}
+
+    <p class="instructions">{{ 'Upload a CSV with columns: source,target,statusCode (statusCode optional, defaults to 301).'|t('beacon') }}</p>
+    <p class="instructions">{{ 'Prefix the source with `regex:` to use a full PCRE pattern. Use `*` (single-segment) or `**` (multi-segment) for glob patterns.'|t('beacon') }}</p>
+
+    {# Use the array-of-pairs shape for forms.selectField — assoc arrays
+       with integer keys get sequentially re-indexed (English ends up
+       posting siteId=0 instead of 2), which the controller's getBodyParam
+       cast to int and tripped the foreign-key constraint on insert. #}
+    {% set sites = craft.app.sites.getAllSites() %}
+    {% set siteOptions = [] %}
+    {% for s in sites %}
+        {% set siteOptions = siteOptions|merge([{ label: s.name, value: s.id }]) %}
+    {% endfor %}
+
+    {{ forms.field({
+        label: 'CSV file'|t('beacon'),
+        required: true,
+        first: true,
+    }, '<input type="file" name="csvFile" accept=".csv" required>') }}
+
+    {{ forms.selectField({
+        label: 'Target site'|t('beacon'),
+        name: 'siteId',
+        value: currentSite.id,
+        options: siteOptions,
+    }) }}
+
+    {% set errors = craft.app.session.get('beacon.import.errors') %}
+    {% if errors %}
+        <hr>
+        <h3>{{ 'Last import errors'|t('beacon') }}</h3>
+        <ul>
+        {% for e in errors %}
+            <li>{{ 'Line {number}'|t('beacon', { number: e.lineNumber }) }}: {{ e.reason }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+{% endblock %}

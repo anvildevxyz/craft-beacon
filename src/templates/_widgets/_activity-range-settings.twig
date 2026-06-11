@@ -1,0 +1,17 @@
+{# Shared settings partial for bot / indexnow / redirect activity widgets.
+   Each widget controller renders its own `*-activity-settings` template
+   (path is part of Craft's widget contract), which delegates here so
+   the time-range options stay in lockstep across the three widgets. #}
+{% import '_includes/forms.twig' as forms %}
+
+{{ forms.selectField({
+    label: 'Time range'|t('beacon'),
+    name: 'range',
+    value: widget.range,
+    options: {
+        '24h': '24 hours'|t('beacon'),
+        '7d': '7 days'|t('beacon'),
+        '30d': '30 days'|t('beacon'),
+    },
+    first: true,
+}) }}

@@ -1,0 +1,50 @@
+{# Default public author profile template. Override by creating
+   `templates/beacon/public/author-profile.twig` in your project. #}
+<!DOCTYPE html>
+<html lang="{{ craft.app.sites.currentSite.language|default('en') }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ author.title }}</title>
+</head>
+<body>
+    <article class="beacon-author-profile" itemscope itemtype="https://schema.org/Person">
+        {% if author.imageAssetId %}
+            <img src="{{ craft.app.elements.getElementById(author.imageAssetId).getUrl() }}" alt="{{ author.title }}" itemprop="image">
+        {% endif %}
+
+        <h1 itemprop="name">{{ author.title }}</h1>
+
+        {% if author.jobTitle %}
+            <p class="beacon-author-jobtitle" itemprop="jobTitle">{{ author.jobTitle }}</p>
+        {% endif %}
+
+        {% if author.description %}
+            <div class="beacon-author-bio" itemprop="description">
+                {{ author.description|nl2br }}
+            </div>
+        {% endif %}
+
+        {% if author.expertise %}
+            <section class="beacon-author-expertise">
+                <h2>{{ 'Expertise'|t('beacon') }}</h2>
+                <ul>{% for topic in author.expertise %}<li itemprop="knowsAbout">{{ topic }}</li>{% endfor %}</ul>
+            </section>
+        {% endif %}
+
+        {% if author.credentials %}
+            <section class="beacon-author-credentials">
+                <h2>{{ 'Credentials'|t('beacon') }}</h2>
+                <ul>{% for cred in author.credentials %}<li>{{ cred }}</li>{% endfor %}</ul>
+            </section>
+        {% endif %}
+
+        {% if author.sameAs %}
+            <section class="beacon-author-links">
+                <h2>{{ 'Also at'|t('beacon') }}</h2>
+                <ul>{% for url in author.sameAs %}<li><a href="{{ url }}" rel="me" itemprop="sameAs">{{ url }}</a></li>{% endfor %}</ul>
+            </section>
+        {% endif %}
+    </article>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{% set crawlerTabs = {
+    'ai-crawlers': { label: 'AI crawlers'|t('beacon'), url: cpUrl('beacon/crawlers/ai-crawlers') },
+    'llms-txt': { label: 'llms.txt'|t('beacon'), url: cpUrl('beacon/crawlers/llms-txt') },
+    'robots': { label: 'robots.txt'|t('beacon'), url: cpUrl('beacon/crawlers/robots') },
+    'humans-txt': { label: 'humans.txt'|t('beacon'), url: cpUrl('beacon/crawlers/humans-txt') },
+    'ads-txt': { label: 'ads.txt'|t('beacon'), url: cpUrl('beacon/crawlers/ads-txt') },
+} %}
+
+<nav id="crawlers-nav">
+    <ul>
+        {% for key, item in crawlerTabs %}
+            <li>
+                <a href="{{ item.url }}" class="{% if key == selectedCrawlerTab %}sel{% endif %}">{{ item.label }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+</nav>

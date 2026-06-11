@@ -1,0 +1,29 @@
+{% import "_includes/forms.twig" as forms %}
+
+<h2 class="heading first">{{ 'Robots directives available in the SEO field'|t('beacon') }}</h2>
+<p class="light">{{ 'Enable which directives authors can configure per entry.'|t('beacon') }}</p>
+
+<table class="data fullwidth fixed-layout">
+    <thead>
+        <tr>
+            <th class="beacon-col--directive">{{ 'Directive'|t('beacon') }}</th>
+            <th class="beacon-col--available">{{ 'Available'|t('beacon') }}</th>
+            <th>{{ 'Description'|t('beacon') }}</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for def in robotsDirectiveDefs %}
+            <tr>
+                <td><code>{{ def.label }}</code> <span class="light">({{ def.type }})</span></td>
+                <td>
+                    {{ forms.lightswitch({
+                        name: 'robotsDirectivesEnabled[' ~ def.key ~ ']',
+                        on: robotsEnabled[def.key] ?? false,
+                        value: '1',
+                    }) }}
+                </td>
+                <td>{{ def.help|t('beacon') }}</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

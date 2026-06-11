@@ -1,0 +1,45 @@
+{% extends '_layouts/cp.twig' %}
+{% set selectedSubnavItem = 'crawlers' %}
+{% import '_includes/forms.twig' as forms %}
+{% set title = (bot ? 'Edit bot' : 'New bot')|t('beacon') %}
+{% set fullPageForm = true %}
+{% set crumbs = [
+    { label: 'Beacon'|t('beacon'), url: cpUrl('beacon') },
+    { label: 'Crawlers'|t('beacon'), url: cpUrl('beacon/crawlers/ai-crawlers') },
+    { label: 'AI crawlers'|t('beacon'), url: cpUrl('beacon/crawlers/ai-crawlers') },
+] %}
+
+{% block content %}
+    <input type="hidden" name="action" value="beacon/ai-crawlers/save-bot">
+    {% if bot %}
+        <input type="hidden" name="botId" value="{{ bot.id }}">
+    {% endif %}
+    {{ redirectInput('beacon/crawlers/ai-crawlers') }}
+    {{ csrfInput() }}
+
+    {{ forms.textField({
+        label: 'Name'|t('beacon'),
+        name: 'name',
+        value: bot.name|default(''),
+        required: true,
+        first: true,
+    }) }}
+
+    {{ forms.textField({
+        label: 'User-Agent pattern'|t('beacon'),
+        instructions: 'Regex-like pattern, e.g., GPTBot/.* or just Bytespider.'|t('beacon'),
+        name: 'userAgentPattern',
+        value: bot.userAgentPattern|default(''),
+        required: true,
+    }) }}
+
+    {{ forms.lightswitchField({
+        label: 'Enabled'|t('beacon'),
+        name: 'enabled',
+        on: bot ? bot.enabled : true,
+    }) }}
+
+    {% if bot and bot.source == 'default' %}
+        <p class="instructions"><strong>{{ 'Source: default.'|t('beacon') }}</strong> {{ 'This bot was seeded by Beacon. You can edit its pattern but cannot delete it.'|t('beacon') }}</p>
+    {% endif %}
+{% endblock %}

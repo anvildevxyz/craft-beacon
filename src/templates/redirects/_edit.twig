@@ -1,0 +1,113 @@
+{% extends '_layouts/cp.twig' %}
+{% set selectedSubnavItem = 'redirects' %}
+{% import '_includes/forms.twig' as forms %}
+{% set title = redirect.id ? ('Edit redirect'|t('beacon')) : ('New redirect'|t('beacon')) %}
+{% set fullPageForm = true %}
+{% set crumbs = [
+    { label: 'Beacon'|t('beacon'), url: cpUrl('beacon') },
+    { label: 'Redirects'|t('beacon'), url: cpUrl('beacon/redirects') },
+] %}
+
+{% block content %}
+    <input type="hidden" name="action" value="beacon/redirects/save">
+    <input type="hidden" name="redirectId" value="{{ redirect.id }}">
+    <input type="hidden" name="siteId" value="{{ currentSite.id }}">
+    {% if from404|default(0) > 0 %}
+        <input type="hidden" name="from404" value="{{ from404 }}">
+    {% endif %}
+    {{ redirectInput('beacon/redirects') }}
+    {{ csrfInput() }}
+
+    {{ forms.lightswitchField({
+        label: 'Enabled'|t('beacon'),
+        name: 'enabled',
+        on: redirect.enabled ?? true,
+        first: true,
+    }) }}
+
+    {% if craft.app.isMultiSite %}
+        {{ forms.selectField({
+            label: 'Sites'|t('beacon'),
+            instructions: 'Which sites this redirect applies to. All rule data is shared across them.'|t('beacon'),
+            id: 'propagationMethod',
+            name: 'propagationMethod',
+            value: redirect.propagationMethod.value ?? 'all',
+            options: [
+                { value: 'all', label: 'All sites'|t('beacon') },
+                { value: 'siteGroup', label: 'Sites in the same group'|t('beacon') },
+                { value: 'language', label: 'Sites with the same language'|t('beacon') },
+                { value: 'none', label: 'Only this site'|t('beacon') ~ ' (' ~ currentSite.name ~ ')' },
+            ],
+        }) }}
+    {% endif %}
+
+    {{ forms.textField({
+        label: 'Source URI'|t('beacon'),
+        instructions: 'The old path to redirect from, e.g. `/old-page`. To match wildcards (`*` / `**`) or a pattern, set the Match type below.'|t('beacon'),
+        name: 'sourceUri',
+        value: redirect.sourceUri,
+        required: true,
+        errors: redirect.getErrors('sourceUri'),
+    }) }}
+
+    {{ forms.textField({
+        label: 'Target URI'|t('beacon'),
+        instructions: 'Where to send the request — a relative path (`/new`) or an absolute `https://…` URL. Captures from the source are available as `$1`, `$2`, etc.'|t('beacon'),
+        name: 'targetUri',
+        value: redirect.targetUri,
+        required: true,
+        errors: redirect.getErrors('targetUri'),
+    }) }}
+
+    {{ forms.selectField({
+        label: 'Match type'|t('beacon'),
+        instructions: 'How the Source URI is matched. Exact: one specific URL. Wildcard: `*` matches one path segment, `**` matches several. Pattern: an advanced regular expression for power users.'|t('beacon'),
+        name: 'type',
+        value: redirect.type,
+        options: {
+            'exact': 'Exact URL'|t('beacon'),
+            'glob': 'Wildcard (* and **)'|t('beacon'),
+            'regex': 'Pattern (advanced)'|t('beacon'),
+        },
+    }) }}
+
+    {{ forms.selectField({
+        label: 'Status code'|t('beacon'),
+        name: 'statusCode',
+        value: redirect.statusCode,
+        options: {
+            '301': '301 (permanent)'|t('beacon'),
+            '302': '302 (temporary)'|t('beacon'),
+            '307': '307 (temporary, preserve method)'|t('beacon'),
+            '308': '308 (permanent, preserve method)'|t('beacon'),
+        },
+    }) }}
+
+    {{ forms.selectField({
+        label: 'Query string'|t('beacon'),
+        instructions: 'Ignore: match on path only. Preserve: append the incoming `?…` to the target. Match: the source URI includes `?key=value` and the full URI must match.'|t('beacon'),
+        name: 'queryStringMode',
+        value: redirect.queryStringMode ?? 'ignore',
+        options: {
+            'ignore': 'Ignore (path only)'|t('beacon'),
+            'preserve': 'Preserve (append to target)'|t('beacon'),
+            'match': 'Match (source includes ?…)'|t('beacon'),
+        },
+    }) }}
+
+    {{ forms.textareaField({
+        label: 'Note'|t('beacon'),
+        instructions: 'Optional internal note for editors (max 500 characters).'|t('beacon'),
+        name: 'note',
+        value: redirect.note,
+        rows: 2,
+        errors: redirect.getErrors('note'),
+    }) }}
+
+    {% if redirect.id %}
+        <hr>
+        <p><strong>{{ 'Hits'|t('beacon') }}:</strong> {{ redirect.hits|number }}</p>
+        <p><strong>{{ 'Last hit'|t('beacon') }}:</strong> {{ redirect.lastHit ? redirect.lastHit|datetime('short') : ('—'|t('beacon')) }}</p>
+        <p><strong>{{ 'Origin'|t('beacon') }}:</strong> {{ redirect.source }}</p>
+    {% endif %}
+{% endblock %}

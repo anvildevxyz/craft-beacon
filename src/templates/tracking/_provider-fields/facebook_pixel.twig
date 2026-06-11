@@ -1,0 +1,10 @@
+{% import '_includes/forms.twig' as forms %}
+{{ forms.textField({
+    label: 'Pixel ID'|t('beacon'),
+    name: 'config[pixelId]',
+    value: script.config.pixelId ?? '',
+    placeholder: '1234567890'|t('beacon'),
+    required: true,
+    errors: script.getErrors('config.pixelId'),
+    first: true,
+}) }}
