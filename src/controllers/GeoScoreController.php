@@ -10,6 +10,7 @@ use Craft;
 use craft\elements\Entry;
 use craft\web\Controller;
 use yii\base\Action;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
@@ -68,6 +69,11 @@ class GeoScoreController extends Controller
     {
         /** @var Entry|null $element */
         $element = Entry::find()->id($elementId)->siteId($siteId)->status(null)->one();
+
+        $user = Craft::$app->getUser()->getIdentity();
+        if ($element !== null && $user !== null && !Craft::$app->getElements()->canView($element, $user)) {
+            throw new ForbiddenHttpException();
+        }
 
         $score = Plugin::$plugin->geoScore->forElement($elementId, $siteId)
             ?? ($element !== null ? Plugin::$plugin->geoScore->compute($element, $siteId, persist: false) : null);

@@ -95,6 +95,9 @@ final class CommerceIntegration
      */
     public static function findLiveMarkdownElement(string $by, int|string $value, int $siteId): ?ElementInterface
     {
+        if (!in_array($by, ['id', 'uri'], true)) {
+            return null;
+        }
         $entry = Entry::find()->$by($value)->siteId($siteId)->status(Entry::STATUS_LIVE)->one();
         if ($entry !== null) {
             return $entry;

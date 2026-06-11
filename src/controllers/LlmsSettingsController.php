@@ -48,6 +48,12 @@ class LlmsSettingsController extends Controller
         $siteId = $this->resolveSiteIdFromPost();
         $get = static fn(string $k) => Strings::trimToNull($request->getBodyParam($k));
 
+        $fullBody = $get('fullBody');
+        if ($fullBody !== null && strlen($fullBody) > 524288) {
+            Craft::$app->getSession()->setError(Craft::t('beacon', 'llms-full.txt body exceeds the 512 KiB limit.'));
+            return null;
+        }
+
         $plugin->siteSettings->saveLlms(new LlmsSettings(
             siteId: $siteId,
             enabled: (bool) $request->getBodyParam('enabled', false),
@@ -58,7 +64,7 @@ class LlmsSettingsController extends Controller
             licenseUrl: $get('licenseUrl'),
             contactEmail: $get('contactEmail'),
             preferredAttribution: $get('preferredAttribution'),
-            fullBody: $get('fullBody'),
+            fullBody: $fullBody,
         ));
 
         return $this->finishSiteScopedSave(

@@ -46,7 +46,8 @@ final class MarkdownResponse
         $h->set('Vary', $includeUserAgentInVary ? 'Accept, User-Agent' : 'Accept');
         $h->set('X-Robots-Tag', 'noindex, nofollow');
         if ($canonicalUrl !== null && $canonicalUrl !== '') {
-            $h->set('Link', "<{$canonicalUrl}>; rel=\"canonical\"");
+            $safe = str_replace(["\r", "\n"], '', $canonicalUrl);
+            $h->set('Link', "<{$safe}>; rel=\"canonical\"");
         }
     }
 }

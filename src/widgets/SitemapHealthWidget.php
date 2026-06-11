@@ -54,10 +54,10 @@ final class SitemapHealthWidget extends Widget
     private function loadData(int $siteId): array
     {
         $rows = Craft::$app->getDb()->createCommand(
-            'SELECT contentKey, generatedAt, content
+            'SELECT [[contentKey]], [[generatedAt]], [[content]]
              FROM {{%beacon_render_cache}}
-             WHERE siteId = :siteId AND type = :type
-             ORDER BY contentKey ASC',
+             WHERE [[siteId]] = :siteId AND [[type]] = :type
+             ORDER BY [[contentKey]] ASC',
             ['siteId' => $siteId, 'type' => RenderCacheType::Sitemap->value],
         )->queryAll();
 

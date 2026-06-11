@@ -37,7 +37,7 @@ final class SafeRegex
         }
         if ($result === false) {
             if (Craft::$app !== null) {
-                Craft::warning('Beacon regex match failed: ' . preg_last_error_msg() . " (pattern={$delimitedPattern})", 'beacon');
+                Craft::warning('Beacon regex match failed: ' . preg_last_error_msg(), 'beacon');
             }
             return null;
         }

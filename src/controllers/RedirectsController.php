@@ -67,8 +67,8 @@ class RedirectsController extends Controller
                 $redirect->type = RedirectType::Exact->value;
                 $redirect->queryStringMode = RedirectQueryStringMode::Ignore->value;
                 $redirect->enabled = true;
-                $redirect->sourceUri = trim((string) $request->getQueryParam('prefillSource', '')) ?: null;
-                $redirect->targetUri = trim((string) $request->getQueryParam('prefillTarget', '')) ?: null;
+                $redirect->sourceUri = mb_substr(trim((string) $request->getQueryParam('prefillSource', '')), 0, 255) ?: null;
+                $redirect->targetUri = mb_substr(trim((string) $request->getQueryParam('prefillTarget', '')), 0, 500) ?: null;
             }
         }
 

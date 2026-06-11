@@ -16,7 +16,6 @@ use yii\web\TooManyRequestsHttpException;
 class GeoExportController extends Controller
 {
     public array|int|bool $allowAnonymous = true;
-    public $enableCsrfValidation = false;
 
     /**
      * `GET /geo/export?id=123` — Markdown export for a live entry.

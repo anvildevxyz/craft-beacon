@@ -91,7 +91,7 @@ class SchemasController extends Controller
         // the form with the user's input intact instead of silently discarding it.
         $record->mapping = $mappingJson = trim((string) $request->getBodyParam('mapping', '{}')) ?: '{}';
 
-        if (mb_strlen($mappingJson) > 65535) {
+        if (strlen($mappingJson) > 65535) {
             $session->setError(Craft::t('beacon', 'Mapping JSON exceeds the 64 KiB limit.'));
             return $this->retainOnError($record);
         }
@@ -281,7 +281,14 @@ class SchemasController extends Controller
             ->status(null)
             ->siteId('*')
             ->one();
-        return $entry instanceof Entry ? $entry : null;
+        if (!$entry instanceof Entry) {
+            return null;
+        }
+        $user = Craft::$app->getUser()->getIdentity();
+        if ($user !== null && !Craft::$app->getElements()->canView($entry, $user)) {
+            return null;
+        }
+        return $entry;
     }
 
     /**

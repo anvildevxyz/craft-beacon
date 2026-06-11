@@ -11,6 +11,7 @@ use anvildev\beacon\events\AfterMatchRedirectEvent;
 use anvildev\beacon\events\BeforeMatchRedirectEvent;
 use anvildev\beacon\helpers\Db;
 use anvildev\beacon\helpers\RedirectStructure;
+use anvildev\beacon\helpers\RedirectTargets;
 use anvildev\beacon\models\Redirect;
 use anvildev\beacon\models\RedirectListFilters;
 use anvildev\beacon\records\RedirectRecord;
@@ -191,6 +192,9 @@ class RedirectService extends Component
         $resolved = strtr($targetTemplate, $sanitised);
         if (preg_match('/[\r\n\0]/', $resolved) === 1) {
             throw new \RuntimeException('Resolved redirect target contains invalid characters');
+        }
+        if (RedirectTargets::validateTargetUri($resolved) !== null) {
+            throw new \RuntimeException('Resolved redirect target has a disallowed scheme');
         }
         return $resolved;
     }

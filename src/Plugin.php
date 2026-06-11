@@ -833,6 +833,15 @@ class Plugin extends BasePlugin
                     }
                     $slug = ltrim($request->getPathInfo(), '/');
                     if ($slug !== '') {
+                        try {
+                            self::$plugin->geoExportThrottle->enforce('short_link_resolve', 120);
+                        } catch (\yii\web\TooManyRequestsHttpException) {
+                            $response->setStatusCode(429);
+                            $response->content = '';
+                            $response->data = null;
+                            $response->stream = null;
+                            return;
+                        }
                         $shortLink = self::$plugin->shortLinks->findBySlug($siteId, $slug);
                         if ($shortLink !== null) {
                             self::$plugin->shortLinks->recordClick($shortLink->id);

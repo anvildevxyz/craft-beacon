@@ -79,6 +79,7 @@ class ShortLinksController extends Controller
 
         $id = $request->getBodyParam('shortLinkId');
         $siteId = (int) $request->getBodyParam('siteId') ?: Craft::$app->getSites()->getCurrentSite()->id;
+        $this->requireEditableSite($siteId);
 
         if ($id) {
             $shortLink = $this->findShortLinkById((int) $id, $siteId);
@@ -120,6 +121,7 @@ class ShortLinksController extends Controller
         $id = (int) Http::request()->getBodyParam('shortLinkId');
         $shortLink = ShortLinkElement::find()->id($id)->siteId('*')->status(null)->one();
         if ($shortLink !== null) {
+            $this->requireEditableSite((int) $shortLink->siteId);
             Craft::$app->getElements()->deleteElement($shortLink);
             Craft::$app->getSession()->setNotice(Craft::t('beacon', 'Short link deleted.'));
         }
