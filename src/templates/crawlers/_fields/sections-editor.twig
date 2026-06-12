@@ -1,5 +1,3 @@
-{% do craft.app.view.registerAssetBundle('anvildev\\beacon\\web\\assets\\sectionseditor\\SectionsEditorAsset') %}
-
 <div class="beacon-sections-editor">
   <div class="sections-editor-header">
     <label class="required">{{ label }}</label>
@@ -114,7 +112,8 @@
 <script>
   document.addEventListener('DOMContentLoaded', () => {
     const bar = document.querySelector('.sections-button-bar');
-    const fieldName = bar?.dataset.fieldName;
+    if (!bar) return;
+    const fieldName = bar.dataset.fieldName;
     const hiddenContainer = document.querySelector('.sections-hidden');
     let draggedElement = null;
 
