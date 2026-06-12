@@ -36,7 +36,7 @@ class FactDensityPillarTest extends TestCase
         $this->assertSame(2, $score->score);
         $this->assertSame(GeoPillarScore::BAND_LOW, $score->band);
         $this->assertNotEmpty($score->notes);
-        $this->assertStringContainsString('Add', $score->notes[0]);
+        $this->assertStringContainsString('geo.pillar.factDensity.below.target.add', $score->notes[0]);
     }
 
     public function testTooShortContentScoresBottomBandWithDistinctNote(): void

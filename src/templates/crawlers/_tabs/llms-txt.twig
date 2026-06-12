@@ -31,13 +31,13 @@
     rows: 4,
 }) }}
 
-{{ forms.checkboxSelectField({
+{% include 'beacon/crawlers/_fields/sections-editor' with {
     label: 'llms.sections.label'|t('beacon'),
     instructions: 'llms.sections.instructions'|t('beacon'),
     name: 'sections',
-    options: allSections,
+    allSections: allSections,
     values: settings.sections,
-}) }}
+} only %}
 
 <hr>
 <h2>{{ 'llms.trust.block.heading'|t('beacon') }}</h2>

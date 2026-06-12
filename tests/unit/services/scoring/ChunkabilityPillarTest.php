@@ -41,8 +41,8 @@ class ChunkabilityPillarTest extends TestCase
         // 1 of 2 sections in range → 5/10.
         $this->assertSame(5, $score->score);
         $this->assertNotSame([], $score->notes);
-        $allNotes = implode("\n", $score->notes);
-        $this->assertStringContainsString('Setup', $allNotes);
+        $this->assertStringContainsString('geo.pillar.chunkability.short.lead', $score->notes[0]);
+        $this->assertSame('Setup', $score->debug['shortLeads'][0]['heading']);
     }
 
     public function testLeadParagraphTooLongPenalisesAndNamesSection(): void
@@ -55,7 +55,8 @@ class ChunkabilityPillarTest extends TestCase
 
         $this->assertSame(0, $score->score);
         $this->assertNotEmpty($score->notes);
-        $this->assertStringContainsString('Reference', implode("\n", $score->notes));
+        $this->assertStringContainsString('geo.pillar.chunkability.long.lead', $score->notes[0]);
+        $this->assertSame('Reference', $score->debug['longLeads'][0]['heading']);
     }
 
     public function testStackedSubheadingsAreFlaggedAsHavingNoLead(): void
@@ -71,8 +72,8 @@ class ChunkabilityPillarTest extends TestCase
 
         // 1 of 2 H2 sections has a proper lead → 5/10.
         $this->assertSame(5, $score->score);
-        $allNotes = implode("\n", $score->notes);
-        $this->assertStringContainsString('Configuration', $allNotes);
+        $this->assertStringContainsString('geo.pillar.chunkability.stacked.headings', $score->notes[0]);
+        $this->assertContains('Configuration', $score->debug['stackedHeadings']);
     }
 
     public function testNoLeadAtAllPenalises(): void
@@ -84,7 +85,8 @@ class ChunkabilityPillarTest extends TestCase
         $score = (new ChunkabilityPillar())->compute($this->ctxWithAst($ast));
 
         $this->assertSame(0, $score->score);
-        $this->assertStringContainsString('Empty section', implode("\n", $score->notes));
+        $this->assertStringContainsString('geo.pillar.chunkability.stacked.headings', $score->notes[0]);
+        $this->assertContains('Empty section', $score->debug['stackedHeadings']);
     }
 
     public function testNoH2SectionsGivesDirectionalLowBand(): void
