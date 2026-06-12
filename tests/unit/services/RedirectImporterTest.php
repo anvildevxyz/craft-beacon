@@ -120,7 +120,7 @@ class RedirectImporterTest extends TestCase
 
         $this->assertCount(0, $rows['valid']);
         $this->assertCount(1, $rows['errors']);
-        $this->assertStringContainsString('statusCode', $rows['errors'][0]['reason']);
+        $this->assertStringContainsString('invalid.statuscode', $rows['errors'][0]['reason']);
     }
 
     public function testStatusCodeDefaultsTo301WhenColumnMissing(): void
@@ -229,7 +229,7 @@ class RedirectImporterTest extends TestCase
 
         $this->assertCount(0, $rows['valid']);
         $this->assertCount(1, $rows['errors']);
-        $this->assertStringContainsString('queryStringMode', $rows['errors'][0]['reason']);
+        $this->assertStringContainsString('invalid.querystringmode', $rows['errors'][0]['reason']);
     }
 
     /**

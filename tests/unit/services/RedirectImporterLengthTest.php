@@ -44,7 +44,7 @@ class RedirectImporterLengthTest extends TestCase
         $result = $this->parse("source,target\n{$source},/landing");
 
         $this->assertCount(1, $result['errors']);
-        $this->assertSame('Source exceeds 255 characters.', $result['errors'][0]['reason']);
+        $this->assertSame('import.redirects.source.exceeds.255.characters', $result['errors'][0]['reason']);
     }
 
     public function testTargetOf500MultibyteCharsIsAccepted(): void
@@ -63,6 +63,6 @@ class RedirectImporterLengthTest extends TestCase
         $result = $this->parse("source,target\n/from,{$target}");
 
         $this->assertCount(1, $result['errors']);
-        $this->assertSame('Target exceeds 500 characters.', $result['errors'][0]['reason']);
+        $this->assertSame('import.redirects.target.exceeds.500.characters', $result['errors'][0]['reason']);
     }
 }

@@ -9,13 +9,13 @@ class SafeRegexTest extends TestCase
 {
     public function testValidateRejectsEmptyPattern(): void
     {
-        $this->assertSame('Pattern cannot be empty.', SafeRegex::validate(''));
+        $this->assertSame('validation.regex.pattern.cannot.empty', SafeRegex::validate(''));
     }
 
     public function testValidateRejectsOverlongPattern(): void
     {
         $long = str_repeat('a', SafeRegex::MAX_PATTERN_LENGTH + 1);
-        $this->assertSame('Pattern exceeds 256 characters.', SafeRegex::validate($long));
+        $this->assertSame('validation.regex.pattern.exceeds.characters', SafeRegex::validate($long));
     }
 
     public function testValidateAcceptsSimplePattern(): void
@@ -31,7 +31,7 @@ class SafeRegexTest extends TestCase
     public function testValidateRejectsUncompilablePattern(): void
     {
         // Unbalanced group — fails to compile.
-        $this->assertSame('Pattern is invalid or too expensive to evaluate.', SafeRegex::validate('('));
+        $this->assertSame('validation.regex.pattern.invalid.too.expensive.evaluate', SafeRegex::validate('('));
     }
 
     public function testValidateRejectsCatastrophicBacktracking(): void
@@ -40,7 +40,7 @@ class SafeRegexTest extends TestCase
         // lowered backtrack limit, so validate() must reject it before it ever
         // reaches the request hot path.
         $this->assertSame(
-            'Pattern is invalid or too expensive to evaluate.',
+            'validation.regex.pattern.invalid.too.expensive.evaluate',
             SafeRegex::validate('^(a+)+$'),
         );
     }

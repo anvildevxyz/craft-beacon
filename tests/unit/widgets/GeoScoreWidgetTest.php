@@ -9,10 +9,8 @@ class GeoScoreWidgetTest extends TestCase
 {
     public function testDisplayNameIsHumanLabel(): void
     {
-        // Without a Craft bootstrap, Craft::t() falls through to the raw
-        // source string — sufficient for verifying the widget surfaces
-        // as "GEO content score" rather than the class name.
-        $this->assertSame('GEO content score', GeoScoreWidget::displayName());
+        // Without a Craft bootstrap, Craft::t() returns the semantic key.
+        $this->assertSame('widgets.geoScore.geo.content.score', GeoScoreWidget::displayName());
     }
 
     public function testIconReturnsCraftIconKey(): void

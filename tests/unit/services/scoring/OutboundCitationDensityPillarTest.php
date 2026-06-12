@@ -109,7 +109,7 @@ class OutboundCitationDensityPillarTest extends TestCase
         $score = $this->pillar()->compute($this->ctx($ast));
 
         $this->assertSame(1, $score->score);
-        $this->assertStringContainsString('too short', $score->notes[0]);
+        $this->assertStringContainsString('outboundCitation.content.too.short', $score->notes[0]);
     }
 
     private function pillar(): OutboundCitationDensityPillar

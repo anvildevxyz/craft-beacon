@@ -47,7 +47,7 @@ class FactDensityPillarTest extends TestCase
         $score = $this->pillar(80)->compute($this->ctxWithAst([$paragraph]));
 
         $this->assertSame(1, $score->score);
-        $this->assertStringContainsString('too short', $score->notes[0]);
+        $this->assertStringContainsString('factDensity.content.too.short', $score->notes[0]);
     }
 
     public function testEmptyAstScoresZeroWithDistinctNote(): void
@@ -55,7 +55,7 @@ class FactDensityPillarTest extends TestCase
         $score = $this->pillar(80)->compute($this->ctxWithAst([]));
 
         $this->assertSame(0, $score->score);
-        $this->assertStringContainsString('No content', $score->notes[0]);
+        $this->assertStringContainsString('factDensity.no.content.found', $score->notes[0]);
     }
 
     public function testTargetSettingShiftsThreshold(): void
