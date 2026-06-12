@@ -11,7 +11,7 @@ use yii\base\Event;
  * {@see CustomRedirectMatcherInterface}. The handle stored in a rule's
  * `type` column dispatches to the matching custom matcher.
  *
- * @since 2.2.0
+ * @since 1.0.0
  */
 final class RegisterRedirectTypesEvent extends Event
 {

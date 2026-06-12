@@ -18,7 +18,7 @@ use yii\base\Event;
  * track their own per-request guard. The cached `$holder->nodes` already
  * reflects prior listener output from the same request.
  *
- * @since 2.1.0
+ * @since 1.0.0
  */
 class DefineSchemasEvent extends Event
 {

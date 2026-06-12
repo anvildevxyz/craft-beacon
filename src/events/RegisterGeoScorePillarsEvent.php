@@ -13,7 +13,7 @@ use yii\base\Event;
  * and label, falling back to the operator's
  * `Settings::$geoScorePillarWeights` override.
  *
- * @since 3.1.0
+ * @since 1.0.0
  */
 final class RegisterGeoScorePillarsEvent extends Event
 {

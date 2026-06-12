@@ -18,7 +18,7 @@ use yii\base\Event;
  *   returns `null` (no redirect issued; useful e.g. for logged-in users).
  * - both unset → service runs its normal exact/wildcard lookup.
  *
- * @since 2.2.0
+ * @since 1.0.0
  */
 final class BeforeMatchRedirectEvent extends Event
 {

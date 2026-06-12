@@ -5,7 +5,7 @@ namespace anvildev\beacon\models;
 /**
  * Mutable JSON-LD graph passed into {@see \anvildev\beacon\events\DefineSchemasEvent}.
  *
- * @since 2.1.0
+ * @since 1.0.0
  */
 final class SchemaGraphHolder
 {

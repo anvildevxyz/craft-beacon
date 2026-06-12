@@ -15,7 +15,7 @@ use yii\base\Event;
  * Setting `$redirect = null` cancels the redirect entirely (the 404 stays
  * a 404).
  *
- * @since 2.2.0
+ * @since 1.0.0
  */
 final class AfterMatchRedirectEvent extends Event
 {

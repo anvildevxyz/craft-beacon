@@ -59,7 +59,7 @@ class GeoScoreService extends Component
      *
      * Event class: {@see RegisterGeoScorePillarsEvent}
      *
-     * @since 3.1.0
+     * @since 1.0.0
      */
     public const EVENT_REGISTER_GEO_SCORE_PILLARS = 'registerGeoScorePillars';
 

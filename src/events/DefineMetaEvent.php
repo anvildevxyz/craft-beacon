@@ -13,7 +13,7 @@ use yii\base\Event;
  *
  * Mutate `$meta` public properties in place (`$meta` is the same instance passed to Twig).
  *
- * @since 2.1.0
+ * @since 1.0.0
  */
 class DefineMetaEvent extends Event
 {

@@ -167,7 +167,7 @@ class Plugin extends BasePlugin
      *
      * Event class: {@see \anvildev\beacon\events\DefineMetaEvent}
      *
-     * @since 2.1.0
+     * @since 1.0.0
      */
     public const EVENT_DEFINE_META = 'defineBeaconMeta';
 
@@ -176,7 +176,7 @@ class Plugin extends BasePlugin
      * be idempotent: this can fire multiple times per request when
      * `beacon.schemas()` is called more than once. See the event class docblock.
      *
-     * @since 2.1.0
+     * @since 1.0.0
      */
     public const EVENT_DEFINE_SCHEMAS = 'defineBeaconSchemas';
 
@@ -186,7 +186,7 @@ class Plugin extends BasePlugin
      *
      * Event class: {@see \anvildev\beacon\events\AfterResolveMetaEvent}
      *
-     * @since 2.1.0
+     * @since 1.0.0
      */
     public const EVENT_AFTER_RESOLVE_META = 'afterResolveBeaconMeta';
 
@@ -196,7 +196,7 @@ class Plugin extends BasePlugin
      *
      * Event class: {@see \anvildev\beacon\events\DefineMetaTagsEvent}
      *
-     * @since 2.2.0
+     * @since 1.0.0
      */
     public const EVENT_DEFINE_META_TAGS = 'defineBeaconMetaTags';
 

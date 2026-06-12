@@ -13,7 +13,7 @@ use yii\base\Event;
  *
  * @phpstan-import-type MetaTag from \anvildev\beacon\models\SeoMeta
  *
- * @since 2.2.0
+ * @since 1.0.0
  */
 class DefineMetaTagsEvent extends Event
 {

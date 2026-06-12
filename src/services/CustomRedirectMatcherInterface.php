@@ -16,7 +16,7 @@ namespace anvildev\beacon\services;
  *   - `slug-history` — match against any historical slug recorded on the
  *     entry, regardless of which one is current.
  *
- * @since 2.2.0
+ * @since 1.0.0
  *
  * @phpstan-type RedirectMatchResult array{captures:array<string,string>, query:string}|null
  */
