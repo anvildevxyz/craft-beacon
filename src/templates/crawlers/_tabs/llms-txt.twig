@@ -80,11 +80,123 @@
 <h2>{{ 'llms.llms.full.txt.heading'|t('beacon') }}</h2>
 <p class="instructions">{{ 'llms.long.form.companion.llms.txt.text'|t('beacon') }}</p>
 
-{{ forms.textareaField({
-    label: 'llms.fullBody.label'|t('beacon'),
-    instructions: 'llms.fullBody.instructions'|t('beacon'),
-    name: 'fullBody',
-    value: settings.fullBody,
-    rows: 16,
-    class: 'fullwidth code',
-}) }}
+<div class="beacon-fullbody-editor">
+  <div class="fullbody-helper">
+    <div class="helper-header">
+      <label class="helper-label">{{ 'beacon.insert.section.variable'|t('beacon') }}</label>
+      <p class="helper-hint">{{ 'beacon.click.to.insert.section'|t('beacon') }}</p>
+    </div>
+    <div class="helper-buttons" data-textarea-name="fullBody">
+      {% for section in allSections %}
+        <button
+          type="button"
+          class="helper-button"
+          data-insert="[{{ section.value }}]"
+          title="{{ 'beacon.insert'|t('beacon') }}: {{ section.label }}"
+        >
+          {{ section.label }}
+        </button>
+      {% endfor %}
+    </div>
+  </div>
+
+  {{ forms.textareaField({
+      label: 'llms.fullBody.label'|t('beacon'),
+      instructions: 'llms.fullBody.instructions'|t('beacon'),
+      name: 'fullBody',
+      value: settings.fullBody,
+      rows: 16,
+      class: 'fullwidth code',
+  }) }}
+</div>
+
+<style>
+  .beacon-fullbody-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .fullbody-helper {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    padding: 1rem;
+  }
+
+  .helper-header {
+    margin-bottom: 0.75rem;
+  }
+
+  .helper-label {
+    display: block;
+    font-weight: 600;
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+    color: #111;
+  }
+
+  .helper-hint {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #6b7280;
+  }
+
+  .helper-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .helper-button {
+    padding: 0.5rem 0.75rem;
+    background: white;
+    border: 1px solid #d1d5db;
+    border-radius: 3px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+  }
+
+  .helper-button:hover {
+    background: #f3f4f6;
+    border-color: #0f7a8f;
+    color: #0f7a8f;
+  }
+
+  .helper-button:active {
+    transform: scale(0.98);
+  }
+</style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const helperButtons = document.querySelectorAll('.helper-button');
+    const textareaName = document.querySelector('.helper-buttons')?.dataset.textareaName;
+    const textarea = textareaName ? document.querySelector(`textarea[name="${textareaName}"]`) : null;
+
+    if (!textarea) return;
+
+    helperButtons.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const insertText = btn.dataset.insert;
+
+        // Insert at cursor position
+        const start = textarea.selectionStart;
+        const end = textarea.selectionEnd;
+        const before = textarea.value.substring(0, start);
+        const after = textarea.value.substring(end);
+        textarea.value = before + insertText + after;
+
+        // Move cursor after inserted text
+        textarea.selectionStart = textarea.selectionEnd = start + insertText.length;
+        textarea.focus();
+
+        // Trigger change event for Craft
+        textarea.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+    });
+  });
+</script>
