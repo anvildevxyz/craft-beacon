@@ -15,7 +15,7 @@ final class BeaconSeoFieldAsset extends AssetBundle
 {
     public $sourcePath = __DIR__ . '/dist';
     public $depends = [CpAsset::class];
-    public $js = ['seo-field.js?v=10', 'geo-score-chip.js?v=1'];
+    public $js = ['seo-field.js?v=11', 'geo-score-chip.js?v=1'];
     public $css = ['seo-field.css'];
 
     /**

@@ -36,6 +36,12 @@ return [
     // Per-request meta cache duration in seconds. null = follow Craft's cacheDuration. Default: null.
     // 'metaCacheDuration' => null,
 
+    // --- SEO field UI ---------------------------------------------------------
+    // Lite mode trims the entry SEO field: char meters + Google preview only,
+    // no checklist, inheritance badges, or soft length hints. Default: true.
+    // Set false here only if you want the full SEO field UI.
+    // 'seoFieldLiteMode' => false,
+
     // --- Social images --------------------------------------------------------
     // Craft image transform handle applied to Open Graph / Twitter images.
     // Use 'none', 'original', or 'full' to serve the asset URL untransformed.

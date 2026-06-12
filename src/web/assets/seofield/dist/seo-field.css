@@ -1027,3 +1027,17 @@ body.beacon-schema-modal-open {
 .beacon-geo-score-chip--good  .beacon-geo-score-chip__value::before { background: #4ba7a7; }
 .beacon-geo-score-chip--low   .beacon-geo-score-chip__value::before { background: #d4a72c; }
 .beacon-geo-score-chip--stale .beacon-geo-score-chip__value::before { background: #c95050; }
+
+/* ---------- Lite SEO field mode ---------- */
+.beacon-preview--lite .beacon-preview-toolbar-help,
+.beacon-preview--lite .beacon-preview-budget {
+    display: none;
+}
+
+.beacon-preview-more {
+    margin: .35rem 0 .5rem;
+}
+
+.beacon-preview--lite.is-expanded .beacon-preview-more {
+    display: none;
+}

@@ -199,7 +199,49 @@ mechanisms as Entry sections.
 
 | Key | Default | Notes |
 |---|---|---|
+| `seoFieldLiteMode` | `true` | **File-only** — trims the per-entry SEO field UI in the CP. See [Lite mode](#seo-field-lite-mode) below. |
 | `robotsDirectivesEnabled` | `null` | Map of robots-directive opt-ins. `null` exposes the four legacy directives (`noindex`, `nofollow`, `noarchive`, `nosnippet`). Pass an explicit map to control which directives editors can select per-entry. |
+
+### SEO field lite mode
+
+**Default: on** (`seoFieldLiteMode: true`). Fresh installs and existing sites
+without a `config/beacon.php` override get the trimmed editor experience.
+
+Lite mode reduces visual noise for day-to-day meta editing. Editors still get
+everything needed to set title, description, social image, canonical, robots,
+and a live Google snippet preview. Advanced GEO/schema tooling stays one click
+away in a collapsed group.
+
+| Surface | Lite mode (default) | Full mode (`seoFieldLiteMode: false`) |
+|---|---|---|
+| Title / description char meters | ✓ | ✓ |
+| Canonical URL hard validation | ✓ | ✓ |
+| Robots redundancy warnings | ✓ | ✓ |
+| Front-matter `key: value` validation | ✓ (in collapsed GEO group) | ✓ |
+| Soft length hints (blur tips on title/description) | hidden | ✓ |
+| Inheritance badges + “where this value comes from” lines | hidden | ✓ |
+| SEO quality checklist + score | hidden | ✓ |
+| Preview “gaps” callout (missing title/description/image) | hidden | ✓ |
+| Live preview tabs | Google desktop only; **More platform previews** reveals the other six | All seven tabs visible |
+| Preview pixel-budget badges + toolbar help | hidden | ✓ |
+| GEO / structured data / AI Markdown group | collapsed by default | expanded by default |
+| Schema add-ons, JSON-LD modal, GEO score chip | unchanged | unchanged |
+
+There is **no Control Panel toggle** for this setting — it is intentionally
+file-only so agencies can lock the editor experience per environment without
+exposing another settings screen.
+
+To restore the full SEO field UI:
+
+```php
+// config/beacon.php
+return [
+    'seoFieldLiteMode' => false,
+];
+```
+
+Resolution order: value in `config/beacon.php` → `Settings` model default
+(`true`). The setting is not stored in the database.
 
 ### Available robots directives
 
@@ -331,6 +373,7 @@ default. The honored keys are:
 | `breadcrumbsHomeLabel` | Per-site first-crumb label (map of site handle → label). |
 | `schemaTypes` | Extra schema.org types for the SEO field's "Add schema" modal (see [Extensibility cookbook](EXTENSIBILITY_COOKBOOK.md) → Recipe 9). |
 | `fullSchemaCatalogue` | Ship the full ~900-type schema.org catalogue in the dropdown. |
+| `seoFieldLiteMode` | Trim the per-entry SEO field CP UI (default `true`). Set `false` for checklist, inheritance chrome, soft hints, and all preview tabs. See [SEO field lite mode](#seo-field-lite-mode). |
 
 The file is read via `Craft::$app->getConfig()->getConfigFromFile('beacon')`,
 so you can use environment-aware multi-environment configs the same way

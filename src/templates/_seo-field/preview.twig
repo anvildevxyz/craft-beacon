@@ -5,6 +5,7 @@
    editor inputs in real time, including pixel-accurate truncation per
    platform. #}
 {% set preview = preview ?? {} %}
+{% set liteMode = liteMode ?? true %}
 {% set canonical = preview.canonical ?? '' %}
 {% set host = canonical|split('://') | last | split('/') | first %}
 {% set path = canonical|split('://') | last | split('/') | slice(1) | join('/') %}
@@ -14,7 +15,7 @@
 {% set twitterCard = preview.twitterCard ?: 'summary_large_image' %}
 
 <div
-    class="beacon-preview"
+    class="beacon-preview{% if liteMode %} beacon-preview--lite{% endif %}"
     id="{{ previewId }}"
     data-beacon-preview
     data-bp-field-name="{{ name ?? '' }}"
@@ -34,31 +35,34 @@
             <span class="beacon-preview-tab-glyph" aria-hidden="true">G</span>
             <span>{{ 'seoField.preview.google.text'|t('beacon') }}</span>
         </button>
-        <button type="button" class="beacon-preview-tab" data-bp-tab="google-mobile" role="tab" aria-selected="false">
+        <button type="button" class="beacon-preview-tab{% if liteMode %} beacon-preview-tab--extra{% endif %}" data-bp-tab="google-mobile" role="tab" aria-selected="false"{% if liteMode %} hidden{% endif %}>
             <span class="beacon-preview-tab-glyph" aria-hidden="true">📱</span>
             <span>{{ 'seoField.preview.mobile.text'|t('beacon') }}</span>
         </button>
-        <button type="button" class="beacon-preview-tab" data-bp-tab="facebook" role="tab" aria-selected="false">
+        <button type="button" class="beacon-preview-tab beacon-preview-tab--extra" data-bp-tab="facebook" role="tab" aria-selected="false"{% if liteMode %} hidden{% endif %}>
             <span class="beacon-preview-tab-glyph" aria-hidden="true">f</span>
             <span>{{ 'seoField.preview.facebook.text'|t('beacon') }}</span>
         </button>
-        <button type="button" class="beacon-preview-tab" data-bp-tab="linkedin" role="tab" aria-selected="false">
+        <button type="button" class="beacon-preview-tab beacon-preview-tab--extra" data-bp-tab="linkedin" role="tab" aria-selected="false"{% if liteMode %} hidden{% endif %}>
             <span class="beacon-preview-tab-glyph" aria-hidden="true">in</span>
             <span>{{ 'seoField.preview.linkedin.text'|t('beacon') }}</span>
         </button>
-        <button type="button" class="beacon-preview-tab" data-bp-tab="twitter" role="tab" aria-selected="false">
+        <button type="button" class="beacon-preview-tab beacon-preview-tab--extra" data-bp-tab="twitter" role="tab" aria-selected="false"{% if liteMode %} hidden{% endif %}>
             <span class="beacon-preview-tab-glyph" aria-hidden="true">𝕏</span>
             <span>{{ 'seoField.preview.x.twitter.text'|t('beacon') }}</span>
         </button>
-        <button type="button" class="beacon-preview-tab" data-bp-tab="slack" role="tab" aria-selected="false">
+        <button type="button" class="beacon-preview-tab beacon-preview-tab--extra" data-bp-tab="slack" role="tab" aria-selected="false"{% if liteMode %} hidden{% endif %}>
             <span class="beacon-preview-tab-glyph" aria-hidden="true">#</span>
             <span>{{ 'seoField.preview.slack.discord.text'|t('beacon') }}</span>
         </button>
-        <button type="button" class="beacon-preview-tab" data-bp-tab="pinterest" role="tab" aria-selected="false">
+        <button type="button" class="beacon-preview-tab beacon-preview-tab--extra" data-bp-tab="pinterest" role="tab" aria-selected="false"{% if liteMode %} hidden{% endif %}>
             <span class="beacon-preview-tab-glyph" aria-hidden="true">P</span>
             <span>{{ 'seoField.preview.pinterest.text'|t('beacon') }}</span>
         </button>
     </div>
+    {% if liteMode %}
+    <button type="button" class="btn small beacon-preview-more" data-bp-show-more-previews>{{ 'seoField.preview.more.platforms.text'|t('beacon') }}</button>
+    {% endif %}
 
     <div class="beacon-preview-panels">
         <div class="beacon-preview-panel is-active" data-bp-panel="google" role="tabpanel">
@@ -83,7 +87,7 @@
             </div>
         </div>
 
-        <div class="beacon-preview-panel" data-bp-panel="google-mobile" role="tabpanel" hidden>
+        <div class="beacon-preview-panel{% if liteMode %} beacon-preview-panel--extra{% endif %}" data-bp-panel="google-mobile" role="tabpanel" hidden>
             <div class="beacon-preview-meta">
                 <span class="beacon-preview-meta-label">{{ 'seoField.preview.google.search.mobile.text'|t('beacon') }}</span>
                 <span class="beacon-preview-budget" data-bp-budget="google-mobile"></span>
@@ -104,7 +108,7 @@
             </div>
         </div>
 
-        <div class="beacon-preview-panel" data-bp-panel="facebook" role="tabpanel" hidden>
+        <div class="beacon-preview-panel beacon-preview-panel--extra" data-bp-panel="facebook" role="tabpanel" hidden>
             <div class="beacon-preview-meta">
                 <span class="beacon-preview-meta-label">{{ 'seoField.preview.facebook.share.text'|t('beacon') }}</span>
                 <span class="beacon-preview-budget" data-bp-budget="facebook"></span>
@@ -123,7 +127,7 @@
             </div>
         </div>
 
-        <div class="beacon-preview-panel" data-bp-panel="linkedin" role="tabpanel" hidden>
+        <div class="beacon-preview-panel beacon-preview-panel--extra" data-bp-panel="linkedin" role="tabpanel" hidden>
             <div class="beacon-preview-meta">
                 <span class="beacon-preview-meta-label">{{ 'seoField.preview.linkedin.share.text'|t('beacon') }}</span>
                 <span class="beacon-preview-budget" data-bp-budget="linkedin"></span>
@@ -139,7 +143,7 @@
             </div>
         </div>
 
-        <div class="beacon-preview-panel" data-bp-panel="twitter" role="tabpanel" hidden>
+        <div class="beacon-preview-panel beacon-preview-panel--extra" data-bp-panel="twitter" role="tabpanel" hidden>
             <div class="beacon-preview-meta">
                 <span class="beacon-preview-meta-label">{{ 'seoField.preview.x.twitter.card.text'|t('beacon') }}</span>
                 <span class="beacon-preview-budget" data-bp-budget="twitter"></span>
@@ -158,7 +162,7 @@
             </div>
         </div>
 
-        <div class="beacon-preview-panel" data-bp-panel="slack" role="tabpanel" hidden>
+        <div class="beacon-preview-panel beacon-preview-panel--extra" data-bp-panel="slack" role="tabpanel" hidden>
             <div class="beacon-preview-meta">
                 <span class="beacon-preview-meta-label">{{ 'seoField.preview.slack.discord.unfurl.text'|t('beacon') }}</span>
                 <span class="beacon-preview-budget" data-bp-budget="slack"></span>
@@ -181,7 +185,7 @@
             </div>
         </div>
 
-        <div class="beacon-preview-panel" data-bp-panel="pinterest" role="tabpanel" hidden>
+        <div class="beacon-preview-panel beacon-preview-panel--extra" data-bp-panel="pinterest" role="tabpanel" hidden>
             <div class="beacon-preview-meta">
                 <span class="beacon-preview-meta-label">{{ 'seoField.preview.pinterest.pin.text'|t('beacon') }}</span>
                 <span class="beacon-preview-budget" data-bp-budget="pinterest"></span>

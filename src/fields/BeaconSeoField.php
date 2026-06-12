@@ -68,6 +68,7 @@ class BeaconSeoField extends Field implements SeoFieldInterface
         $fallback = ['title' => '', 'description' => '', 'ogImage' => '', 'sourceMap' => []];
         $sectionDefaults = [];
         $settings = null;
+        $liteMode = Plugin::$plugin->settings->get()->seoFieldLiteMode;
 
         if ($element instanceof Entry && !$element->getIsRevision()) {
             try {
@@ -89,6 +90,7 @@ class BeaconSeoField extends Field implements SeoFieldInterface
                 );
 
                 $preview = Craft::$app->getView()->renderTemplate('beacon/_seo-field/preview', [
+                    'liteMode' => $liteMode,
                     'preview' => [
                         'title' => $meta->title,
                         'description' => $meta->description,
@@ -153,6 +155,7 @@ class BeaconSeoField extends Field implements SeoFieldInterface
         return $this->renderScoreChip($entryForSchema) . Craft::$app->getView()->renderTemplate('beacon/_seo-field/input', [
             'name' => $this->handle,
             'value' => $value,
+            'liteMode' => $liteMode,
             'preview' => $preview,
             'sectionDefaults' => $sectionDefaults,
             'debug' => $debug,

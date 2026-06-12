@@ -37,6 +37,18 @@
         return String(str).replace(/"/g, '\\"');
     }
 
+    function isLiteMode(fieldEl) {
+        return !!(fieldEl && fieldEl.getAttribute('data-seo-lite-mode') === '1');
+    }
+
+    function fieldPrefix(fieldEl) {
+        if (!fieldEl) return '';
+        var prefix = fieldEl.getAttribute('data-field-prefix') || '';
+        if (prefix) return prefix;
+        var checklist = fieldEl.querySelector('[data-seo-checklist]');
+        return checklist ? (checklist.getAttribute('data-field-prefix') || '') : '';
+    }
+
     function el(tag, attrs, children) {
         var node = document.createElement(tag);
         if (attrs) {
@@ -135,25 +147,6 @@
         return pass ? 1 : 0;
     }
 
-    function buildActionItems(checks, titleLen, descriptionLen, canonical) {
-        var actions = [];
-        if (!checks.titleLength) {
-            actions.push(titleLen < 50 ? Craft.t('beacon', 'seoField.js.increase.seo.title.length.toward') : Craft.t('beacon', 'seoField.js.shorten.seo.title.stay.within'));
-        }
-        if (!checks.descriptionLength) {
-            actions.push(descriptionLen < 140 ? Craft.t('beacon', 'seoField.js.expand.seo.description.toward.140') : Craft.t('beacon', 'seoField.js.trim.seo.description.avoid.truncation'));
-        }
-        if (!checks.canonical) actions.push(Craft.t('beacon', 'seoField.js.set.canonical.url.absolute.http'));
-        if (!checks.robots) actions.push(Craft.t('beacon', 'seoField.js.review.robots.directives.avoid.combining'));
-        if (!checks.schema) actions.push(Craft.t('beacon', 'seoField.js.add.least.one.schema.bundle'));
-        if (!checks.social) actions.push(Craft.t('beacon', 'seoField.js.fill.title.description.so.open'));
-        if (actions.length === 0) {
-            actions.push(Craft.t('beacon', 'seoField.js.looks.good.next.validate.social'));
-            if (canonical !== '') actions.push(Craft.t('beacon', 'seoField.js.re.check.canonical.after.url'));
-        }
-        return actions.slice(0, 4);
-    }
-
     function updateChecklist(root) {
         (root || document).querySelectorAll('[data-seo-checklist]').forEach(function(listEl) {
             var prefix = listEl.getAttribute('data-field-prefix') || '';
@@ -180,7 +173,7 @@
 
             var checks = {
                 titleLength: title.length >= 50 && title.length <= 60,
-                descriptionLength: description.length >= 140 && description.length <= 165,
+                descriptionLength: description.length >= 150 && description.length <= 160,
                 canonical: canonical === '' || /^https?:\/\/.+/i.test(canonical),
                 robots: !(hasNoindex && hasNosnippet),
                 schema: schemaCount > 0,
@@ -198,18 +191,8 @@
             var scoreEl = listEl.querySelector('[data-seo-score]');
             if (scoreEl) scoreEl.textContent = String(score);
 
-            var actionsEl = listEl.querySelector('[data-seo-actions]');
-            if (actionsEl) {
-                actionsEl.innerHTML = '';
-                buildActionItems(checks, title.length, description.length, canonical).forEach(function(action) {
-                    var li = document.createElement('li');
-                    li.textContent = action;
-                    actionsEl.appendChild(li);
-                });
-            }
-
             // Source-trace badges (where the resolved value comes from)
-            if (fieldEl) {
+            if (fieldEl && !isLiteMode(fieldEl)) {
                 updateSourceBadge(fieldEl.querySelector('[data-bp-source-badge="title"]'), seoTitle !== '', !!entryTitleEl && !!entryTitleEl.value);
                 updateSourceBadge(fieldEl.querySelector('[data-bp-source-badge="description"]'), description !== '', false);
                 // Source-of-truth lines under each input (only when blank)
@@ -323,8 +306,8 @@
             if (fieldEl.dataset.bpInlineBound === '1') return;
             fieldEl.dataset.bpInlineBound = '1';
 
-            var checklist = fieldEl.querySelector('[data-seo-checklist]');
-            var prefix = checklist ? (checklist.getAttribute('data-field-prefix') || '') : '';
+            var prefix = fieldPrefix(fieldEl);
+            var lite = isLiteMode(fieldEl);
 
             var titleEl = queryByName(prefix, '[title]', fieldEl);
             var descEl = queryByName(prefix, '[description]', fieldEl);
@@ -385,11 +368,11 @@
                 notice.classList.toggle('is-active', msgs.length > 0);
             }
 
-            if (titleEl) {
+            if (!lite && titleEl) {
                 titleEl.addEventListener('blur', validateTitleSoft);
                 titleEl.addEventListener('input', function() { if (ensureHintSlot(titleEl).getAttribute('data-active')) validateTitleSoft(); });
             }
-            if (descEl) {
+            if (!lite && descEl) {
                 descEl.addEventListener('blur', validateDescSoft);
                 descEl.addEventListener('input', function() { if (ensureHintSlot(descEl).getAttribute('data-active')) validateDescSoft(); });
             }
@@ -406,19 +389,18 @@
             });
             validateRobots();
 
-            // Source-line "Edit" links: visible whenever we know where the
-            // value comes from (section / global). The HTML is rendered
-            // server-side with hidden default; JS toggles visibility.
-            fieldEl.querySelectorAll('[data-bp-source-line]').forEach(function(line) {
-                var which = line.getAttribute('data-bp-source-line');
-                line.classList.toggle('is-visible', shouldShowSourceLine(fieldEl, which));
-            });
+            if (!lite) {
+                fieldEl.querySelectorAll('[data-bp-source-line]').forEach(function(line) {
+                    var which = line.getAttribute('data-bp-source-line');
+                    line.classList.toggle('is-visible', shouldShowSourceLine(fieldEl, which));
+                });
+            }
         });
     }
 
     function shouldShowSourceLine(fieldEl, which) {
-        var checklist = fieldEl.querySelector('[data-seo-checklist]');
-        var prefix = checklist ? (checklist.getAttribute('data-field-prefix') || '') : '';
+        if (isLiteMode(fieldEl)) return false;
+        var prefix = fieldPrefix(fieldEl);
         var key = which === 'title' ? '[title]' : '[description]';
         var input = queryByName(prefix, key, fieldEl);
         return !!(input && (input.value || '') === '');
@@ -1426,6 +1408,17 @@
                 hideToggle.classList.toggle('is-active', on);
                 hideToggle.textContent = on ? Craft.t('beacon', 'seoField.js.show.image') : Craft.t('beacon', 'seoField.preview.hide.image.text');
                 refresh();
+            });
+        }
+
+        var moreBtn = root.querySelector('[data-bp-show-more-previews]');
+        if (moreBtn) {
+            moreBtn.addEventListener('click', function() {
+                root.classList.add('is-expanded');
+                root.querySelectorAll('.beacon-preview-tab--extra').forEach(function(tab) {
+                    tab.hidden = false;
+                });
+                moreBtn.hidden = true;
             });
         }
 

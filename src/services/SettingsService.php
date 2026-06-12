@@ -39,6 +39,7 @@ class SettingsService extends Component
         'log404s',
         'log404RetentionDays',
         'staleThresholdDays',
+        'seoFieldLiteMode',
     ];
 
     /**
@@ -89,6 +90,8 @@ class SettingsService extends Component
             geoScorePillarWeights: $this->decodePillarWeights($record->geoScorePillarWeights),
             geoScoreClaimDetectionMode: (string) $record->geoScoreClaimDetectionMode,
             geoScoreFactDetectionMode: (string) $record->geoScoreFactDetectionMode,
+            // File-only; not stored in DB. Default true (lite SEO field UI).
+            seoFieldLiteMode: true,
         );
 
         return $this->cached = $this->applyConfigFileOverrides($settings);

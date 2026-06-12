@@ -53,7 +53,7 @@ First-run path:
 
 1. **Open** `/admin/beacon`.
 2. **Set your identity** under **Settings → Organization** (name, logo, social profiles) — this feeds JSON-LD sitewide.
-3. **Add the Beacon SEO field** to your entry types' field layouts so editors get per-entry meta + live previews.
+3. **Add the Beacon SEO field** to your entry types' field layouts so editors get per-entry meta + live previews. By default the field opens in **lite mode** (char meters + Google preview; checklist and extra platform tabs hidden). Set `seoFieldLiteMode => false` in `config/beacon.php` for the full UI — see [Settings → SEO field lite mode](docs/SETTINGS.md#seo-field-lite-mode).
 4. **Add `head()` to your layout** (below) so meta, Open Graph, and JSON-LD render.
 5. **Go live:** set `CRAFT_ENVIRONMENT=production`. Outside production Beacon emits `noindex` on every page by design — see [Troubleshooting](#troubleshooting).
 

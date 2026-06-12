@@ -85,6 +85,8 @@ class Settings
         public int $geoScoreFactDensityTarget = 80,
         public string $geoScoreFactDetectionMode = 'heuristic',
         public array $geoScoreAuthorityDomainOverrides = [],
+        /** When true, the entry SEO field hides checklist, inheritance chrome, soft hints, and extra preview tabs. */
+        public bool $seoFieldLiteMode = true,
     ) {
     }
 

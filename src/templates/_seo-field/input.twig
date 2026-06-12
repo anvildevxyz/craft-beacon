@@ -6,9 +6,12 @@
 {% set fallbackTitle = fallback.title ?? '' %}
 {% set fallbackDescription = fallback.description ?? '' %}
 {% set fallbackOgImage = fallback.ogImage ?? '' %}
+{% set liteMode = liteMode ?? true %}
 
-<div class="beacon-seo-field"
+<div class="beacon-seo-field{% if liteMode %} is-lite{% endif %}"
     data-beacon-seo-field
+    data-seo-lite-mode="{{ liteMode ? '1' : '0' }}"
+    data-field-prefix="{{ name }}"
     data-bp-resolve-url="{{ resolveUrl ?? '' }}"
     data-bp-entry-id="{{ entryId ?? '' }}"
     data-bp-site-id="{{ siteId ?? '' }}"
@@ -33,7 +36,7 @@
 
     {{ forms.textField({
         label: 'seoField.seo.title.label'|t('beacon'),
-        instructions: 'seoField.leave.blank.inherit.placeholder.shows.instructions'|t('beacon'),
+        instructions: liteMode ? null : 'seoField.leave.blank.inherit.placeholder.shows.instructions'|t('beacon'),
         name: name ~ '[title]',
         value: seoTitleValue,
         placeholder: fallbackTitle,
@@ -43,11 +46,14 @@
         <span class="beacon-seo-meter-count">{{ seoTitleValue|length }}</span>
         <span class="beacon-seo-meter-range">{{ 'seoField.50.60.chars.text'|t('beacon') }}</span>
         <span class="beacon-seo-meter-bar"><span class="beacon-seo-meter-fill"></span></span>
+        {% if not liteMode %}
         <span class="beacon-source-badge" data-bp-source-badge="title"
               data-bp-has-section="{{ hasSectionTitle ? '1' : '0' }}"
               title="{{ 'seoField.where.resolved.seo.title.comes.text'|t('beacon') }}"
         ></span>
+        {% endif %}
     </div>
+    {% if not liteMode %}
     <div class="beacon-source-line" data-bp-source-line="title">
         {% if hasSectionTitle %}
             <span>{{ 'seoField.inheriting.title.template.section.defaults.text'|t('beacon') }}</span>
@@ -57,10 +63,11 @@
             <a href="{{ cpUrl('beacon/settings/general') }}" target="_blank" rel="noopener">{{ 'seoField.edit.global.defaults.text'|t('beacon') }} ↗</a>
         {% endif %}
     </div>
+    {% endif %}
 
     {{ forms.textareaField({
         label: 'seoField.seo.description.label'|t('beacon'),
-        instructions: 'seoField.aim.150.160.characters.placeholder.instructions'|t('beacon'),
+        instructions: liteMode ? null : 'seoField.aim.150.160.characters.placeholder.instructions'|t('beacon'),
         name: name ~ '[description]',
         value: seoDescriptionValue,
         rows: 3,
@@ -71,11 +78,14 @@
         <span class="beacon-seo-meter-count">{{ seoDescriptionValue|length }}</span>
         <span class="beacon-seo-meter-range">{{ 'seoField.150.160.chars.text'|t('beacon') }}</span>
         <span class="beacon-seo-meter-bar"><span class="beacon-seo-meter-fill"></span></span>
+        {% if not liteMode %}
         <span class="beacon-source-badge" data-bp-source-badge="description"
               data-bp-has-section="{{ hasSectionDesc ? '1' : '0' }}"
               title="{{ 'seoField.where.resolved.description.comes.entry.text'|t('beacon') }}"
         ></span>
+        {% endif %}
     </div>
+    {% if not liteMode %}
     <div class="beacon-source-line" data-bp-source-line="description">
         {% if hasSectionDesc %}
             <span>{{ 'seoField.inheriting.description.template.section.defaults.text'|t('beacon') }}</span>
@@ -85,7 +95,9 @@
             <a href="{{ cpUrl('beacon/settings/general') }}" target="_blank" rel="noopener">{{ 'seoField.edit.global.defaults.text'|t('beacon') }} ↗</a>
         {% endif %}
     </div>
+    {% endif %}
 
+    {% if not liteMode %}
     <section class="beacon-seo-checklist" data-seo-checklist data-field-prefix="{{ name }}">
         <div class="beacon-seo-checklist-header">
             <strong>{{ 'seoField.seo.quality.checklist.text'|t('beacon') }}</strong>
@@ -100,6 +112,7 @@
             <li data-seo-check="social">{{ 'seoField.social.preview.has.title.description.text'|t('beacon') }}</li>
         </ul>
     </section>
+    {% endif %}
 
     {% set ogImageId = value.ogImageId ?? null %}
     {% set ogImageAsset = ogImageId ? craft.assets().id(ogImageId).status(null).one() : null %}
@@ -193,7 +206,9 @@
     {% if preview %}
         <section class="beacon-seo-section beacon-seo-previews">
             <h3 class="beacon-seo-section-title">{{ 'seoField.search.social.previews.heading'|t('beacon') }}</h3>
+            {% if not liteMode %}
             <div class="beacon-preview-callout" data-bp-missing-fields aria-live="polite" hidden></div>
+            {% endif %}
             {{ preview|raw }}
         </section>
     {% endif %}
@@ -201,7 +216,7 @@
         </div>
     </details>
 
-    <details class="beacon-seo-group" open>
+    <details class="beacon-seo-group"{{ liteMode ? '' : ' open' }}>
         <summary class="beacon-seo-group-summary">
             <span class="beacon-seo-group-title">{{ 'seoField.ai.structured.data.geo.text'|t('beacon') }}</span>
             <span class="beacon-seo-group-hint">{{ 'seoField.json.ld.schema.ai.markdown.text'|t('beacon') }}</span>
