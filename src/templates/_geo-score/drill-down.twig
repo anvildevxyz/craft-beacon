@@ -3,7 +3,7 @@
 {% set title = ('geoScore.drillDown.geo.score.text'|t('beacon', { title: element ? element.title : ('#' ~ elementId) })) %}
 {% set crumbs = [
     { label: 'nav.beacon'|t('beacon'), url: cpUrl('beacon') },
-    { label: 'geoScore.drillDown.geo.score.label'|t('beacon'), url: cpUrl('beacon') },
+    { label: title },
 ] %}
 
 {% block actionButton %}
@@ -29,37 +29,122 @@
 {% endblock %}
 
 {% block content %}
-    <h2>{{ 'geoScore.drillDown.per.pillar.breakdown.heading'|t('beacon') }}</h2>
-    <p class="light">{{ 'geoScore.drillDown.pillars.sorted.weakest.first.focus.text'|t('beacon') }}</p>
+    <div class="beacon-dash beacon-geo-score-drilldown">
+        <section class="pane beacon-geo-score-drilldown__pane">
+            <div class="beacon-geo-score-drilldown__pane-head">
+                <h2 class="heading">{{ 'geoScore.drillDown.composite.label'|t('beacon') }}</h2>
+                <div class="beacon-geo-score-drilldown__meta">
+                    <p><strong>{{ score.score }}/100</strong> {{ drillDown.compositeBandLabel }}</p>
+                    {% if drillDown.weakest %}
+                        <p class="light">{{ 'geoScore.drillDown.weakest.pillar.text'|t('beacon', { label: drillDown.weakest.label, score: drillDown.weakest.score }) }}</p>
+                    {% endif %}
+                    <p class="light">{{ 'geoScore.drillDown.computed.at.text'|t('beacon', { date: drillDown.computedAtFormatted }) }}</p>
+                    {% if element and element.url %}
+                        <p class="light"><code>{{ element.url|replace({ 'https://': '', 'http://': '' }) }}</code></p>
+                    {% endif %}
+                </div>
+            </div>
+        </section>
 
-    {% set sortedPillars = score.pillars|sort((a, b) => a.score <=> b.score) %}
+        {% if drillDown.focusPillars %}
+            <section class="pane beacon-geo-score-drilldown__pane">
+                <div class="beacon-geo-score-drilldown__pane-head">
+                    <h2 class="heading">{{ 'geoScore.drillDown.focus.first.heading'|t('beacon') }}</h2>
+                    <p class="light">{{ 'geoScore.drillDown.pillars.sorted.weakest.first.focus.text'|t('beacon') }}</p>
+                </div>
+                <table class="data fullwidth">
+                    <thead>
+                        <tr>
+                            <th>{{ 'geoScore.drillDown.pillar.text'|t('beacon') }}</th>
+                            <th class="thin">{{ 'geoScore.drillDown.score.text'|t('beacon') }}</th>
+                            <th>{{ 'geoScore.drillDown.notes.text'|t('beacon') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in drillDown.focusPillars %}
+                            {% set pillar = row.pillar %}
+                            <tr>
+                                <td>{{ pillar.label }}</td>
+                                <td class="thin">
+                                    <strong>{{ pillar.score }}</strong>/10
+                                    <div class="beacon-geo-score-widget-bar beacon-geo-score-widget-bar--{{ pillar.band }}"
+                                         style="--beacon-bar-width: {{ row.scorePct }}%; --beacon-bar-min-width: {{ pillar.score > 0 ? '2%' : '0%' }};"
+                                         aria-hidden="true"></div>
+                                </td>
+                                <td>
+                                    {% if row.notes %}
+                                        <ul class="beacon-geo-score-drilldown__notes">
+                                            {% for note in row.notes %}
+                                                <li>
+                                                    {{ note.text }}
+                                                    {% if note.url and note.linkLabel %}
+                                                        <a href="{{ note.url }}" class="go beacon-geo-score-drilldown__note-link">{{ note.linkLabel }}</a>
+                                                    {% endif %}
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% else %}
+                                        <span class="light">—</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </section>
+        {% endif %}
 
-    <table class="data fullwidth beacon-geo-score-drilldown__pillars">
-        <thead>
-            <tr>
-                <th>{{ 'geoScore.drillDown.pillar.text'|t('beacon') }}</th>
-                <th class="thin right">{{ 'geoScore.drillDown.score.text'|t('beacon') }}</th>
-                <th>{{ 'geoScore.drillDown.notes.text'|t('beacon') }}</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for pillar in sortedPillars %}
-                <tr class="beacon-geo-score-drilldown__row beacon-geo-score-drilldown__row--{{ pillar.band }}">
-                    <td><strong>{{ pillar.label }}</strong></td>
-                    <td class="thin right"><strong>{{ pillar.score }}</strong>/10</td>
-                    <td>
-                        {% if pillar.notes %}
-                            <ul class="beacon-geo-score-drilldown__notes">
-                                {% for note in pillar.notes %}
-                                    <li>{{ note }}</li>
-                                {% endfor %}
-                            </ul>
-                        {% else %}
-                            <span class="light">{{ 'geoScore.drillDown.no.actionable.feedback.pillar.top.text'|t('beacon') }}</span>
-                        {% endif %}
-                    </td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+        <section class="pane beacon-geo-score-drilldown__pane">
+            <div class="beacon-geo-score-drilldown__pane-head">
+                <h2 class="heading">{{ 'geoScore.drillDown.all.pillars.heading'|t('beacon') }}</h2>
+                {% if drillDown.strongPillars %}
+                    <p class="light">
+                        {{ 'geoScore.drillDown.strong.pillars.summary'|t('beacon', { count: drillDown.strongPillars|length }) }}
+                        {% for strong in drillDown.strongPillars %}
+                            {{ strong.label }} ({{ strong.score }}/10){% if not loop.last %}, {% endif %}
+                        {% endfor %}
+                    </p>
+                {% endif %}
+            </div>
+            <table class="data fullwidth beacon-geo-score-drilldown__pillars">
+                <thead>
+                    <tr>
+                        <th>{{ 'geoScore.drillDown.pillar.text'|t('beacon') }}</th>
+                        <th class="thin">{{ 'geoScore.drillDown.score.text'|t('beacon') }}</th>
+                        <th>{{ 'geoScore.drillDown.notes.text'|t('beacon') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in drillDown.allPillars %}
+                        {% set pillar = row.pillar %}
+                        <tr>
+                            <td>{{ pillar.label }}</td>
+                            <td class="thin">
+                                <strong>{{ pillar.score }}</strong>/10
+                                <div class="beacon-geo-score-widget-bar beacon-geo-score-widget-bar--{{ pillar.band }}"
+                                     style="--beacon-bar-width: {{ row.scorePct }}%; --beacon-bar-min-width: {{ pillar.score > 0 ? '2%' : '0%' }};"
+                                     aria-hidden="true"></div>
+                            </td>
+                            <td>
+                                {% if row.notes %}
+                                    <ul class="beacon-geo-score-drilldown__notes">
+                                        {% for note in row.notes %}
+                                            <li>
+                                                {{ note.text }}
+                                                {% if note.url and note.linkLabel %}
+                                                    <a href="{{ note.url }}" class="go beacon-geo-score-drilldown__note-link">{{ note.linkLabel }}</a>
+                                                {% endif %}
+                                            </li>
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <span class="light">{{ 'geoScore.drillDown.no.actionable.feedback.pillar.top.text'|t('beacon') }}</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </section>
+    </div>
 {% endblock %}

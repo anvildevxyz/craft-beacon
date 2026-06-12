@@ -58,7 +58,7 @@ final class FreshnessBandingPillar implements PillarComputerInterface
                 GeoPillarScore::BAND_GOOD,
                 Craft::t(
                     'beacon',
-                    'Updated {days} days ago. Re-publish substantive updates to reach the <30 day fresh band.',
+                    'geo.pillar.freshness.updated.days.republish',
                     ['days' => $ageDays],
                 ),
             ],
@@ -67,7 +67,7 @@ final class FreshnessBandingPillar implements PillarComputerInterface
                 GeoPillarScore::BAND_LOW,
                 Craft::t(
                     'beacon',
-                    'Updated {days} days ago. AI engines down-weight content older than ~6 months.',
+                    'geo.pillar.freshness.updated.days.downweight',
                     ['days' => $ageDays],
                 ),
             ],
@@ -76,7 +76,7 @@ final class FreshnessBandingPillar implements PillarComputerInterface
                 GeoPillarScore::BAND_STALE,
                 Craft::t(
                     'beacon',
-                    'Updated {days} days ago. Consider a refresh — AI engines rarely cite content older than ~2 years.',
+                    'geo.pillar.freshness.updated.days.refresh',
                     ['days' => $ageDays],
                 ),
             ],

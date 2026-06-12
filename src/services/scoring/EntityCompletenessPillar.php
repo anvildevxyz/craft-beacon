@@ -58,7 +58,7 @@ final class EntityCompletenessPillar implements PillarComputerInterface
         if ($sameAsCount < 3) {
             $notes[] = Craft::t(
                 'beacon',
-                'Organization has {count} sameAs URL(s). Add Wikidata, LinkedIn, and Crunchbase to hit the 3+ entity-graph threshold.',
+                'geo.pillar.entityCompleteness.organization.sameAs.threshold',
                 ['count' => $sameAsCount],
             );
         }

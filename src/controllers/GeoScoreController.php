@@ -3,6 +3,7 @@
 namespace anvildev\beacon\controllers;
 
 use anvildev\beacon\helpers\BeaconPermissions;
+use anvildev\beacon\helpers\GeoScoreDrillDownPresenter;
 use anvildev\beacon\helpers\Http;
 use anvildev\beacon\jobs\RecomputeGeoScoreJob;
 use anvildev\beacon\Plugin;
@@ -84,6 +85,7 @@ class GeoScoreController extends Controller
 
         return $this->renderTemplate('beacon/_geo-score/drill-down', [
             'score' => $score,
+            'drillDown' => GeoScoreDrillDownPresenter::prepare($score, $element),
             'element' => $element,
             'elementId' => $elementId,
             'siteId' => $siteId,

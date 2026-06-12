@@ -115,14 +115,11 @@ final class OutboundCitationDensityPillar implements PillarComputerInterface
         $notes = [];
 
         if ($tier1 === 0 && $tier2 === 0) {
-            $notes[] = Craft::t(
-                'beacon',
-                'No outbound citations to authoritative sources. Link to Wikipedia, .edu / .gov references, or tier-1 publishers (NYT, BBC, Nature) to lift this score significantly.',
-            );
+            $notes[] = Craft::t('beacon', 'geo.pillar.outboundCitation.no.authoritative.sources');
         } else {
             $notes[] = Craft::t(
                 'beacon',
-                'Low authority density: {t1} tier-1 + {t2} tier-2 outbound citation(s). Add more references to Wikipedia, .edu / .gov, or curated publishers to reach the top band.',
+                'geo.pillar.outboundCitation.low.authority.density',
                 ['t1' => $tier1, 't2' => $tier2],
             );
         }
@@ -130,7 +127,7 @@ final class OutboundCitationDensityPillar implements PillarComputerInterface
         if ($unclassifiedCount > 0) {
             $notes[] = Craft::t(
                 'beacon',
-                '{n} outbound link(s) point at unclassified hosts, e.g. {sample}. Add them to the authority list in Settings → GEO if they are authoritative on your site.',
+                'geo.pillar.outboundCitation.unclassified.hosts',
                 ['n' => $unclassifiedCount, 'sample' => implode(', ', array_slice(array_keys($unclassifiedHosts), 0, 3))],
             );
         }

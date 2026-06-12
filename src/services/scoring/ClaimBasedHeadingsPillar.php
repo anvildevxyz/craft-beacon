@@ -54,7 +54,7 @@ final class ClaimBasedHeadingsPillar implements PillarComputerInterface
         if ($topicHeadings !== []) {
             $notes[] = Craft::t(
                 'beacon',
-                '{n} heading(s) read as topics rather than claims, e.g. "{sample}". Rephrase as complete statements (subject + verb).',
+                'geo.pillar.claimHeadings.topic.not.claim',
                 [
                     'n' => count($topicHeadings),
                     'sample' => implode('", "', array_slice($topicHeadings, 0, 3)),

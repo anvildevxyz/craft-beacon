@@ -23,7 +23,7 @@ class OutboundCitationDensityPillarTest extends TestCase
         $this->assertSame(0, $score->score);
         $this->assertSame(GeoPillarScore::BAND_STALE, $score->band);
         $this->assertNotEmpty($score->notes);
-        $this->assertStringContainsString('No outbound citations', $score->notes[0]);
+        $this->assertStringContainsString('outboundCitation.no.authoritative.sources', $score->notes[0]);
     }
 
     public function testInternalLinksAreIgnored(): void
@@ -100,7 +100,7 @@ class OutboundCitationDensityPillarTest extends TestCase
 
         $this->assertSame(2, $score->debug['unclassified']);
         $combined = implode("\n", $score->notes);
-        $this->assertStringContainsString('example-blog.com', $combined);
+        $this->assertStringContainsString('outboundCitation.unclassified.hosts', $combined);
     }
 
     public function testTooShortContentScoresBottomBand(): void

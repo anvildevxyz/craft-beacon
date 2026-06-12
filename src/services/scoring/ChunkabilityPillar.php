@@ -128,7 +128,7 @@ final class ChunkabilityPillar implements PillarComputerInterface
             $first = $shortLeads[0];
             $notes[] = Craft::t(
                 'beacon',
-                '{n} section(s) open with a too-short lead, e.g. "{heading}" ({words} words). Expand to 40–75 words.',
+                'geo.pillar.chunkability.short.lead',
                 ['n' => count($shortLeads), 'heading' => $first['heading'], 'words' => $first['words']],
             );
         }
@@ -137,7 +137,7 @@ final class ChunkabilityPillar implements PillarComputerInterface
             $first = $longLeads[0];
             $notes[] = Craft::t(
                 'beacon',
-                '{n} section(s) open with a too-long lead, e.g. "{heading}" ({words} words). Trim to 40–75 words.',
+                'geo.pillar.chunkability.long.lead',
                 ['n' => count($longLeads), 'heading' => $first['heading'], 'words' => $first['words']],
             );
         }
@@ -145,7 +145,7 @@ final class ChunkabilityPillar implements PillarComputerInterface
         if ($stackedHeadings !== []) {
             $notes[] = Craft::t(
                 'beacon',
-                '{n} H2 section(s) jump straight into subheadings without a lead paragraph, e.g. "{sample}". Add a self-contained 40–75-word answer under each H2.',
+                'geo.pillar.chunkability.stacked.headings',
                 ['n' => count($stackedHeadings), 'sample' => implode('", "', array_slice($stackedHeadings, 0, 3))],
             );
         }

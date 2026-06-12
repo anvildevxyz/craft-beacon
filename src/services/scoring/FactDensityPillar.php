@@ -95,7 +95,7 @@ final class FactDensityPillar implements PillarComputerInterface
             $notes[] = $gap > 0
                 ? Craft::t(
                     'beacon',
-                    'Fact density {found}:{words} (found {facts} fact(s) in {words} words). Add {gap} more stat(s), date(s), or citation(s) to hit the 1-per-{target}-words target.',
+                    'geo.pillar.factDensity.below.target.add',
                     [
                         'found' => $facts > 0 ? '1' : '0',
                         'words' => $totalWords,
@@ -106,7 +106,7 @@ final class FactDensityPillar implements PillarComputerInterface
                 )
                 : Craft::t(
                     'beacon',
-                    'Fact density just below target ({facts} fact(s) in {words} words). Consider tightening prose to lift density.',
+                    'geo.pillar.factDensity.below.target.tighten',
                     ['facts' => $facts, 'words' => $totalWords],
                 );
         }

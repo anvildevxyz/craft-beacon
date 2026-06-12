@@ -361,28 +361,75 @@ details.bsb-group > summary.bsb-group-head {
   font-size: 13px;
 }
 
-.beacon-geo-score-drilldown__row--top td:first-child::before {
-  content: '▲ ';
-  color: var(--green-500, #5cbf5c);
+.beacon-geo-score-drilldown.beacon-dash {
+  gap: var(--m, 16px);
 }
 
-.beacon-geo-score-drilldown__row--good td:first-child::before {
-  content: '◆ ';
-  color: var(--teal-500, #4ba7a7);
+.beacon-geo-score-drilldown__pane {
+  margin: 0;
+  padding: 0;
 }
 
-.beacon-geo-score-drilldown__row--low td:first-child::before,
-.beacon-geo-score-drilldown__row--stale td:first-child::before {
-  content: '▼ ';
-  color: var(--red-500, #c95050);
+.beacon-geo-score-drilldown__pane-head {
+  padding: var(--padding, 24px);
+  padding-bottom: var(--s, 10px);
+}
+
+.beacon-geo-score-drilldown__pane:not(:has(> table.data)) .beacon-geo-score-drilldown__pane-head {
+  padding-bottom: var(--padding, 24px);
+}
+
+.beacon-geo-score-drilldown__meta {
+  margin: 0;
+  padding: 0;
+}
+
+.beacon-geo-score-drilldown__meta p {
+  margin: 0 0 4px;
+}
+
+.beacon-geo-score-drilldown__meta p:last-child {
+  margin-bottom: 0;
+}
+
+.beacon-geo-score-drilldown__pane > table.data {
+  margin: 0;
+}
+
+.beacon-geo-score-drilldown__pane > table.data :is(th, td) {
+  padding-left: 0;
+  padding-right: var(--m, 16px);
+}
+
+.beacon-geo-score-drilldown__pane > table.data :is(th, td):first-child {
+  padding-left: var(--padding, 24px);
+}
+
+.beacon-geo-score-drilldown__pane > table.data :is(th, td):last-child {
+  padding-right: var(--padding, 24px);
+}
+
+.beacon-geo-score-drilldown__pillars .beacon-geo-score-widget-bar,
+.beacon-geo-score-drilldown__pane .beacon-geo-score-widget-bar {
+  max-width: 120px;
+  margin-top: 6px;
 }
 
 .beacon-geo-score-drilldown__notes {
   margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .beacon-geo-score-drilldown__notes li {
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+}
+
+.beacon-geo-score-drilldown__note-link {
+  display: inline-block;
+  margin-left: .35rem;
+  font-size: 12px;
+  white-space: nowrap;
 }
 
 /* Dashboard (beacon/dashboard) */
