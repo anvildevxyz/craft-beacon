@@ -6,67 +6,21 @@
     {% if instructions %}<p class="instructions">{{ instructions }}</p>{% endif %}
   </div>
 
-  <div class="sections-editor-container">
-    {# Left panel: Available sections #}
-    <div class="sections-available">
-      <h3>{{ 'beacon.available.sections'|t('beacon') }}</h3>
-      <input
-        type="text"
-        class="sections-search"
-        placeholder="{{ 'beacon.search.sections'|t('beacon') }}"
-        aria-label="{{ 'beacon.search.sections'|t('beacon') }}"
+  <div class="sections-button-bar" data-field-name="{{ name }}">
+    {% for section in allSections %}
+      <button
+        type="button"
+        class="section-button {% if section.value in values %}selected{% endif %}"
+        data-handle="{{ section.value }}"
+        draggable="true"
+        title="Click to toggle, drag to reorder"
       >
-      <div class="sections-list">
-        {% for section in allSections %}
-          <div class="section-item" data-handle="{{ section.value }}">
-            <input
-              type="checkbox"
-              class="section-checkbox"
-              value="{{ section.value }}"
-              {% if section.value in values %}checked{% endif %}
-              id="section-{{ section.value }}"
-            >
-            <label for="section-{{ section.value }}" class="section-label">
-              {{ section.label }}
-            </label>
-            <button
-              type="button"
-              class="section-add-btn"
-              data-handle="{{ section.value }}"
-              title="{{ 'beacon.add.section'|t('beacon') }}"
-              aria-label="{{ 'beacon.add.section.for'|t('beacon') }}: {{ section.label }}"
-            >
-              +
-            </button>
-          </div>
-        {% endfor %}
-      </div>
-    </div>
-
-    {# Right panel: Selected sections (draggable) #}
-    <div class="sections-selected">
-      <h3>{{ 'beacon.selected.sections'|t('beacon') }}</h3>
-      <div class="sections-chips" data-field-name="{{ name }}">
-        {% for section in allSections %}
-          {% if section.value in values %}
-            <div class="section-chip" draggable="true" data-handle="{{ section.value }}">
-              <span class="chip-label">{{ section.label }}</span>
-              <button
-                type="button"
-                class="chip-remove"
-                data-handle="{{ section.value }}"
-                title="{{ 'beacon.remove.section'|t('beacon') }}"
-                aria-label="{{ 'beacon.remove.section.for'|t('beacon') }}: {{ section.label }}"
-              >
-                ×
-              </button>
-            </div>
-          {% endif %}
-        {% endfor %}
-      </div>
-      <p class="chip-hint">{{ 'beacon.drag.to.reorder'|t('beacon') }}</p>
-    </div>
+        {{ section.label }}
+      </button>
+    {% endfor %}
   </div>
+
+  <p class="sections-hint">{{ 'beacon.drag.to.reorder'|t('beacon') }}</p>
 
   {# Hidden inputs for form submission #}
   <div class="sections-hidden">
@@ -78,183 +32,161 @@
 
 <style>
   .beacon-sections-editor {
-    margin: 1.5rem 0;
+    margin: 1rem 0;
   }
 
   .sections-editor-header {
-    margin-bottom: 1rem;
+    margin-bottom: 0.75rem;
   }
 
   .sections-editor-header label {
     display: block;
     font-weight: 600;
+    font-size: 0.95rem;
     margin-bottom: 0.25rem;
   }
 
   .sections-editor-header .instructions {
-    margin-top: 0.5rem;
-    font-size: 0.9rem;
-    color: #888;
-  }
-
-  .sections-editor-container {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1rem;
-    border: 1px solid #e0e0e0;
-    border-radius: 3px;
-    padding: 0.75rem;
-    background: #fafafa;
-  }
-
-  .sections-available h3,
-  .sections-selected h3 {
-    font-size: 0.85rem;
-    font-weight: 600;
-    margin: 0 0 0.5rem 0;
-    color: #333;
-  }
-
-  .sections-search {
-    display: block;
-    width: 100%;
-    margin-bottom: 0.5rem;
-    padding: 0.35rem 0.5rem;
-    border: 1px solid #ddd;
-    border-radius: 3px;
-    font-size: 0.8rem;
-  }
-
-  .sections-list {
-    max-height: 200px;
-    overflow-y: auto;
-    border: 1px solid #ddd;
-    border-radius: 3px;
-    background: white;
-  }
-
-  .section-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.4rem 0.5rem;
-    border-bottom: 1px solid #f0f0f0;
-    transition: background 0.15s;
-  }
-
-  .section-item:hover {
-    background: #f9f9f9;
-  }
-
-  .section-checkbox {
-    flex-shrink: 0;
-    cursor: pointer;
-  }
-
-  .section-label {
-    flex: 1;
-    cursor: pointer;
     margin: 0;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
+    color: #666;
   }
 
-  .section-add-btn {
-    flex-shrink: 0;
-    width: 24px;
-    height: 24px;
-    padding: 0;
-    border: 1px solid #ddd;
-    border-radius: 3px;
+  .sections-button-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 4px;
+    min-height: 40px;
+    align-content: flex-start;
+  }
+
+  .section-button {
+    padding: 0.5rem 1rem;
     background: white;
-    cursor: pointer;
-    font-weight: bold;
+    border: 1px solid #d1d5db;
+    border-radius: 20px;
     font-size: 0.9rem;
-    transition: all 0.15s;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+    font-weight: 500;
+    color: #374151;
   }
 
-  .section-add-btn:hover {
-    background: #e8f4f8;
+  .section-button:hover {
     border-color: #0f7a8f;
+    background: #f0fafb;
     color: #0f7a8f;
   }
 
-  .sections-chips {
-    min-height: 60px;
-    border: 2px dashed #ddd;
-    border-radius: 3px;
-    padding: 0.5rem;
-    background: white;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-    align-content: flex-start;
-    transition: border-color 0.15s;
-  }
-
-  .sections-chips.drag-over {
-    border-color: #0f7a8f;
-    background: #f0fafb;
-  }
-
-  .section-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    padding: 0.3rem 0.6rem;
+  .section-button.selected {
     background: #0f7a8f;
+    border-color: #0f7a8f;
     color: white;
-    border-radius: 16px;
-    cursor: move;
-    user-select: none;
-    transition: all 0.15s;
-    font-size: 0.8rem;
+    font-weight: 600;
   }
 
-  .section-chip:hover {
+  .section-button.selected:hover {
     background: #0a5a6f;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-color: #0a5a6f;
   }
 
-  .section-chip.drag-item {
-    opacity: 0.5;
+  .section-button.drag-item {
+    opacity: 0.6;
   }
 
-  .chip-label {
+  .sections-hint {
+    margin: 0.5rem 0 0 0;
     font-size: 0.8rem;
-    font-weight: 500;
-  }
-
-  .chip-remove {
-    flex-shrink: 0;
-    background: none;
-    border: none;
-    color: white;
-    cursor: pointer;
-    padding: 0;
-    font-size: 1rem;
-    line-height: 1;
-    transition: transform 0.15s;
-  }
-
-  .chip-remove:hover {
-    transform: scale(1.2);
-  }
-
-  .chip-hint {
-    margin-top: 0.4rem;
-    font-size: 0.75rem;
-    color: #888;
+    color: #999;
     font-style: italic;
   }
 
   .sections-hidden {
     display: none;
   }
-
-  @media (max-width: 768px) {
-    .sections-editor-container {
-      grid-template-columns: 1fr;
-      gap: 1.5rem;
-    }
-  }
 </style>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const bar = document.querySelector('.sections-button-bar');
+    const fieldName = bar?.dataset.fieldName;
+    const hiddenContainer = document.querySelector('.sections-hidden');
+    let draggedElement = null;
+
+    // Toggle selection on click
+    bar.querySelectorAll('.section-button').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        btn.classList.toggle('selected');
+        updateHiddenInputs();
+      });
+    });
+
+    // Drag and drop
+    bar.addEventListener('dragstart', (e) => {
+      if (e.target.classList.contains('section-button')) {
+        draggedElement = e.target;
+        draggedElement.classList.add('drag-item');
+        e.dataTransfer.effectAllowed = 'move';
+      }
+    });
+
+    bar.addEventListener('dragend', (e) => {
+      draggedElement?.classList.remove('drag-item');
+      draggedElement = null;
+    });
+
+    bar.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+    });
+
+    bar.addEventListener('drop', (e) => {
+      e.preventDefault();
+      if (!draggedElement) return;
+
+      const afterElement = getDragAfterElement(bar, e.clientX);
+      if (afterElement == null) {
+        bar.appendChild(draggedElement);
+      } else {
+        bar.insertBefore(draggedElement, afterElement);
+      }
+
+      updateHiddenInputs();
+    });
+
+    function getDragAfterElement(container, x) {
+      const draggableElements = [...container.querySelectorAll('.section-button:not(.drag-item)')];
+
+      return draggableElements.reduce(
+        (closest, child) => {
+          const box = child.getBoundingClientRect();
+          const offset = x - box.left - box.width / 2;
+
+          if (offset < 0 && offset > closest.offset) {
+            return { offset: offset, element: child };
+          } else {
+            return closest;
+          }
+        },
+        { offset: Number.NEGATIVE_INFINITY }
+      ).element;
+    }
+
+    function updateHiddenInputs() {
+      hiddenContainer.innerHTML = '';
+      bar.querySelectorAll('.section-button.selected').forEach((btn) => {
+        const input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = fieldName + '[]';
+        input.value = btn.dataset.handle;
+        hiddenContainer.appendChild(input);
+      });
+    }
+  });
+</script>
