@@ -36,7 +36,7 @@ final class GeoScoreWidget extends Widget
 
     public static function displayName(): string
     {
-        return Craft::t('beacon', 'GEO content score');
+        return Craft::t('beacon', 'widgets.geoScore.geo.content.score');
     }
 
     public static function icon(): ?string
@@ -46,7 +46,7 @@ final class GeoScoreWidget extends Widget
 
     public function getTitle(): ?string
     {
-        return Craft::t('beacon', 'GEO content score');
+        return Craft::t('beacon', 'widgets.geoScore.geo.content.score');
     }
 
     public function getBodyHtml(): ?string

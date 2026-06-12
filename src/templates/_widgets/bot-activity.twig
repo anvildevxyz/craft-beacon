@@ -1,13 +1,13 @@
 {% if bots is empty %}
-    <p>{{ 'No AI bot activity in this time range.'|t('beacon') }}</p>
+    <p>{{ 'widgets.botActivity.no.ai.bot.activity.time.text'|t('beacon') }}</p>
 {% else %}
     <table class="data fullwidth">
         <thead>
             <tr>
-                <th>{{ 'Bot'|t('beacon') }}</th>
-                <th>{{ 'Hits'|t('beacon') }}</th>
-                <th>{{ 'Last seen'|t('beacon') }}</th>
-                <th>{{ 'Top paths'|t('beacon') }}</th>
+                <th>{{ 'widgets.botActivity.bot.text'|t('beacon') }}</th>
+                <th>{{ 'widgets.botActivity.hits.text'|t('beacon') }}</th>
+                <th>{{ 'widgets.botActivity.last.seen.text'|t('beacon') }}</th>
+                <th>{{ 'widgets.botActivity.top.paths.text'|t('beacon') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -31,6 +31,6 @@
 
 {% if silentBots %}
     <p class="beacon-widget-footnote">
-        <small>{{ 'No activity from'|t('beacon') }}: {{ silentBots|join(', ') }}</small>
+        <small>{{ 'widgets.botActivity.no.activity.text'|t('beacon') }}: {{ silentBots|join(', ') }}</small>
     </p>
 {% endif %}

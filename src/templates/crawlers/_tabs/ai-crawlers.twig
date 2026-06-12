@@ -1,28 +1,28 @@
 {% import '_includes/forms.twig' as forms %}
 
-<h2 class="heading first">{{ 'Rules'|t('beacon') }}</h2>
-<p class="instructions">{{ 'Crawler-specific allow/disallow paths added to /robots.txt.'|t('beacon') }}</p>
+<h2 class="heading first">{{ 'aiCrawlers.rules.heading'|t('beacon') }}</h2>
+<p class="instructions">{{ 'aiCrawlers.crawler.specific.allow.disallow.paths.text'|t('beacon') }}</p>
 <div class="buttons">
-    <a href="{{ url('beacon/crawlers/ai-crawlers/rules/new') }}" class="btn submit add icon">{{ 'New rule'|t('beacon') }}</a>
+    <a href="{{ url('beacon/crawlers/ai-crawlers/rules/new') }}" class="btn submit add icon">{{ 'aiCrawlers.new.rule.text'|t('beacon') }}</a>
 </div>
 
 {% if rules is empty %}
     <div class="beacon-empty beacon-space-bottom">
         <div class="beacon-empty__icon" aria-hidden="true">🛡️</div>
-        <h3>{{ 'No crawler rules yet'|t('beacon') }}</h3>
-        <p>{{ 'Add allow/disallow rules to shape how AI crawlers access your site.'|t('beacon') }}</p>
+        <h3>{{ 'aiCrawlers.no.crawler.rules.yet.heading'|t('beacon') }}</h3>
+        <p>{{ 'aiCrawlers.add.allow.disallow.rules.shape.text'|t('beacon') }}</p>
         <div class="beacon-empty__actions">
-            <a href="{{ url('beacon/crawlers/ai-crawlers/rules/new') }}" class="btn submit">{{ 'Create first rule'|t('beacon') }}</a>
+            <a href="{{ url('beacon/crawlers/ai-crawlers/rules/new') }}" class="btn submit">{{ 'aiCrawlers.create.first.rule.text'|t('beacon') }}</a>
         </div>
     </div>
 {% else %}
     <table class="data fullwidth beacon-space-bottom">
         <thead>
             <tr>
-                <th>{{ 'Bot'|t('beacon') }}</th>
-                <th>{{ 'Allow'|t('beacon') }}</th>
-                <th>{{ 'Disallow'|t('beacon') }}</th>
-                <th class="thin">{{ 'Enabled'|t('beacon') }}</th>
+                <th>{{ 'aiCrawlers.bot.text'|t('beacon') }}</th>
+                <th>{{ 'aiCrawlers.allow.text'|t('beacon') }}</th>
+                <th>{{ 'aiCrawlers.disallow.text'|t('beacon') }}</th>
+                <th class="thin">{{ 'field.enabled'|t('beacon') }}</th>
                 <th class="thin"></th>
             </tr>
         </thead>
@@ -30,8 +30,8 @@
         {% for r in rules %}
             <tr>
                 <td><a href="{{ url('beacon/crawlers/ai-crawlers/rules/' ~ r.id) }}">{{ r.botName }}</a></td>
-                <td><code>{{ r.allowPaths|join(', ') ?: '—'|t('beacon') }}</code></td>
-                <td><code>{{ r.disallowPaths|join(', ') ?: '—'|t('beacon') }}</code></td>
+                <td><code>{{ r.allowPaths|join(', ') ?: 'common.emDash'|t('beacon') }}</code></td>
+                <td><code>{{ r.disallowPaths|join(', ') ?: 'common.emDash'|t('beacon') }}</code></td>
                 <td class="thin">
                     {{ forms.lightswitch({
                         on: r.enabled,
@@ -45,11 +45,11 @@
                     }) }}
                 </td>
                 <td class="thin">
-                    <form method="post" action="" class="inline" data-confirm="{{ 'Delete this rule?'|t('beacon') }}">
+                    <form method="post" action="" class="inline" data-confirm="{{ 'aiCrawlers.delete.rule.text'|t('beacon') }}">
                         {{ csrfInput() }}
                         <input type="hidden" name="action" value="beacon/ai-crawlers/delete-rule">
                         <input type="hidden" name="ruleId" value="{{ r.id }}">
-                        <button type="submit" class="delete icon" title="{{ 'Delete'|t('beacon') }}"></button>
+                        <button type="submit" class="delete icon" title="{{ 'action.delete'|t('beacon') }}"></button>
                     </form>
                 </td>
             </tr>
@@ -60,24 +60,24 @@
 
 <hr>
 
-<h2>{{ 'Bots'|t('beacon') }}</h2>
-<p class="instructions">{{ 'Known AI crawlers (defaults + custom). Toggle to enable/disable, or delete bots you do not want. Use "Restore defaults" to bring deleted defaults back.'|t('beacon') }}</p>
+<h2>{{ 'aiCrawlers.bots.heading'|t('beacon') }}</h2>
+<p class="instructions">{{ 'aiCrawlers.known.ai.crawlers.defaults.custom.text'|t('beacon') }}</p>
 <div class="buttons">
-    <a href="{{ url('beacon/crawlers/ai-crawlers/bots/new') }}" class="btn submit add icon">{{ 'New bot'|t('beacon') }}</a>
-    <form method="post" action="" data-confirm="{{ 'Restore default bots that have been deleted?'|t('beacon') }}">
+    <a href="{{ url('beacon/crawlers/ai-crawlers/bots/new') }}" class="btn submit add icon">{{ 'aiCrawlers.new.bot.text'|t('beacon') }}</a>
+    <form method="post" action="" data-confirm="{{ 'aiCrawlers.restore.default.bots.have.been.text'|t('beacon') }}">
         {{ csrfInput() }}
         <input type="hidden" name="action" value="beacon/ai-crawlers/reset-defaults">
-        <button type="submit" class="btn">{{ 'Restore defaults'|t('beacon') }}</button>
+        <button type="submit" class="btn">{{ 'aiCrawlers.restore.defaults.text'|t('beacon') }}</button>
     </form>
 </div>
 
 <table class="data fullwidth">
     <thead>
         <tr>
-            <th>{{ 'Name'|t('beacon') }}</th>
-            <th>{{ 'User-Agent pattern'|t('beacon') }}</th>
-            <th class="thin">{{ 'Enabled'|t('beacon') }}</th>
-            <th>{{ 'Source'|t('beacon') }}</th>
+            <th>{{ 'aiCrawlers.name.text'|t('beacon') }}</th>
+            <th>{{ 'aiCrawlers.user.agent.pattern.text'|t('beacon') }}</th>
+            <th class="thin">{{ 'field.enabled'|t('beacon') }}</th>
+            <th>{{ 'aiCrawlers.source.text'|t('beacon') }}</th>
             <th class="thin"></th>
         </tr>
     </thead>
@@ -100,17 +100,17 @@
             </td>
             <td>
                 {% if b.source == 'default' %}
-                    <span class="status active"></span> {{ 'default'|t('beacon') }}
+                    <span class="status active"></span> {{ 'aiCrawlers.default.text'|t('beacon') }}
                 {% else %}
-                    <span class="status"></span> {{ 'custom'|t('beacon') }}
+                    <span class="status"></span> {{ 'aiCrawlers.custom.text'|t('beacon') }}
                 {% endif %}
             </td>
             <td class="thin">
-                <form method="post" action="" class="inline" data-confirm="{{ b.source == 'default' ? 'Delete this default bot? You can use "Restore defaults" to bring it back.'|t('beacon') : 'Delete this bot?'|t('beacon') }}">
+                <form method="post" action="" class="inline" data-confirm="{{ b.source == 'default' ? 'aiCrawlers.delete.default.bot.you.can.text'|t('beacon') : 'aiCrawlers.delete.bot.text'|t('beacon') }}">
                     {{ csrfInput() }}
                     <input type="hidden" name="action" value="beacon/ai-crawlers/delete-bot">
                     <input type="hidden" name="botId" value="{{ b.id }}">
-                    <button type="submit" class="delete icon" title="{{ 'Delete'|t('beacon') }}"></button>
+                    <button type="submit" class="delete icon" title="{{ 'action.delete'|t('beacon') }}"></button>
                 </form>
             </td>
         </tr>

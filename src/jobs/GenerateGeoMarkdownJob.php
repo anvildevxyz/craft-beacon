@@ -46,6 +46,6 @@ class GenerateGeoMarkdownJob extends BaseJob
 
     protected function defaultDescription(): ?string
     {
-        return Craft::t('beacon', 'Generating GEO Markdown for element {id}', ['id' => $this->elementId]);
+        return Craft::t('beacon', 'jobs.geoMarkdown.generating.geo.markdown.element', ['id' => $this->elementId]);
     }
 }

@@ -16,14 +16,14 @@ final class CustomScriptProvider extends AbstractBeaconTrackingProvider
 
     public function getDisplayName(): string
     {
-        return Craft::t('beacon', 'Custom Script');
+        return Craft::t('beacon', 'tracking.custom.custom.script');
     }
 
     public function validateConfig(array $config): array
     {
         $html = trim((string)($config['html'] ?? ''));
         if ($html === '') {
-            return ['html' => Craft::t('beacon', 'HTML is required.')];
+            return ['html' => Craft::t('beacon', 'tracking.custom.html.required')];
         }
         return [];
     }

@@ -2,8 +2,8 @@
 
 {% set selectedSubnavItem = 'crawlers' %}
 {% set fullPageForm = selectedCrawlerTab != 'ai-crawlers' %}
-{% set title = 'Crawlers'|t('beacon') %}
-{% set crumbs = [{ label: 'Beacon'|t('beacon'), url: cpUrl('beacon') }] %}
+{% set title = 'nav.crawlers'|t('beacon') %}
+{% set crumbs = [{ label: 'nav.beacon'|t('beacon'), url: cpUrl('beacon') }] %}
 
 {% block sidebar %}
     {% include 'beacon/crawlers/_sidebar' %}

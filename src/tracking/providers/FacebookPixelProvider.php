@@ -16,14 +16,14 @@ final class FacebookPixelProvider extends AbstractBeaconTrackingProvider
 
     public function getDisplayName(): string
     {
-        return Craft::t('beacon', 'Facebook Pixel');
+        return Craft::t('beacon', 'tracking.facebookPixel.facebook.pixel');
     }
 
     public function validateConfig(array $config): array
     {
         $id = (string)($config['pixelId'] ?? '');
         if (!preg_match('/^[0-9]{10,20}$/', $id)) {
-            return ['pixelId' => Craft::t('beacon', 'Pixel ID must be 10–20 digits.')];
+            return ['pixelId' => Craft::t('beacon', 'tracking.facebookPixel.pixel.id.must.10.20')];
         }
         return [];
     }

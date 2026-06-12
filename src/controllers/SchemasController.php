@@ -92,17 +92,17 @@ class SchemasController extends Controller
         $record->mapping = $mappingJson = trim((string) $request->getBodyParam('mapping', '{}')) ?: '{}';
 
         if (strlen($mappingJson) > 65535) {
-            $session->setError(Craft::t('beacon', 'Mapping JSON exceeds the 64 KiB limit.'));
+            $session->setError(Craft::t('beacon', 'flash.schemas.mapping.json.exceeds.64.kib'));
             return $this->retainOnError($record);
         }
         $decoded = JsonHelper::decodeObject($mappingJson);
         if ($decoded === null) {
-            $session->setError(Craft::t('beacon', 'Mapping must be a valid JSON object.'));
+            $session->setError(Craft::t('beacon', 'flash.schemas.mapping.must.valid.json.object'));
             return $this->retainOnError($record);
         }
 
         if ($record->entryTypeHandle === '' || $record->schemaType === '') {
-            $session->setError(Craft::t('beacon', 'Entry type and schema type are required.'));
+            $session->setError(Craft::t('beacon', 'flash.schemas.entry.type.schema.type.required'));
             return $this->retainOnError($record);
         }
         $now = Db::now();
@@ -113,12 +113,12 @@ class SchemasController extends Controller
         $record->dateUpdated = $now;
 
         if (!$record->save()) {
-            $session->setError(Craft::t('beacon', 'Couldn\'t save schema.'));
+            $session->setError(Craft::t('beacon', 'flash.schemas.couldnt.save'));
             return $this->retainOnError($record);
         }
 
         $plugin->bundles->clearCache();
-        $session->setNotice(Craft::t('beacon', 'Schema saved.'));
+        $session->setNotice(Craft::t('beacon', 'flash.schemas.schema.saved'));
         return $this->redirectToPostedUrl($record);
     }
 
@@ -194,7 +194,7 @@ class SchemasController extends Controller
         $entryTypeHandle = trim((string) $request->getBodyParam('entryTypeHandle', ''));
         $type = trim((string) $request->getRequiredBodyParam('schemaType'));
         if ($type === '' || !$suggester->knowsType($type)) {
-            throw new BadRequestHttpException(Craft::t('beacon', 'Unknown schema type: {type}', ['type' => $type]));
+            throw new BadRequestHttpException(Craft::t('beacon', 'flash.schemas.unknown.schema.type', ['type' => $type]));
         }
 
         $entry = $entryTypeHandle !== '' ? $this->sampleEntry($entryTypeHandle) : null;
@@ -219,12 +219,12 @@ class SchemasController extends Controller
 
         $type = trim((string) $request->getBodyParam('schemaType', ''));
         if ($type === '') {
-            return $this->asJson(['error' => Craft::t('beacon', 'Choose a schema type first.')]);
+            return $this->asJson(['error' => Craft::t('beacon', 'flash.schemas.choose.schema.type.first')]);
         }
 
         $decoded = JsonHelper::decodeObject(trim((string) $request->getBodyParam('mapping', '{}')) ?: '{}');
         if ($decoded === null) {
-            return $this->asJson(['error' => Craft::t('beacon', 'Mapping must be a valid JSON object.')]);
+            return $this->asJson(['error' => Craft::t('beacon', 'flash.schemas.mapping.must.valid.json.object')]);
         }
         /** @var array<string,string> $mapping */
         $mapping = array_filter($decoded, static fn($v): bool => is_string($v));

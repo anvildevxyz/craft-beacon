@@ -27,8 +27,8 @@
     // component config in Plugin.php to add NewsArticle, Event, etc.
     var DEFAULT_TYPES = ['Article', 'Product', 'Recipe', 'HowTo', 'FAQPage', 'Review'];
     var TIER_MARKER = { required: '★', recommended: '◇', optional: '' };
-    var TIER_LABEL = { required: Craft.t('beacon', 'Required'), recommended: Craft.t('beacon', 'Recommended'), optional: Craft.t('beacon', 'Optional') };
-    var SOURCE_GROUP_LABEL = { entry: Craft.t('beacon', 'Entry attributes'), seo: Craft.t('beacon', 'SEO field'), field: Craft.t('beacon', 'Custom fields') };
+    var TIER_LABEL = { required: Craft.t('beacon', 'seoField.js.required'), recommended: Craft.t('beacon', 'seoField.js.recommended'), optional: Craft.t('beacon', 'seoField.js.optional') };
+    var SOURCE_GROUP_LABEL = { entry: Craft.t('beacon', 'seoField.js.entry.attributes'), seo: Craft.t('beacon', 'seoField.js.seo.field'), field: Craft.t('beacon', 'seoField.js.custom.fields') };
     var CUSTOM_PROPERTY = '__custom';
     var CUSTOM_TEMPLATE = '__template';
 
@@ -138,18 +138,18 @@
     function buildActionItems(checks, titleLen, descriptionLen, canonical) {
         var actions = [];
         if (!checks.titleLength) {
-            actions.push(titleLen < 50 ? Craft.t('beacon', 'Increase SEO title length toward 50–60 characters.') : Craft.t('beacon', 'Shorten SEO title to stay within 50–60 characters.'));
+            actions.push(titleLen < 50 ? Craft.t('beacon', 'seoField.js.increase.seo.title.length.toward') : Craft.t('beacon', 'seoField.js.shorten.seo.title.stay.within'));
         }
         if (!checks.descriptionLength) {
-            actions.push(descriptionLen < 140 ? Craft.t('beacon', 'Expand SEO description toward 140–165 characters.') : Craft.t('beacon', 'Trim SEO description to avoid truncation in SERP snippets.'));
+            actions.push(descriptionLen < 140 ? Craft.t('beacon', 'seoField.js.expand.seo.description.toward.140') : Craft.t('beacon', 'seoField.js.trim.seo.description.avoid.truncation'));
         }
-        if (!checks.canonical) actions.push(Craft.t('beacon', 'Set canonical URL to an absolute http(s) URL or leave it blank for automatic canonical.'));
-        if (!checks.robots) actions.push(Craft.t('beacon', 'Review robots directives: avoid combining noindex with nosnippet unless intentionally blocking AI/search visibility.'));
-        if (!checks.schema) actions.push(Craft.t('beacon', 'Add at least one schema bundle or entry-level schema add-on for richer machine understanding.'));
-        if (!checks.social) actions.push(Craft.t('beacon', 'Fill title + description so Open Graph/Twitter previews are complete.'));
+        if (!checks.canonical) actions.push(Craft.t('beacon', 'seoField.js.set.canonical.url.absolute.http'));
+        if (!checks.robots) actions.push(Craft.t('beacon', 'seoField.js.review.robots.directives.avoid.combining'));
+        if (!checks.schema) actions.push(Craft.t('beacon', 'seoField.js.add.least.one.schema.bundle'));
+        if (!checks.social) actions.push(Craft.t('beacon', 'seoField.js.fill.title.description.so.open'));
         if (actions.length === 0) {
-            actions.push(Craft.t('beacon', 'Looks good. Next: validate social image quality and keep title/description aligned with page intent.'));
-            if (canonical !== '') actions.push(Craft.t('beacon', 'Re-check canonical after URL/slug changes.'));
+            actions.push(Craft.t('beacon', 'seoField.js.looks.good.next.validate.social'));
+            if (canonical !== '') actions.push(Craft.t('beacon', 'seoField.js.re.check.canonical.after.url'));
         }
         return actions.slice(0, 4);
     }
@@ -335,16 +335,16 @@
                 if (!titleEl) return;
                 var len = (titleEl.value || '').length;
                 if (len === 0) { setHint(titleEl, null, ''); return; }
-                if (len > 60) setHint(titleEl, 'warn', Craft.t('beacon', 'Tip: titles over 60 characters tend to truncate in Google mobile.'));
-                else if (len < 30) setHint(titleEl, 'info', Craft.t('beacon', 'Short titles can underperform — aim for 50–60 characters.'));
+                if (len > 60) setHint(titleEl, 'warn', Craft.t('beacon', 'seoField.js.tip.titles.over.60.characters'));
+                else if (len < 30) setHint(titleEl, 'info', Craft.t('beacon', 'seoField.js.short.titles.can.underperform.aim'));
                 else setHint(titleEl, null, '');
             }
             function validateDescSoft() {
                 if (!descEl) return;
                 var len = (descEl.value || '').length;
                 if (len === 0) { setHint(descEl, null, ''); return; }
-                if (len > 165) setHint(descEl, 'warn', Craft.t('beacon', 'Tip: descriptions over 165 characters often truncate in SERP snippets.'));
-                else if (len < 120) setHint(descEl, 'info', Craft.t('beacon', 'Below 120 characters — most SERPs have room for 150–160.'));
+                if (len > 165) setHint(descEl, 'warn', Craft.t('beacon', 'seoField.js.tip.descriptions.over.165.characters'));
+                else if (len < 120) setHint(descEl, 'info', Craft.t('beacon', 'seoField.js.below.120.characters.most.serps'));
                 else setHint(descEl, null, '');
             }
             function validateCanonical() {
@@ -352,7 +352,7 @@
                 var v = (canonicalEl.value || '').trim();
                 if (v === '') { setHint(canonicalEl, null, ''); canonicalEl.classList.remove('is-invalid'); return; }
                 var ok = /^https?:\/\/[^\s]+$/i.test(v);
-                if (!ok) { setHint(canonicalEl, 'error', Craft.t('beacon', 'Canonical must be an absolute URL beginning with http:// or https://')); canonicalEl.classList.add('is-invalid'); }
+                if (!ok) { setHint(canonicalEl, 'error', Craft.t('beacon', 'seoField.js.canonical.must.absolute.url.beginning')); canonicalEl.classList.add('is-invalid'); }
                 else { setHint(canonicalEl, null, ''); canonicalEl.classList.remove('is-invalid'); }
             }
             function validateFrontMatter() {
@@ -366,7 +366,7 @@
                     if (line === '' || line.charAt(0) === '#') continue;
                     if (!/^[A-Za-z][A-Za-z0-9_-]*:\s*\S/.test(line)) bad.push(i + 1);
                 }
-                if (bad.length) setHint(frontMatterEl, 'warn', Craft.t('beacon', 'Line {line}: expected "key: value" format.', { line: bad[0] }));
+                if (bad.length) setHint(frontMatterEl, 'warn', Craft.t('beacon', 'seoField.js.line.expected.key.value.format', { line: bad[0] }));
                 else setHint(frontMatterEl, null, '');
             }
             function validateRobots() {
@@ -379,8 +379,8 @@
                 var ns = nosnippetEl && nosnippetEl.checked;
                 var na = noarchiveEl && noarchiveEl.checked;
                 var msgs = [];
-                if (ni && ns) msgs.push(Craft.t('beacon', 'noindex + nosnippet together also blocks AI/search visibility — confirm this is intentional.'));
-                if (ni && na) msgs.push(Craft.t('beacon', 'noindex + noarchive is redundant: noindex already drops the page from results.'));
+                if (ni && ns) msgs.push(Craft.t('beacon', 'seoField.js.noindex.nosnippet.together.also.blocks'));
+                if (ni && na) msgs.push(Craft.t('beacon', 'seoField.js.noindex.noarchive.redundant.noindex.already'));
                 notice.textContent = msgs.join(' ');
                 notice.classList.toggle('is-active', msgs.length > 0);
             }
@@ -443,15 +443,15 @@
         var description = descEl ? (descEl.value || '').trim() : '';
 
         var items = [];
-        if (!effectiveTitle) items.push(Craft.t('beacon', 'Title is empty — Google and social cards will fall back to the entry title or be blank.'));
-        if (!description) items.push(Craft.t('beacon', 'Description is empty — Slack/Discord/Facebook cards will not show a snippet.'));
-        if (!hasEntryImage && !hasFallbackImage) items.push(Craft.t('beacon', 'No social image — Open Graph / Twitter cards will render text-only.'));
+        if (!effectiveTitle) items.push(Craft.t('beacon', 'seoField.js.title.empty.google.social.cards'));
+        if (!description) items.push(Craft.t('beacon', 'seoField.js.description.empty.slack.discord.facebook'));
+        if (!hasEntryImage && !hasFallbackImage) items.push(Craft.t('beacon', 'seoField.js.no.social.image.open.graph'));
 
         callout.innerHTML = '';
         if (!items.length) { callout.hidden = true; return; }
         callout.hidden = false;
         var heading = document.createElement('strong');
-        heading.textContent = Craft.t('beacon', 'Preview gaps');
+        heading.textContent = Craft.t('beacon', 'seoField.js.preview.gaps');
         callout.appendChild(heading);
         var ul = document.createElement('ul');
         items.forEach(function(text) {
@@ -473,13 +473,13 @@
         var hasSection = badge.getAttribute('data-bp-has-section') === '1';
         var cls, label;
         if (hasEntryValue) {
-            cls = 'is-entry'; label = Craft.t('beacon', 'Entry override');
+            cls = 'is-entry'; label = Craft.t('beacon', 'seoField.js.entry.override');
         } else if (source === 'section' || (source === undefined && hasSection)) {
-            cls = 'is-section'; label = Craft.t('beacon', 'Section default');
+            cls = 'is-section'; label = Craft.t('beacon', 'seoField.js.section.default');
         } else if (source === 'entry' || (source === undefined && hasEntryTitleFallback)) {
-            cls = 'is-fallback'; label = Craft.t('beacon', 'Entry title fallback');
+            cls = 'is-fallback'; label = Craft.t('beacon', 'seoField.js.entry.title.fallback');
         } else {
-            cls = 'is-global'; label = Craft.t('beacon', 'Global default');
+            cls = 'is-global'; label = Craft.t('beacon', 'seoField.js.global.default');
         }
         badge.classList.remove('is-entry', 'is-section', 'is-global', 'is-fallback');
         badge.classList.add(cls);
@@ -654,19 +654,19 @@
         var recommendedHit = recommendedProps.filter(function(p) { return mapping[p.name]; }).length;
 
         var statusClass = 'is-ok';
-        var statusText = '✓ ' + Craft.t('beacon', '{hit}/{total} required', { hit: requiredHit, total: requiredProps.length });
+        var statusText = '✓ ' + Craft.t('beacon', 'seoField.js.required.2', { hit: requiredHit, total: requiredProps.length });
         if (requiredProps.length && requiredHit < requiredProps.length) {
             statusClass = 'is-error';
-            statusText = '★ ' + Craft.t('beacon', '{hit}/{total} required', { hit: requiredHit, total: requiredProps.length });
+            statusText = '★ ' + Craft.t('beacon', 'seoField.js.required.2', { hit: requiredHit, total: requiredProps.length });
         } else if (recommendedProps.length && recommendedHit < recommendedProps.length) {
             statusClass = 'is-warn';
-            statusText = '◇ ' + Craft.t('beacon', '{hit}/{total} recommended', { hit: recommendedHit, total: recommendedProps.length });
+            statusText = '◇ ' + Craft.t('beacon', 'seoField.js.recommended.2', { hit: recommendedHit, total: recommendedProps.length });
         }
 
         var propertyNames = Object.keys(mapping);
         var summaryLine = propertyNames.length
             ? propertyNames.slice(0, 6).join(', ') + (propertyNames.length > 6 ? ' (+' + (propertyNames.length - 6) + ')' : '')
-            : Craft.t('beacon', '— no properties mapped —');
+            : Craft.t('beacon', 'seoField.js.no.properties.mapped');
 
         body.innerHTML = '';
         var top = el('div', null, [
@@ -735,7 +735,7 @@
             });
             select.appendChild(grp);
         });
-        var customOpt = el('option', { value: CUSTOM_PROPERTY, text: Craft.t('beacon', '— Custom property…') });
+        var customOpt = el('option', { value: CUSTOM_PROPERTY, text: Craft.t('beacon', 'seoField.js.custom.property') });
         select.appendChild(customOpt);
         if (currentProperty && !seenCurrent) customOpt.selected = true;
         return select;
@@ -760,7 +760,7 @@
             });
             select.appendChild(grp);
         });
-        var customOpt = el('option', { value: CUSTOM_TEMPLATE, text: Craft.t('beacon', '— Custom template…') });
+        var customOpt = el('option', { value: CUSTOM_TEMPLATE, text: Craft.t('beacon', 'seoField.js.custom.template') });
         select.appendChild(customOpt);
         if (currentTemplate && !matched) customOpt.selected = true;
         return select;
@@ -793,10 +793,10 @@
         };
 
         var modal = el('div', { class: 'beacon-schema-modal' });
-        var headerTitle = options.titleText || (typeInput && typeInput.value ? Craft.t('beacon', 'Edit schema') : Craft.t('beacon', 'Add schema'));
+        var headerTitle = options.titleText || (typeInput && typeInput.value ? Craft.t('beacon', 'schemas.edit.edit.schema.text') : Craft.t('beacon', 'seoField.add.schema.text'));
         var header = el('div', { class: 'beacon-schema-modal-header' }, [
             el('h2', { class: 'beacon-schema-modal-title', text: headerTitle }),
-            el('button', { type: 'button', class: 'beacon-schema-modal-close', 'aria-label': Craft.t('beacon', 'Close'), text: '×' })
+            el('button', { type: 'button', class: 'beacon-schema-modal-close', 'aria-label': Craft.t('beacon', 'seoField.js.close'), text: '×' })
         ]);
         var body = el('div', { class: 'beacon-schema-modal-body' });
         var footer = el('div', { class: 'beacon-schema-modal-footer' });
@@ -820,44 +820,44 @@
             href: 'https://schema.org/' + encodeURIComponent(state.type),
             target: '_blank',
             rel: 'noopener',
-            text: Craft.t('beacon', 'schema.org docs ↗'),
-            title: Craft.t('beacon', 'Open this type’s spec on schema.org'),
+            text: Craft.t('beacon', 'seoField.js.schema.org.docs'),
+            title: Craft.t('beacon', 'seoField.js.open.type.s.spec.schema.2'),
         });
         typeSelect.addEventListener('change', function() {
             docsLink.setAttribute('href', 'https://schema.org/' + encodeURIComponent(typeSelect.value));
         });
         var typeField = el('div', { class: 'field' }, [
-            el('div', { class: 'heading' }, [el('label', { text: Craft.t('beacon', 'Schema type') })]),
+            el('div', { class: 'heading' }, [el('label', { text: Craft.t('beacon', 'schemas.edit.schemaType.label') })]),
             el('div', { class: 'input ltr beacon-schema-modal-type' }, [typeSelect, docsLink])
         ]);
-        var suggestBtn = el('button', { type: 'button', class: 'btn', 'data-modal-suggest': '', text: Craft.t('beacon', 'Suggest mapping') });
+        var suggestBtn = el('button', { type: 'button', class: 'btn', 'data-modal-suggest': '', text: Craft.t('beacon', 'seoField.js.suggest.mapping') });
         var suggestNote = el('div', { class: 'beacon-schema-modal-suggest-note light' });
         if (!config.entryId) {
             suggestBtn.disabled = true;
-            suggestBtn.title = Craft.t('beacon', 'Save the entry once before requesting a suggested mapping.');
-            suggestNote.textContent = Craft.t('beacon', 'Save this entry first — Beacon needs the entry’s saved fields to suggest mappings.');
+            suggestBtn.title = Craft.t('beacon', 'seoField.js.save.entry.once.before.requesting');
+            suggestNote.textContent = Craft.t('beacon', 'seoField.js.save.entry.first.needs.entry.2');
         }
         body.appendChild(el('div', { class: 'beacon-schema-modal-toolbar' }, [typeField, suggestBtn, suggestNote]));
 
         // Grid layout (not a <table>): keeps the Property/Source columns aligned
         // even when one row reveals its "Custom" text input below the select.
-        body.appendChild(el('h3', { class: 'beacon-seo-section-title', text: Craft.t('beacon', 'Properties') }));
+        body.appendChild(el('h3', { class: 'beacon-seo-section-title', text: Craft.t('beacon', 'seoField.js.properties') }));
 
         var grid = el('div', { class: 'beacon-mapping-grid' });
         grid.appendChild(el('div', { class: 'beacon-mapping-grid-head' }, [
-            el('span', { class: 'beacon-mapping-grid-head-label', text: Craft.t('beacon', 'Property') }),
-            el('span', { class: 'beacon-mapping-grid-head-label', text: Craft.t('beacon', 'Source') }),
+            el('span', { class: 'beacon-mapping-grid-head-label', text: Craft.t('beacon', 'seoField.js.property') }),
+            el('span', { class: 'beacon-mapping-grid-head-label', text: Craft.t('beacon', 'aiCrawlers.source.text') }),
             el('span')
         ]));
         var tbody = el('div', { class: 'beacon-mapping-grid-body', 'data-modal-rows': '' });
         grid.appendChild(tbody);
         body.appendChild(grid);
-        body.appendChild(el('button', { type: 'button', class: 'btn small add icon', 'data-modal-add-row': '', text: Craft.t('beacon', 'Add property') }));
+        body.appendChild(el('button', { type: 'button', class: 'btn small add icon', 'data-modal-add-row': '', text: Craft.t('beacon', 'seoField.js.add.property') }));
         var validation = el('div', { class: 'beacon-mapping-validation', 'data-modal-validation': '' });
         body.appendChild(validation);
 
         var preview = el('details', { class: 'beacon-schema-preview' }, [
-            el('summary', { class: 'light', text: Craft.t('beacon', 'JSON-LD preview') }),
+            el('summary', { class: 'light', text: Craft.t('beacon', 'seoField.js.json.ld.preview') }),
             el('pre', { 'data-modal-preview': '' })
         ]);
         body.appendChild(preview);
@@ -865,8 +865,8 @@
         // Footer
         footer.appendChild(el('div', { class: 'light', 'data-modal-status': '' }));
         var footerRight = el('div', { class: 'beacon-schema-modal-footer-right' }, [
-            el('button', { type: 'button', class: 'btn', 'data-modal-cancel': '', text: Craft.t('beacon', 'Cancel') }),
-            el('button', { type: 'button', class: 'btn submit', 'data-modal-save': '', text: Craft.t('beacon', 'Save') })
+            el('button', { type: 'button', class: 'btn', 'data-modal-cancel': '', text: Craft.t('beacon', 'seoField.js.cancel') }),
+            el('button', { type: 'button', class: 'btn submit', 'data-modal-save': '', text: Craft.t('beacon', 'seoField.js.save') })
         ]);
         footer.appendChild(footerRight);
 
@@ -893,7 +893,7 @@
             var propSelect = buildPropertySelect(type, row.property, config);
             var propCustom = el('input', {
                 type: 'text', class: 'text fullwidth beacon-mapping-custom-input',
-                placeholder: Craft.t('beacon', 'propertyName')
+                placeholder: Craft.t('beacon', 'seoField.js.propertyName')
             });
             propCustom.value = propSelect.value === CUSTOM_PROPERTY ? row.property : '';
             propCustom.hidden = propSelect.value !== CUSTOM_PROPERTY;
@@ -948,7 +948,7 @@
                 sourceSelect,
                 sourceCustom
             ]);
-            var removeBtn = el('button', { type: 'button', class: 'btn small beacon-mapping-row-remove', 'aria-label': Craft.t('beacon', 'Remove'), text: '×' });
+            var removeBtn = el('button', { type: 'button', class: 'btn small beacon-mapping-row-remove', 'aria-label': Craft.t('beacon', 'redirectSources.remove.ariaLabel'), text: '×' });
             removeBtn.addEventListener('click', function() {
                 state.rows.splice(idx, 1);
                 paintRows();
@@ -974,14 +974,14 @@
             validation.classList.remove('is-warn', 'is-error', 'is-ok');
             if (missingRequired.length) {
                 validation.classList.add('is-error');
-                validation.textContent = '★ ' + Craft.t('beacon', 'Missing required: {props}', { props: missingRequired.join(', ') });
+                validation.textContent = '★ ' + Craft.t('beacon', 'seoField.js.missing.required', { props: missingRequired.join(', ') });
             } else if (missingRecommended.length) {
                 validation.classList.add('is-warn');
-                validation.textContent = '◇ ' + Craft.t('beacon', 'Missing recommended: {props}', { props: missingRecommended.slice(0, 4).join(', ') })
+                validation.textContent = '◇ ' + Craft.t('beacon', 'seoField.js.missing.recommended', { props: missingRecommended.slice(0, 4).join(', ') })
                     + (missingRecommended.length > 4 ? ' (+' + (missingRecommended.length - 4) + ')' : '');
             } else {
                 validation.classList.add('is-ok');
-                validation.textContent = '✓ ' + Craft.t('beacon', 'All required + recommended properties mapped');
+                validation.textContent = '✓ ' + Craft.t('beacon', 'seoField.js.all.required.recommended.properties.mapped');
             }
         }
 
@@ -1007,7 +1007,7 @@
             if (!config.entryId) return;
             var prevText = suggestBtn.textContent;
             suggestBtn.disabled = true;
-            suggestBtn.textContent = Craft.t('beacon', 'Loading…');
+            suggestBtn.textContent = Craft.t('beacon', 'seoField.js.loading');
 
             var done = function() { suggestBtn.disabled = false; suggestBtn.textContent = prevText; };
 
@@ -1023,9 +1023,9 @@
                 }).catch(function(err) {
                     if (window.console && console.warn) console.warn('[Beacon] suggest-mapping failed:', err);
                     if (window.Craft && Craft.cp && typeof Craft.cp.displayError === 'function') {
-                        Craft.cp.displayError(Craft.t('beacon', 'Could not load suggested mapping.'));
+                        Craft.cp.displayError(Craft.t('beacon', 'seoField.js.could.not.load.suggested.mapping'));
                     } else {
-                        window.alert(Craft.t('beacon', 'Could not load suggested mapping.'));
+                        window.alert(Craft.t('beacon', 'seoField.js.could.not.load.suggested.mapping'));
                     }
                 }).finally(done);
                 return;
@@ -1033,7 +1033,7 @@
 
             // Fallback path (non-CP context); CSRF won't be auto-attached.
             done();
-            window.alert(Craft.t('beacon', 'Suggest mapping requires the Craft CP — open this entry in the CP.'));
+            window.alert(Craft.t('beacon', 'seoField.js.suggest.mapping.requires.craft.cp'));
         });
 
         function mergeSuggestedMapping(mapping) {
@@ -1110,8 +1110,8 @@
         }));
         card.appendChild(el('div', { class: 'beacon-schema-card-body', 'data-card-body': '' }));
         var actions = el('div', { class: 'beacon-schema-card-actions' }, [
-            el('button', { type: 'button', class: 'btn small', 'data-card-edit': '', text: Craft.t('beacon', 'Edit') }),
-            el('button', { type: 'button', class: 'btn small', 'data-card-remove': '', text: Craft.t('beacon', 'Remove') })
+            el('button', { type: 'button', class: 'btn small', 'data-card-edit': '', text: Craft.t('beacon', 'seoField.edit.text') }),
+            el('button', { type: 'button', class: 'btn small', 'data-card-remove': '', text: Craft.t('beacon', 'redirectSources.remove.ariaLabel') })
         ]);
         card.appendChild(actions);
         container.appendChild(card);
@@ -1134,7 +1134,7 @@
             var card = buildEmptyCard(container);
             paintCards(container);
             openSchemaModal(card, {
-                titleText: Craft.t('beacon', 'Add schema'),
+                titleText: Craft.t('beacon', 'seoField.add.schema.text'),
                 discardOnClose: true,
                 onClose: null
             });
@@ -1144,7 +1144,7 @@
         var editBtn = t.closest('[data-card-edit]');
         if (editBtn) {
             var card1 = editBtn.closest('[data-beacon-schema-card]');
-            if (card1) openSchemaModal(card1, { titleText: Craft.t('beacon', 'Edit schema') });
+            if (card1) openSchemaModal(card1, { titleText: Craft.t('beacon', 'schemas.edit.edit.schema.text') });
             return;
         }
 
@@ -1348,12 +1348,12 @@
             var bits = [];
             if (titlePxBudget && titleTrunc) {
                 var px = measureTextPx(state.title, titleTrunc.dataset.bpFont || '14px arial, sans-serif');
-                bits.push(Craft.t('beacon', 'Title {px}px / {budget}px', { px: Math.round(px), budget: titlePxBudget }));
+                bits.push(Craft.t('beacon', 'seoField.js.title.px.px', { px: Math.round(px), budget: titlePxBudget }));
             } else if (titleCharBudget) {
-                bits.push(Craft.t('beacon', 'Title {count} / {budget} chars', { count: state.title.length, budget: titleCharBudget }));
+                bits.push(Craft.t('beacon', 'seoField.js.title.chars', { count: state.title.length, budget: titleCharBudget }));
             }
             if (descCharBudget) {
-                bits.push(Craft.t('beacon', 'Desc {count} / {budget}', { count: state.description.length, budget: descCharBudget }));
+                bits.push(Craft.t('beacon', 'seoField.js.desc', { count: state.description.length, budget: descCharBudget }));
             }
             budgetEl.textContent = bits.join(' · ');
 
@@ -1380,23 +1380,23 @@
             meta.hidden = false;
             var msg = meta.querySelector('[data-bp-image-msg]');
             meta.classList.remove('is-ok', 'is-warn', 'is-bad');
-            if (msg) msg.textContent = Craft.t('beacon', 'Checking image…');
+            if (msg) msg.textContent = Craft.t('beacon', 'seoField.js.checking.image');
             var img = new Image();
             img.onload = function() {
                 var w = img.naturalWidth, h = img.naturalHeight;
                 var ratio = h ? (w / h) : 0;
-                var label = Craft.t('beacon', 'Social image {w} × {h}px', { w: w, h: h });
+                var label = Craft.t('beacon', 'seoField.js.social.image.px', { w: w, h: h });
                 var cls = 'is-ok';
-                if (w < 600) { cls = 'is-bad'; label += Craft.t('beacon', ' — too small (need ≥ 600 wide; 1200×630 recommended)'); }
-                else if (Math.abs(ratio - 1.91) > 0.35) { cls = 'is-warn'; label += Craft.t('beacon', ' — aspect ratio off (1.91:1 recommended for OG/X)'); }
-                else if (w < 1200) { cls = 'is-warn'; label += Craft.t('beacon', ' — below 1200×630 recommendation'); }
-                else { label += Craft.t('beacon', ' — looks good ✓'); }
+                if (w < 600) { cls = 'is-bad'; label += Craft.t('beacon', 'seoField.js.too.small.need.600.wide'); }
+                else if (Math.abs(ratio - 1.91) > 0.35) { cls = 'is-warn'; label += Craft.t('beacon', 'seoField.js.aspect.ratio.off.1.91'); }
+                else if (w < 1200) { cls = 'is-warn'; label += Craft.t('beacon', 'seoField.js.below.1200.630.recommendation'); }
+                else { label += Craft.t('beacon', 'seoField.js.looks.good'); }
                 meta.classList.add(cls);
                 if (msg) msg.textContent = label;
             };
             img.onerror = function() {
                 meta.classList.add('is-bad');
-                if (msg) msg.textContent = Craft.t('beacon', 'Could not load image to verify dimensions');
+                if (msg) msg.textContent = Craft.t('beacon', 'seoField.js.could.not.load.image.verify');
             };
             img.src = state.ogImageUrl;
         }
@@ -1424,7 +1424,7 @@
                 root.dataset.bpHideImage = on ? '1' : '0';
                 hideToggle.setAttribute('aria-pressed', on ? 'true' : 'false');
                 hideToggle.classList.toggle('is-active', on);
-                hideToggle.textContent = on ? Craft.t('beacon', 'Show with image') : Craft.t('beacon', 'Hide image');
+                hideToggle.textContent = on ? Craft.t('beacon', 'seoField.js.show.image') : Craft.t('beacon', 'seoField.preview.hide.image.text');
                 refresh();
             });
         }

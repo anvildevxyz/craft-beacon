@@ -65,7 +65,7 @@ class SitemapSettingsController extends Controller
         ));
 
         return $this->finishSiteScopedSave(
-            Craft::t('beacon', 'Sitemap settings saved.'),
+            Craft::t('beacon', 'flash.sitemap.sitemap.settings.saved'),
             'beacon/sitemap',
             $siteId,
             RenderCacheType::Sitemap,

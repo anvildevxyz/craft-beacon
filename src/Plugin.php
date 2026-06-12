@@ -407,7 +407,7 @@ class Plugin extends BasePlugin
             Entry::class,
             Entry::EVENT_REGISTER_TABLE_ATTRIBUTES,
             static function(RegisterElementTableAttributesEvent $event): void {
-                $event->tableAttributes['beacon:geoScore'] = ['label' => Craft::t('beacon', 'GEO score')];
+                $event->tableAttributes['beacon:geoScore'] = ['label' => Craft::t('beacon', 'geoScore.drillDown.geo.score.label')];
             },
         );
         Event::on(
@@ -431,7 +431,7 @@ class Plugin extends BasePlugin
                 $event->html = sprintf(
                     '<a href="%s" title="%s"><strong>%d</strong>/100</a>',
                     htmlspecialchars($url, ENT_QUOTES, 'UTF-8'),
-                    htmlspecialchars(Craft::t('beacon', 'Open GEO score drill-down'), ENT_QUOTES, 'UTF-8'),
+                    htmlspecialchars(Craft::t('beacon', 'plugin.open.geo.score.drill.down'), ENT_QUOTES, 'UTF-8'),
                     $score->score,
                 );
             },
@@ -441,7 +441,7 @@ class Plugin extends BasePlugin
             Entry::EVENT_REGISTER_SORT_OPTIONS,
             static function(RegisterElementSortOptionsEvent $event): void {
                 $event->sortOptions[] = [
-                    'label' => Craft::t('beacon', 'GEO score'),
+                    'label' => Craft::t('beacon', 'geoScore.drillDown.geo.score.label'),
                     'orderBy' => static function(int $dir) {
                         $direction = $dir === SORT_DESC ? 'DESC' : 'ASC';
                         $expr = '(SELECT [[score]] FROM {{%beacon_geo_score}} [[gs]] WHERE [[gs.elementId]] = [[elements.id]] LIMIT 1)';
@@ -593,17 +593,17 @@ class Plugin extends BasePlugin
             Gql::class,
             Gql::EVENT_REGISTER_GQL_SCHEMA_COMPONENTS,
             static function(RegisterGqlSchemaComponentsEvent $event): void {
-                $event->queries[Craft::t('beacon', 'Beacon redirects')] = [
-                    'beaconRedirects:read' => ['label' => Craft::t('beacon', 'Query Beacon redirects')],
+                $event->queries[Craft::t('beacon', 'plugin.redirects')] = [
+                    'beaconRedirects:read' => ['label' => Craft::t('beacon', 'plugin.query.redirects')],
                 ];
-                $event->queries[Craft::t('beacon', 'Beacon 404 log')] = [
-                    'beaconRedirect404s:read' => ['label' => Craft::t('beacon', 'Query Beacon 404 log')],
+                $event->queries[Craft::t('beacon', 'plugin.404.log')] = [
+                    'beaconRedirect404s:read' => ['label' => Craft::t('beacon', 'plugin.query.404.log')],
                 ];
-                $event->queries[Craft::t('beacon', 'Beacon short links')] = [
-                    'beaconShortLinks:read' => ['label' => Craft::t('beacon', 'Query Beacon short links')],
+                $event->queries[Craft::t('beacon', 'plugin.short.links')] = [
+                    'beaconShortLinks:read' => ['label' => Craft::t('beacon', 'plugin.query.short.links')],
                 ];
-                $event->queries[Craft::t('beacon', 'Beacon GEO score')] = [
-                    'beaconGeoScore:read' => ['label' => Craft::t('beacon', 'Read Beacon GEO content score')],
+                $event->queries[Craft::t('beacon', 'plugin.geo.score')] = [
+                    'beaconGeoScore:read' => ['label' => Craft::t('beacon', 'plugin.read.geo.content.score')],
                 ];
             },
         );
@@ -917,7 +917,7 @@ class Plugin extends BasePlugin
                     return;
                 }
                 $event->previewTargets[] = [
-                    'label' => Craft::t('beacon', 'GEO Markdown'),
+                    'label' => Craft::t('beacon', 'plugin.geo.markdown'),
                     'url' => $settings->geoMarkdownMdSuffixEnabled
                         ? rtrim($url, '/') . '.md'
                         : '/geo/export?id=' . (int) $entry->id,
@@ -930,7 +930,7 @@ class Plugin extends BasePlugin
             UserPermissions::EVENT_REGISTER_PERMISSIONS,
             static function(RegisterUserPermissionsEvent $event): void {
                 $event->permissions[] = [
-                    'heading' => Craft::t('beacon', 'Beacon'),
+                    'heading' => Craft::t('beacon', 'nav.beacon'),
                     'permissions' => BeaconPermissions::definitions(),
                 ];
             }
@@ -959,11 +959,11 @@ class Plugin extends BasePlugin
             'dashboard' => ['perm' => BeaconPermissions::VIEW_DASHBOARD, 'label' => 'Dashboard', 'url' => 'beacon'],
             'authors' => ['perm' => BeaconPermissions::EDIT_AUTHORS, 'label' => 'Authors', 'url' => 'beacon/authors'],
             'redirects' => ['perm' => BeaconPermissions::EDIT_REDIRECTS, 'label' => 'Redirects', 'url' => 'beacon/redirects'],
-            'shortLinks' => ['perm' => BeaconPermissions::EDIT_SHORT_LINKS, 'label' => Craft::t('beacon', 'Short links'), 'url' => 'beacon/short-links'],
+            'shortLinks' => ['perm' => BeaconPermissions::EDIT_SHORT_LINKS, 'label' => Craft::t('beacon', 'nav.shortLinks'), 'url' => 'beacon/short-links'],
             'schemas' => ['perm' => BeaconPermissions::EDIT_SCHEMAS, 'label' => 'Schemas', 'url' => 'beacon/schemas'],
             'sitemap' => ['perm' => BeaconPermissions::EDIT_SITEMAP, 'label' => 'Sitemap', 'url' => 'beacon/sitemap'],
-            'tracking' => ['perm' => BeaconPermissions::EDIT_TRACKING, 'label' => Craft::t('beacon', 'Tracking'), 'url' => 'beacon/tracking'],
-            'crawlers' => ['perm' => BeaconPermissions::EDIT_CRAWLERS, 'label' => Craft::t('beacon', 'Crawlers'), 'url' => 'beacon/crawlers'],
+            'tracking' => ['perm' => BeaconPermissions::EDIT_TRACKING, 'label' => Craft::t('beacon', 'nav.tracking'), 'url' => 'beacon/tracking'],
+            'crawlers' => ['perm' => BeaconPermissions::EDIT_CRAWLERS, 'label' => Craft::t('beacon', 'nav.crawlers'), 'url' => 'beacon/crawlers'],
             'settings' => ['perm' => BeaconPermissions::EDIT_SETTINGS, 'label' => 'Settings', 'url' => 'beacon/settings'],
         ];
 

@@ -40,7 +40,7 @@ final class FreshnessBandingPillar implements PillarComputerInterface
                 pillar: $this->pillar(),
                 score: 1,
                 band: GeoPillarScore::BAND_STALE,
-                notes: [Craft::t('beacon', 'Entry has no last-updated timestamp; treated as stale.')],
+                notes: [Craft::t('beacon', 'geo.pillar.freshness.entry.has.no.last.updated')],
             );
         }
 
@@ -51,7 +51,7 @@ final class FreshnessBandingPillar implements PillarComputerInterface
             $ageDays < self::DAYS_FRESH => [
                 10,
                 GeoPillarScore::BAND_TOP,
-                Craft::t('beacon', 'Updated within the last 30 days — top freshness band.'),
+                Craft::t('beacon', 'geo.pillar.freshness.updated.within.last.30.days'),
             ],
             $ageDays < self::DAYS_RECENT => [
                 7,

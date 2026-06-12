@@ -53,7 +53,7 @@ class HumansSettingsController extends Controller
         ));
 
         return $this->finishSiteScopedSave(
-            Craft::t('beacon', 'humans.txt settings saved.'),
+            Craft::t('beacon', 'flash.humansTxt.humans.txt.settings.saved'),
             'beacon/crawlers/humans-txt',
             $siteId,
             RenderCacheType::Humans,

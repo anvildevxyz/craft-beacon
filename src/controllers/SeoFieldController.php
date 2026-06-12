@@ -46,7 +46,7 @@ class SeoFieldController extends Controller
         $entryId = (int) $request->getRequiredBodyParam('entryId');
         $type = trim((string) $request->getRequiredBodyParam('type'));
         if ($type === '' || !$suggester->knowsType($type)) {
-            throw new BadRequestHttpException(Craft::t('beacon', 'Unknown schema type: {type}', ['type' => $type]));
+            throw new BadRequestHttpException(Craft::t('beacon', 'flash.schemas.unknown.schema.type', ['type' => $type]));
         }
 
         $entry = $this->findEntryForField($entryId);
@@ -68,7 +68,7 @@ class SeoFieldController extends Controller
             ->siteId($siteId ?? '*')
             ->one();
         if (!$entry instanceof Entry) {
-            throw new NotFoundHttpException(Craft::t('beacon', 'Entry {id} not found', ['id' => $entryId]));
+            throw new NotFoundHttpException(Craft::t('beacon', 'error.seoField.entry.not.found', ['id' => $entryId]));
         }
         return $entry;
     }

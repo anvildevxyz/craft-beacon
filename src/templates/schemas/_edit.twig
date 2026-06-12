@@ -1,15 +1,15 @@
 {% extends '_layouts/cp.twig' %}
 {% set selectedSubnavItem = 'schemas' %}
 {% import '_includes/forms.twig' as forms %}
-{% set title = schema.id ? ('Edit schema'|t('beacon')) : ('New schema'|t('beacon')) %}
+{% set title = schema.id ? ('schemas.edit.edit.schema.text'|t('beacon')) : ('schemas.edit.new.schema.text'|t('beacon')) %}
 {% set fullPageForm = true %}
 {% set crumbs = [
-    { label: 'Beacon'|t('beacon'), url: cpUrl('beacon') },
-    { label: 'Schemas'|t('beacon'), url: cpUrl('beacon/schemas') },
+    { label: 'nav.beacon'|t('beacon'), url: cpUrl('beacon') },
+    { label: 'nav.schemas'|t('beacon'), url: cpUrl('beacon/schemas') },
 ] %}
 
 {% set formActions = [{
-    label: 'Save and continue editing'|t('beacon'),
+    label: 'schemas.edit.save.continue.editing.label'|t('beacon'),
     redirect: 'beacon/schemas/{id}'|hash,
     shortcut: true,
     retainScroll: true,
@@ -29,11 +29,11 @@
     {{ redirectInput('beacon/schemas') }}
     {{ csrfInput() }}
 
-    <h2 class="heading first">{{ 'Match'|t('beacon') }}</h2>
-    <p class="light">{{ 'Pick the entry type this schema applies to.'|t('beacon') }}</p>
+    <h2 class="heading first">{{ 'schemas.edit.match.heading'|t('beacon') }}</h2>
+    <p class="light">{{ 'schemas.edit.pick.entry.type.schema.applies.text'|t('beacon') }}</p>
 
     {{ forms.selectField({
-        label: 'Entry type'|t('beacon'),
+        label: 'schemas.edit.entryTypeHandle.label'|t('beacon'),
         id: 'entryTypeHandle',
         name: 'entryTypeHandle',
         value: schema.entryTypeHandle,
@@ -44,11 +44,11 @@
 
     <hr>
 
-    <h2>{{ 'Schema output'|t('beacon') }}</h2>
-    <p class="light">{{ 'Choose the schema.org type and define how its properties are populated from the entry.'|t('beacon') }}</p>
+    <h2>{{ 'schemas.edit.schema.output.heading'|t('beacon') }}</h2>
+    <p class="light">{{ 'schemas.edit.choose.schema.org.type.define.text'|t('beacon') }}</p>
 
     {{ forms.selectField({
-        label: 'Schema type'|t('beacon'),
+        label: 'schemas.edit.schemaType.label'|t('beacon'),
         id: 'schemaType',
         name: 'schemaType',
         value: schema.schemaType,
@@ -62,10 +62,10 @@
        from the SchemaPropertyRegistry, and keeps the textarea in sync. #}
     <div class="field">
         <div class="heading">
-            <label>{{ 'Property mapping'|t('beacon') }}</label>
+            <label>{{ 'schemas.edit.property.mapping.text'|t('beacon') }}</label>
         </div>
         <div class="instructions">
-            <p>{{ 'Fill in the value for each schema.org property. Reference entry fields with {handle} placeholders — e.g. {title} or {seo.description}. Leave a property blank to omit it.'|t('beacon') }}</p>
+            <p>{{ 'schemas.edit.fill.value.each.schema.org.text'|t('beacon') }}</p>
         </div>
 
         <div id="beacon-schema-builder"
@@ -87,7 +87,7 @@
             placeholder: '{}',
         }) }}
         <div class="instructions" data-bsb-raw-help>
-            <p>{{ 'JSON object mapping each schema.org property to a template string. Example: {"headline": "{title}", "description": "{seo.description}"}'|t('beacon') }}</p>
+            <p>{{ 'schemas.edit.json.object.mapping.each.schema.text'|t('beacon') }}</p>
         </div>
     </div>
 {% endblock %}
@@ -95,7 +95,7 @@
 {% block details %}
     <div class="meta">
         {{ forms.lightswitchField({
-            label: 'Enabled'|t('beacon'),
+            label: 'field.enabled'|t('beacon'),
             id: 'enabled',
             name: 'enabled',
             on: schema.enabled ?? true,
@@ -105,18 +105,18 @@
     {% if schema.id %}
         <div class="meta read-only">
             <div class="data">
-                <h5 class="heading">{{ 'Sort order'|t('beacon') }}</h5>
+                <h5 class="heading">{{ 'schemas.edit.sort.order.text'|t('beacon') }}</h5>
                 <div class="value">{{ schema.sortOrder }}</div>
             </div>
             {% if schema.dateCreated %}
                 <div class="data">
-                    <h5 class="heading">{{ 'Created'|t('beacon') }}</h5>
+                    <h5 class="heading">{{ 'schemas.edit.created.text'|t('beacon') }}</h5>
                     <div class="value">{{ schema.dateCreated|datetime('short') }}</div>
                 </div>
             {% endif %}
             {% if schema.dateUpdated %}
                 <div class="data">
-                    <h5 class="heading">{{ 'Updated'|t('beacon') }}</h5>
+                    <h5 class="heading">{{ 'schemas.edit.updated.text'|t('beacon') }}</h5>
                     <div class="value">{{ schema.dateUpdated|datetime('short') }}</div>
                 </div>
             {% endif %}

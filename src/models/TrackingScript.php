@@ -56,7 +56,7 @@ class TrackingScript extends Model
             ]));
         }
         if (!in_array($this->{$attribute}, $handles, true)) {
-            $this->addError($attribute, Craft::t('beacon', 'Unknown tracking provider "{handle}".', [
+            $this->addError($attribute, Craft::t('beacon', 'tracking.script.unknown.tracking.provider', [
                 'handle' => (string) $this->{$attribute},
             ]));
         }

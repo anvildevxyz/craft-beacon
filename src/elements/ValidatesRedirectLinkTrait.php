@@ -16,7 +16,7 @@ trait ValidatesRedirectLinkTrait
     public function validateStatusCode(string $attribute): void
     {
         if (RedirectStatusCode::tryFrom((int) $this->$attribute) === null) {
-            $this->addError($attribute, Craft::t('beacon', 'Invalid status code.'));
+            $this->addError($attribute, Craft::t('beacon', 'validation.redirect.invalid.status.code'));
         }
     }
 

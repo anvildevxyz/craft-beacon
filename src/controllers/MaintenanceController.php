@@ -25,7 +25,7 @@ class MaintenanceController extends Controller
     {
         $this->requirePostRequest();
         Plugin::$plugin->renderCache->flush();
-        return $this->done(Craft::t('beacon', 'Beacon render cache flushed.'));
+        return $this->done(Craft::t('beacon', 'flash.maintenance.render.cache.flushed'));
     }
 
     /**
@@ -38,7 +38,7 @@ class MaintenanceController extends Controller
         $this->requirePostRequest();
         $siteId = $this->resolveSiteIdFromPost();
         Plugin::$plugin->renderCache->flush($siteId, RenderCacheType::Sitemap);
-        return $this->done(Craft::t('beacon', 'Sitemap cache flushed. Next request will regenerate.'));
+        return $this->done(Craft::t('beacon', 'flash.maintenance.sitemap.cache.flushed.next.request'));
     }
 
     /**
@@ -51,7 +51,7 @@ class MaintenanceController extends Controller
         $this->requirePostRequest();
         $siteId = $this->resolveSiteIdFromPost();
         Plugin::$plugin->renderCache->invalidate($siteId, RenderCacheType::LlmsTxt);
-        return $this->done(Craft::t('beacon', 'llms.txt cache invalidated. Next request will regenerate.'));
+        return $this->done(Craft::t('beacon', 'flash.maintenance.llms.txt.cache.invalidated.next'));
     }
 
     /**
@@ -69,7 +69,7 @@ class MaintenanceController extends Controller
         foreach ([RenderCacheType::LlmsTxt, RenderCacheType::Humans, RenderCacheType::Ads] as $type) {
             $cache->invalidate($siteId, $type);
         }
-        return $this->done(Craft::t('beacon', 'All Beacon text/sitemap caches invalidated. Use `craft beacon/cache/regenerate-all` to warm them.'));
+        return $this->done(Craft::t('beacon', 'flash.maintenance.all.text.sitemap.caches.invalidated'));
     }
 
     private function done(string $message): Response

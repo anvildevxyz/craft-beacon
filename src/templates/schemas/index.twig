@@ -1,24 +1,24 @@
 {% extends '_layouts/cp.twig' %}
 {% set selectedSubnavItem = 'schemas' %}
 {% import '_includes/forms.twig' as forms %}
-{% set title = 'Schemas'|t('beacon') %}
-{% set crumbs = [{ label: 'Beacon'|t('beacon'), url: cpUrl('beacon') }] %}
+{% set title = 'nav.schemas'|t('beacon') %}
+{% set crumbs = [{ label: 'nav.beacon'|t('beacon'), url: cpUrl('beacon') }] %}
 
 {% set total = 0 %}
 {% for _, entryRows in grouped %}{% set total = total + entryRows|length %}{% endfor %}
 
 {% block actionButton %}
-    <a href="{{ url('beacon/schemas/new') }}" class="btn submit add icon">{{ 'New schema'|t('beacon') }}</a>
+    <a href="{{ url('beacon/schemas/new') }}" class="btn submit add icon">{{ 'schemas.new.schema.text'|t('beacon') }}</a>
 {% endblock %}
 
 {% block content %}
     {% if not total %}
         <div class="beacon-empty">
             <div class="beacon-empty__icon" aria-hidden="true">{}</div>
-            <h3>{{ 'No schemas defined yet'|t('beacon') }}</h3>
-            <p>{{ 'Create your first schema mapping to generate JSON-LD for entries.'|t('beacon') }}</p>
+            <h3>{{ 'schemas.no.schemas.defined.yet.heading'|t('beacon') }}</h3>
+            <p>{{ 'schemas.create.first.schema.mapping.generate.text'|t('beacon') }}</p>
             <div class="beacon-empty__actions">
-                <a href="{{ url('beacon/schemas/new') }}" class="btn submit">{{ 'Add first schema'|t('beacon') }}</a>
+                <a href="{{ url('beacon/schemas/new') }}" class="btn submit">{{ 'schemas.add.first.schema.text'|t('beacon') }}</a>
             </div>
         </div>
     {% else %}
@@ -28,16 +28,16 @@
             <div class="beacon-schema-group">
                 <h2 class="beacon-schema-group__heading">
                     <code>{{ entryTypeHandle }}</code>
-                    <span class="light">{{ '{n, plural, =1{# schema} other{# schemas}}'|t('beacon', { n: entryRows|length }) }}</span>
+                    <span class="light">{{ 'schemas.other.text'|t('beacon', { n: entryRows|length }) }}</span>
                 </h2>
 
                 <table class="data fullwidth beacon-schema-table" data-entry-type="{{ entryTypeHandle }}">
                     <thead>
                         <tr>
                             <th class="thin"></th>
-                            <th scope="col">{{ 'Schema type'|t('beacon') }}</th>
-                            <th scope="col">{{ 'Mapping'|t('beacon') }}</th>
-                            <th scope="col" class="thin">{{ 'Enabled'|t('beacon') }}</th>
+                            <th scope="col">{{ 'schemas.schema.type.text'|t('beacon') }}</th>
+                            <th scope="col">{{ 'schemas.mapping.text'|t('beacon') }}</th>
+                            <th scope="col" class="thin">{{ 'field.enabled'|t('beacon') }}</th>
                             <th scope="col" class="thin"></th>
                         </tr>
                     </thead>
@@ -49,22 +49,22 @@
                         {% set extraCount = keys|length - visibleKeys|length %}
                         <tr data-id="{{ r.id }}">
                             <td class="thin beacon-schema-cell-drag">
-                                <span class="beacon-drag-handle move icon" aria-label="{{ 'Drag to reorder'|t('beacon') }}" title="{{ 'Drag to reorder'|t('beacon') }}"></span>
+                                <span class="beacon-drag-handle move icon" aria-label="{{ 'schemas.drag.reorder.ariaLabel'|t('beacon') }}" title="{{ 'schemas.drag.reorder.text'|t('beacon') }}"></span>
                             </td>
-                            <th scope="row" data-title="{{ 'Schema type'|t('beacon') }}">
+                            <th scope="row" data-title="{{ 'schemas.schema.type.text'|t('beacon') }}">
                                 <a href="{{ url('beacon/schemas/' ~ r.id) }}">{{ r.schemaType }}</a>
                             </th>
-                            <td data-title="{{ 'Mapping'|t('beacon') }}">
+                            <td data-title="{{ 'schemas.mapping.text'|t('beacon') }}">
                                 {% if keys|length %}
                                     <span class="beacon-chip-list" title="{{ r.mapping }}">
                                         {% for k in visibleKeys %}<span class="beacon-chip"><code>{{ k }}</code></span>{% endfor %}
                                         {% if extraCount > 0 %}<span class="beacon-chip beacon-chip--more">+{{ extraCount }}</span>{% endif %}
                                     </span>
                                 {% else %}
-                                    <span class="light">{{ 'No fields mapped'|t('beacon') }}</span>
+                                    <span class="light">{{ 'schemas.no.fields.mapped.text'|t('beacon') }}</span>
                                 {% endif %}
                             </td>
-                            <td class="thin" data-title="{{ 'Enabled'|t('beacon') }}">
+                            <td class="thin" data-title="{{ 'field.enabled'|t('beacon') }}">
                                 {{ forms.lightswitch({
                                     on: r.enabled,
                                     small: true,
@@ -81,8 +81,8 @@
                                         class="delete icon beacon-schema-delete"
                                         data-schema-id="{{ r.id }}"
                                         data-schema-label="{{ r.schemaType }}"
-                                        title="{{ 'Delete'|t('beacon') }}"
-                                        aria-label="{{ 'Delete'|t('beacon') }}"></button>
+                                        title="{{ 'action.delete'|t('beacon') }}"
+                                        aria-label="{{ 'action.delete'|t('beacon') }}"></button>
                             </td>
                         </tr>
                     {% endfor %}
@@ -92,7 +92,7 @@
         {% endfor %}
 
         <div class="beacon-redirects-count meta beacon-schema-summary">
-            {{ '{total, plural, =1{# schema} other{# schemas}} across {groups, plural, =1{# entry type} other{# entry types}}'|t('beacon', { total: total, groups: grouped|length }) }}
+            {{ 'schemas.other.across.other.text'|t('beacon', { total: total, groups: grouped|length }) }}
         </div>
     {% endif %}
 {% endblock %}

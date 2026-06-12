@@ -27,21 +27,21 @@
 
         {% if author.expertise %}
             <section class="beacon-author-expertise">
-                <h2>{{ 'Expertise'|t('beacon') }}</h2>
+                <h2>{{ 'authors.profile.expertise.heading'|t('beacon') }}</h2>
                 <ul>{% for topic in author.expertise %}<li itemprop="knowsAbout">{{ topic }}</li>{% endfor %}</ul>
             </section>
         {% endif %}
 
         {% if author.credentials %}
             <section class="beacon-author-credentials">
-                <h2>{{ 'Credentials'|t('beacon') }}</h2>
+                <h2>{{ 'authors.profile.credentials.heading'|t('beacon') }}</h2>
                 <ul>{% for cred in author.credentials %}<li>{{ cred }}</li>{% endfor %}</ul>
             </section>
         {% endif %}
 
         {% if author.sameAs %}
             <section class="beacon-author-links">
-                <h2>{{ 'Also at'|t('beacon') }}</h2>
+                <h2>{{ 'authors.profile.also.heading'|t('beacon') }}</h2>
                 <ul>{% for url in author.sameAs %}<li><a href="{{ url }}" rel="me" itemprop="sameAs">{{ url }}</a></li>{% endfor %}</ul>
             </section>
         {% endif %}

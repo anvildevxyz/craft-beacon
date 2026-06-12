@@ -1,16 +1,16 @@
 {% extends '_layouts/cp' %}
 
-{% set title = ('GEO score for {title}'|t('beacon', { title: element ? element.title : ('#' ~ elementId) })) %}
+{% set title = ('geoScore.drillDown.geo.score.text'|t('beacon', { title: element ? element.title : ('#' ~ elementId) })) %}
 {% set crumbs = [
-    { label: 'Beacon'|t('beacon'), url: cpUrl('beacon') },
-    { label: 'GEO score'|t('beacon'), url: cpUrl('beacon') },
+    { label: 'nav.beacon'|t('beacon'), url: cpUrl('beacon') },
+    { label: 'geoScore.drillDown.geo.score.label'|t('beacon'), url: cpUrl('beacon') },
 ] %}
 
 {% block actionButton %}
     <div class="beacon-geo-score-drilldown__actions">
         <div class="btngroup">
             {% if element and element.cpEditUrl %}
-                <a class="btn" href="{{ element.cpEditUrl }}">{{ 'Open entry'|t('beacon') }}</a>
+                <a class="btn" href="{{ element.cpEditUrl }}">{{ 'geoScore.drillDown.open.entry.text'|t('beacon') }}</a>
             {% endif %}
             {% if canRecompute %}
                 <button type="button"
@@ -18,7 +18,7 @@
                         data-beacon-recompute
                         data-element-id="{{ elementId }}"
                         data-site-id="{{ siteId }}">
-                    {{ 'Recompute now'|t('beacon') }}
+                    {{ 'geoScore.drillDown.recompute.now.text'|t('beacon') }}
                 </button>
             {% endif %}
         </div>
@@ -29,17 +29,17 @@
 {% endblock %}
 
 {% block content %}
-    <h2>{{ 'Per-pillar breakdown'|t('beacon') }}</h2>
-    <p class="light">{{ 'Pillars sorted weakest first. Focus on the top 1–2 for the highest-leverage edits.'|t('beacon') }}</p>
+    <h2>{{ 'geoScore.drillDown.per.pillar.breakdown.heading'|t('beacon') }}</h2>
+    <p class="light">{{ 'geoScore.drillDown.pillars.sorted.weakest.first.focus.text'|t('beacon') }}</p>
 
     {% set sortedPillars = score.pillars|sort((a, b) => a.score <=> b.score) %}
 
     <table class="data fullwidth beacon-geo-score-drilldown__pillars">
         <thead>
             <tr>
-                <th>{{ 'Pillar'|t('beacon') }}</th>
-                <th class="thin right">{{ 'Score'|t('beacon') }}</th>
-                <th>{{ 'Notes'|t('beacon') }}</th>
+                <th>{{ 'geoScore.drillDown.pillar.text'|t('beacon') }}</th>
+                <th class="thin right">{{ 'geoScore.drillDown.score.text'|t('beacon') }}</th>
+                <th>{{ 'geoScore.drillDown.notes.text'|t('beacon') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -55,7 +55,7 @@
                                 {% endfor %}
                             </ul>
                         {% else %}
-                            <span class="light">{{ 'No actionable feedback — this pillar is at the top band.'|t('beacon') }}</span>
+                            <span class="light">{{ 'geoScore.drillDown.no.actionable.feedback.pillar.top.text'|t('beacon') }}</span>
                         {% endif %}
                     </td>
                 </tr>

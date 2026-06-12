@@ -277,19 +277,19 @@ class DashboardController extends Controller
         $robots = $siteSettings->getRobots($siteId);
 
         return [
-            ['key' => 'sitemap', 'label' => Craft::t('beacon', 'Sitemap configured (at least one section enabled)'),
+            ['key' => 'sitemap', 'label' => Craft::t('beacon', 'flash.dashboard.sitemap.configured.least.one.section'),
                 'done' => $sitemap->sections !== [], 'url' => 'beacon/sitemap', ],
-            ['key' => 'robots', 'label' => Craft::t('beacon', 'robots.txt user-agent rules defined'),
+            ['key' => 'robots', 'label' => Craft::t('beacon', 'flash.dashboard.robots.txt.user.agent.rules'),
                 'done' => $robots->userAgentRules !== [], 'url' => 'beacon/crawlers/robots', ],
-            ['key' => 'llms', 'label' => Craft::t('beacon', 'llms.txt enabled with at least one section'),
+            ['key' => 'llms', 'label' => Craft::t('beacon', 'flash.dashboard.llms.txt.enabled.least.one'),
                 'done' => $llms->enabled && $llms->sections !== [], 'url' => 'beacon/crawlers/llms-txt', ],
-            ['key' => 'aiCrawlers', 'label' => Craft::t('beacon', 'AI crawler rules configured'),
+            ['key' => 'aiCrawlers', 'label' => Craft::t('beacon', 'flash.dashboard.ai.crawler.rules.configured'),
                 'done' => $plugin->aiCrawlers->getAllRules() !== [], 'url' => 'beacon/crawlers', ],
-            ['key' => 'geoMarkdown', 'label' => Craft::t('beacon', 'GEO Markdown enabled'),
+            ['key' => 'geoMarkdown', 'label' => Craft::t('beacon', 'flash.dashboard.geo.markdown.enabled'),
                 'done' => $settings->geoMarkdownEnabled, 'url' => 'beacon/settings/geo', ],
-            ['key' => 'allowlist', 'label' => Craft::t('beacon', 'GEO Markdown section allowlist set'),
+            ['key' => 'allowlist', 'label' => Craft::t('beacon', 'flash.dashboard.geo.markdown.section.allowlist.set'),
                 'done' => $settings->geoMarkdownEnabled && $settings->geoMarkdownSectionAllowlist !== [], 'url' => 'beacon/settings/geo', ],
-            ['key' => 'organization', 'label' => Craft::t('beacon', 'Organization identity configured'),
+            ['key' => 'organization', 'label' => Craft::t('beacon', 'flash.dashboard.organization.identity.configured'),
                 'done' => is_string($settings->organizationName) && trim($settings->organizationName) !== '', 'url' => 'beacon/settings/organization', ],
         ];
     }

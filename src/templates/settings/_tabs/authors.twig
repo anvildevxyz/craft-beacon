@@ -1,21 +1,21 @@
 {% import "_includes/forms.twig" as forms %}
 
-<h2 class="heading first">{{ 'Public author profiles'|t('beacon') }}</h2>
-<p class="light">{{ 'Publish a crawlable page per author for E-E-A-T. Off by default. See the Authors guide in the docs for setup and SEO/GEO guidance.'|t('beacon') }}</p>
+<h2 class="heading first">{{ 'settings.authors.public.author.profiles.heading'|t('beacon') }}</h2>
+<p class="light">{{ 'settings.authors.publish.crawlable.page.per.author.text'|t('beacon') }}</p>
 <hr>
 
 {{ forms.lightswitchField({
-    label: 'Publish public author pages'|t('beacon'),
-    instructions: 'Adds a crawlable URL per author and lists them in the sitemap.'|t('beacon'),
+    label: 'settings.authors.authorPagesEnabled.label'|t('beacon'),
+    instructions: 'settings.authors.authorPagesEnabled.instructions'|t('beacon'),
     name: 'authorPagesEnabled',
     on: settings.authorPagesEnabled,
     first: true,
 }) }}
 
 {{ forms.textField({
-    label: 'URL prefix'|t('beacon'),
-    instructions: 'Path segment before the author slug — e.g. `authors` → `/authors/jane-doe`.'|t('beacon'),
+    label: 'settings.authors.authorPagesUriPrefix.label'|t('beacon'),
+    instructions: 'settings.authors.authorPagesUriPrefix.instructions'|t('beacon'),
     name: 'authorPagesUriPrefix',
     value: settings.authorPagesUriPrefix,
-    placeholder: 'authors'|t('beacon'),
+    placeholder: 'settings.authors.authorPagesUriPrefix.placeholder'|t('beacon'),
 }) }}

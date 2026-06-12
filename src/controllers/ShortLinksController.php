@@ -27,7 +27,7 @@ class ShortLinksController extends Controller
     public function actionIndex(): Response
     {
         return $this->renderTemplate('beacon/short-links/_index', [
-            'title' => Craft::t('beacon', 'Short links'),
+            'title' => Craft::t('beacon', 'nav.shortLinks'),
         ]);
     }
 
@@ -102,11 +102,11 @@ class ShortLinksController extends Controller
         $shortLink->note = trim((string) $request->getBodyParam('note', '')) ?: null;
 
         if (!Craft::$app->getElements()->saveElement($shortLink)) {
-            $session->setError(Craft::t('beacon', 'Couldn\'t save short link.'));
+            $session->setError(Craft::t('beacon', 'flash.shortLinks.couldnt.save'));
             return $this->retainSubmittedForm(['shortLink' => $shortLink]);
         }
 
-        $session->setNotice(Craft::t('beacon', 'Short link saved.'));
+        $session->setNotice(Craft::t('beacon', 'flash.shortLinks.short.link.saved'));
         return $this->redirectToPostedUrl($shortLink);
     }
 
@@ -123,7 +123,7 @@ class ShortLinksController extends Controller
         if ($shortLink !== null) {
             $this->requireEditableSite((int) $shortLink->siteId);
             Craft::$app->getElements()->deleteElement($shortLink);
-            Craft::$app->getSession()->setNotice(Craft::t('beacon', 'Short link deleted.'));
+            Craft::$app->getSession()->setNotice(Craft::t('beacon', 'flash.shortLinks.short.link.deleted'));
         }
         return $this->redirectToPostedUrl();
     }

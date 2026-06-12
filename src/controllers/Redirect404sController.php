@@ -68,7 +68,7 @@ class Redirect404sController extends Controller
         $ids = array_values(array_filter(array_map(intval(...), $raw)));
 
         if ($ids === []) {
-            $session->setError(Craft::t('beacon', 'Select at least one 404 entry.'));
+            $session->setError(Craft::t('beacon', 'flash.redirects404.select.least.one.404.entry'));
             return $this->redirect(UrlHelper::cpUrl('beacon/redirects/404s'));
         }
 
@@ -78,7 +78,7 @@ class Redirect404sController extends Controller
         }
 
         $count = Plugin::$plugin->redirect404Log->bulkMarkHandled($ids, $siteId);
-        $session->setNotice(Craft::t('beacon', '{count} entries marked handled.', ['count' => $count]));
+        $session->setNotice(Craft::t('beacon', 'flash.redirects404.entries.marked.handled', ['count' => $count]));
         return $this->redirect(UrlHelper::cpUrl('beacon/redirects/404s'));
     }
 }

@@ -30,7 +30,7 @@ final class RedirectActivityWidget extends Widget
 
     public static function displayName(): string
     {
-        return Craft::t('beacon', 'Redirect activity');
+        return Craft::t('beacon', 'widgets.redirectActivity.redirect.activity');
     }
 
     public static function icon(): ?string
@@ -40,7 +40,7 @@ final class RedirectActivityWidget extends Widget
 
     public function getTitle(): ?string
     {
-        return Craft::t('beacon', 'Redirect activity');
+        return Craft::t('beacon', 'widgets.redirectActivity.redirect.activity');
     }
 
     public function getBodyHtml(): ?string

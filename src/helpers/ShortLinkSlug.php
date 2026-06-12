@@ -20,20 +20,20 @@ final class ShortLinkSlug
     public static function validate(string $slug): ?string
     {
         if ($slug === '') {
-            return Craft::t('beacon', 'Slug is required.');
+            return Craft::t('beacon', 'validation.shortLink.slug.required');
         }
         if (str_starts_with($slug, '/')) {
-            return Craft::t('beacon', 'Slug must not start with a forward slash.');
+            return Craft::t('beacon', 'validation.shortLink.slug.must.not.start.forward');
         }
         if (mb_strlen($slug) > 128) {
-            return Craft::t('beacon', 'Slug exceeds 128 characters.');
+            return Craft::t('beacon', 'validation.shortLink.slug.exceeds.128.characters');
         }
         if (preg_match('#^[A-Za-z0-9._\-/]+$#', $slug) !== 1) {
-            return Craft::t('beacon', 'Slug may only contain letters, digits, "-", "_", ".", and "/".');
+            return Craft::t('beacon', 'validation.shortLink.slug.may.only.contain.letters');
         }
         $firstSeg = strstr($slug, '/', true) ?: $slug;
         if (in_array($firstSeg, ['admin', 'api', 'cpresources', 'actions', 'index.php', '.well-known'], true)) {
-            return Craft::t('beacon', 'Slug "{segment}" is reserved by Craft / Beacon — pick another.', [
+            return Craft::t('beacon', 'validation.shortLink.slug.reserved.by.craft.pick', [
                 'segment' => $firstSeg,
             ]);
         }

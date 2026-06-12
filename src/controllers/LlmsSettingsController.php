@@ -50,7 +50,7 @@ class LlmsSettingsController extends Controller
 
         $fullBody = $get('fullBody');
         if ($fullBody !== null && strlen($fullBody) > 524288) {
-            Craft::$app->getSession()->setError(Craft::t('beacon', 'llms-full.txt body exceeds the 512 KiB limit.'));
+            Craft::$app->getSession()->setError(Craft::t('beacon', 'flash.llms.llms.full.txt.body.exceeds'));
             return null;
         }
 
@@ -68,7 +68,7 @@ class LlmsSettingsController extends Controller
         ));
 
         return $this->finishSiteScopedSave(
-            Craft::t('beacon', 'llms.txt settings saved.'),
+            Craft::t('beacon', 'flash.llms.llms.txt.settings.saved'),
             'beacon/crawlers/llms-txt',
             $siteId,
             RenderCacheType::LlmsTxt,

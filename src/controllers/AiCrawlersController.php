@@ -44,7 +44,7 @@ class AiCrawlersController extends Controller
         $plugin = Plugin::$plugin;
         $rule = $ruleId !== null ? $plugin->aiCrawlers->findRule($ruleId) : null;
         if ($ruleId !== null && $rule === null) {
-            throw new NotFoundHttpException(Craft::t('beacon', 'Rule not found'));
+            throw new NotFoundHttpException(Craft::t('beacon', 'flash.aiCrawlers.rule.not.found'));
         }
         return $this->renderTemplate('beacon/ai-crawlers/_edit-rule', [
             'rule' => $rule,
@@ -72,7 +72,7 @@ class AiCrawlersController extends Controller
             enabled: (bool) $request->getBodyParam('enabled', true),
         );
 
-        Craft::$app->getSession()->setNotice(Craft::t('beacon', 'Rule saved.'));
+        Craft::$app->getSession()->setNotice(Craft::t('beacon', 'flash.aiCrawlers.rule.saved'));
         return $this->redirect(self::REDIRECT);
     }
 
@@ -85,7 +85,7 @@ class AiCrawlersController extends Controller
     {
         $this->requirePostRequest();
         Plugin::$plugin->aiCrawlers->deleteRule((int) Http::request()->getBodyParam('ruleId'));
-        Craft::$app->getSession()->setNotice(Craft::t('beacon', 'Rule deleted.'));
+        Craft::$app->getSession()->setNotice(Craft::t('beacon', 'flash.aiCrawlers.rule.deleted'));
         return $this->redirect(self::REDIRECT);
     }
 
@@ -98,7 +98,7 @@ class AiCrawlersController extends Controller
     {
         $bot = $botId !== null ? Plugin::$plugin->aiBots->findBot($botId) : null;
         if ($botId !== null && $bot === null) {
-            throw new NotFoundHttpException(Craft::t('beacon', 'Bot not found'));
+            throw new NotFoundHttpException(Craft::t('beacon', 'flash.aiCrawlers.bot.not.found'));
         }
         return $this->renderTemplate('beacon/ai-crawlers/_edit-bot', ['bot' => $bot]);
     }
@@ -128,7 +128,7 @@ class AiCrawlersController extends Controller
             enabled: (bool) $request->getBodyParam('enabled', true),
         );
 
-        Craft::$app->getSession()->setNotice(Craft::t('beacon', 'Bot saved.'));
+        Craft::$app->getSession()->setNotice(Craft::t('beacon', 'flash.aiCrawlers.bot.saved'));
         return $this->redirect(self::REDIRECT);
     }
 
@@ -141,7 +141,7 @@ class AiCrawlersController extends Controller
     {
         $this->requirePostRequest();
         Plugin::$plugin->aiBots->deleteBot((int) Http::request()->getBodyParam('botId'));
-        Craft::$app->getSession()->setNotice(Craft::t('beacon', 'Bot deleted.'));
+        Craft::$app->getSession()->setNotice(Craft::t('beacon', 'flash.aiCrawlers.bot.deleted'));
         return $this->redirect(self::REDIRECT);
     }
 
@@ -154,7 +154,7 @@ class AiCrawlersController extends Controller
     {
         $this->requirePostRequest();
         $count = Plugin::$plugin->aiBots->resetDefaults();
-        Craft::$app->getSession()->setNotice(Craft::t('beacon', '{count} default bots restored.', ['count' => $count]));
+        Craft::$app->getSession()->setNotice(Craft::t('beacon', 'flash.aiCrawlers.default.bots.restored', ['count' => $count]));
         return $this->redirect(self::REDIRECT);
     }
 
@@ -166,7 +166,7 @@ class AiCrawlersController extends Controller
      */
     public function actionToggleBot(): Response
     {
-        return $this->toggleEnabled('botId', static fn(int $id, bool $on) => Plugin::$plugin->aiBots->setBotEnabled($id, $on), Craft::t('beacon', 'Bot not found'));
+        return $this->toggleEnabled('botId', static fn(int $id, bool $on) => Plugin::$plugin->aiBots->setBotEnabled($id, $on), Craft::t('beacon', 'flash.aiCrawlers.bot.not.found'));
     }
 
     /**
@@ -177,6 +177,6 @@ class AiCrawlersController extends Controller
      */
     public function actionToggleRule(): Response
     {
-        return $this->toggleEnabled('ruleId', static fn(int $id, bool $on) => Plugin::$plugin->aiCrawlers->setRuleEnabled($id, $on), Craft::t('beacon', 'Rule not found'));
+        return $this->toggleEnabled('ruleId', static fn(int $id, bool $on) => Plugin::$plugin->aiCrawlers->setRuleEnabled($id, $on), Craft::t('beacon', 'flash.aiCrawlers.rule.not.found'));
     }
 }

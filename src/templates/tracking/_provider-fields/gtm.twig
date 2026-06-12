@@ -1,9 +1,9 @@
 {% import '_includes/forms.twig' as forms %}
 {{ forms.textField({
-    label: 'Container ID'|t('beacon'),
+    label: 'tracking.gtm.config.containerId..label'|t('beacon'),
     name: 'config[containerId]',
     value: script.config.containerId ?? '',
-    placeholder: 'GTM-XXXXX'|t('beacon'),
+    placeholder: 'tracking.gtm.config.containerId..placeholder'|t('beacon'),
     required: true,
     errors: script.getErrors('config.containerId'),
     first: true,

@@ -62,7 +62,7 @@ class AdsSettingsController extends Controller
         ));
 
         return $this->finishSiteScopedSave(
-            Craft::t('beacon', 'ads.txt settings saved.'),
+            Craft::t('beacon', 'flash.adsTxt.ads.txt.settings.saved'),
             'beacon/crawlers/ads-txt',
             $siteId,
             RenderCacheType::Ads,

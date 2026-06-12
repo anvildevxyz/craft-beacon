@@ -1,12 +1,12 @@
 {% extends '_layouts/cp.twig' %}
 {% set selectedSubnavItem = 'crawlers' %}
 {% import '_includes/forms.twig' as forms %}
-{% set title = (rule ? 'Edit rule' : 'New rule')|t('beacon') %}
+{% set title = (rule ? 'aiCrawlers.rule.edit.title'|t('beacon') : 'aiCrawlers.rule.new.title'|t('beacon')) %}
 {% set fullPageForm = true %}
 {% set crumbs = [
-    { label: 'Beacon'|t('beacon'), url: cpUrl('beacon') },
-    { label: 'Crawlers'|t('beacon'), url: cpUrl('beacon/crawlers/ai-crawlers') },
-    { label: 'AI crawlers'|t('beacon'), url: cpUrl('beacon/crawlers/ai-crawlers') },
+    { label: 'nav.beacon'|t('beacon'), url: cpUrl('beacon') },
+    { label: 'nav.crawlers'|t('beacon'), url: cpUrl('beacon/crawlers/ai-crawlers') },
+    { label: 'aiCrawlers.rule.ai.crawlers.label'|t('beacon'), url: cpUrl('beacon/crawlers/ai-crawlers') },
 ] %}
 
 {% block content %}
@@ -18,23 +18,23 @@
     {{ csrfInput() }}
 
     {{ forms.lightswitchField({
-        label: 'Enabled'|t('beacon'),
+        label: 'field.enabled'|t('beacon'),
         name: 'enabled',
         on: rule ? rule.enabled : true,
         first: true,
     }) }}
 
     {{ forms.textField({
-        label: 'Bot name'|t('beacon'),
-        instructions: 'Name of the bot this rule applies to (e.g., GPTBot, ClaudeBot).'|t('beacon'),
+        label: 'aiCrawlers.rule.botName.label'|t('beacon'),
+        instructions: 'aiCrawlers.rule.botName.instructions'|t('beacon'),
         name: 'botName',
         value: rule.botName|default(''),
         required: true,
     }) }}
 
     {{ forms.textareaField({
-        label: 'Allow paths'|t('beacon'),
-        instructions: 'One path per line.'|t('beacon'),
+        label: 'aiCrawlers.rule.allowPaths.label'|t('beacon'),
+        instructions: 'aiCrawlers.rule.allowPaths.instructions'|t('beacon'),
         name: 'allowPaths',
         value: rule.allowPaths|default([])|join('\n'),
         rows: 5,
@@ -42,8 +42,8 @@
     }) }}
 
     {{ forms.textareaField({
-        label: 'Disallow paths'|t('beacon'),
-        instructions: 'One path per line.'|t('beacon'),
+        label: 'aiCrawlers.rule.disallowPaths.label'|t('beacon'),
+        instructions: 'aiCrawlers.rule.disallowPaths.instructions'|t('beacon'),
         name: 'disallowPaths',
         value: rule.disallowPaths|default([])|join('\n'),
         rows: 5,

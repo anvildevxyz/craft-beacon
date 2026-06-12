@@ -1,10 +1,10 @@
 {% extends '_layouts/elementindex' %}
 
 {% set selectedSubnavItem = 'authors' %}
-{% set title = 'Authors'|t('beacon') %}
+{% set title = 'nav.authors'|t('beacon') %}
 {% set elementType = 'anvildev\\beacon\\elements\\AuthorElement' %}
 {% set showSiteMenu = true %}
 
 {% block actionButton %}
-    <a href="{{ url('beacon/authors/new') }}" class="btn submit add icon">{{ 'New author'|t('beacon') }}</a>
+    <a href="{{ url('beacon/authors/new') }}" class="btn submit add icon">{{ 'authors.new.author.text'|t('beacon') }}</a>
 {% endblock %}

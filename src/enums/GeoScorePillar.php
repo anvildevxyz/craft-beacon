@@ -42,12 +42,12 @@ enum GeoScorePillar: string
     public function label(): string
     {
         return match ($this) {
-            self::FreshnessBanding => Craft::t('beacon', 'Freshness'),
-            self::EntityCompleteness => Craft::t('beacon', 'Entity completeness'),
-            self::ClaimBasedHeadings => Craft::t('beacon', 'Claim-based headings'),
-            self::Chunkability => Craft::t('beacon', 'Chunkability'),
-            self::FactDensity => Craft::t('beacon', 'Fact density'),
-            self::OutboundCitationDensity => Craft::t('beacon', 'Outbound citations'),
+            self::FreshnessBanding => Craft::t('beacon', 'geo.pillar.freshness'),
+            self::EntityCompleteness => Craft::t('beacon', 'geo.pillar.entity.completeness'),
+            self::ClaimBasedHeadings => Craft::t('beacon', 'geo.pillar.claim.based.headings'),
+            self::Chunkability => Craft::t('beacon', 'geo.pillar.chunkability'),
+            self::FactDensity => Craft::t('beacon', 'geo.pillar.fact.density'),
+            self::OutboundCitationDensity => Craft::t('beacon', 'geo.pillar.outbound.citations'),
         };
     }
 }

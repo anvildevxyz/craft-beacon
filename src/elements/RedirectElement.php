@@ -56,22 +56,22 @@ class RedirectElement extends Element
 
     public static function displayName(): string
     {
-        return Craft::t('beacon', 'Redirect');
+        return Craft::t('beacon', 'elements.redirect.redirect');
     }
 
     public static function lowerDisplayName(): string
     {
-        return Craft::t('beacon', 'redirect');
+        return Craft::t('beacon', 'elements.redirect.redirect.2');
     }
 
     public static function pluralDisplayName(): string
     {
-        return Craft::t('beacon', 'Redirects');
+        return Craft::t('beacon', 'nav.redirects');
     }
 
     public static function pluralLowerDisplayName(): string
     {
-        return Craft::t('beacon', 'redirects');
+        return Craft::t('beacon', 'elements.redirect.redirects');
     }
 
     public static function refHandle(): ?string
@@ -122,7 +122,7 @@ class RedirectElement extends Element
     public function validateType(string $attribute): void
     {
         if (RedirectType::tryFrom((string) $this->$attribute) === null) {
-            $this->addError($attribute, Craft::t('beacon', 'Invalid type.'));
+            $this->addError($attribute, Craft::t('beacon', 'elements.redirect.invalid.type'));
         }
     }
 
@@ -135,7 +135,7 @@ class RedirectElement extends Element
     {
         $value = (string) $this->$attribute;
         if (Strings::containsLineBreaks($value)) {
-            $this->addError($attribute, Craft::t('beacon', 'Source URI contains invalid line breaks.'));
+            $this->addError($attribute, Craft::t('beacon', 'elements.redirect.source.uri.contains.invalid.line'));
             return;
         }
         if ($this->type === RedirectType::Regex->value && ($err = SafeRegex::validate($value)) !== null) {
@@ -216,7 +216,7 @@ class RedirectElement extends Element
     {
         $source = [
             'key' => '*',
-            'label' => Craft::t('beacon', 'All redirects'),
+            'label' => Craft::t('beacon', 'elements.redirect.all.redirects'),
             'criteria' => [],
         ];
 
@@ -233,12 +233,12 @@ class RedirectElement extends Element
     protected static function defineTableAttributes(): array
     {
         return [
-            'title' => ['label' => Craft::t('beacon', 'Source')],
-            'targetUri' => ['label' => Craft::t('beacon', 'Target')],
-            'statusCode' => ['label' => Craft::t('beacon', 'Status')],
-            'type' => ['label' => Craft::t('beacon', 'Type')],
-            'hits' => ['label' => Craft::t('beacon', 'Hits')],
-            'lastHit' => ['label' => Craft::t('beacon', 'Last hit')],
+            'title' => ['label' => Craft::t('beacon', 'aiCrawlers.source.text')],
+            'targetUri' => ['label' => Craft::t('beacon', 'elements.redirect.target')],
+            'statusCode' => ['label' => Craft::t('beacon', 'dashboard.status.heading')],
+            'type' => ['label' => Craft::t('beacon', 'elements.redirect.type')],
+            'hits' => ['label' => Craft::t('beacon', 'redirects.edit.hits.text')],
+            'lastHit' => ['label' => Craft::t('beacon', 'dashboard.last.hit.text')],
         ];
     }
 

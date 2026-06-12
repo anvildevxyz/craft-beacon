@@ -5,28 +5,28 @@
     <div class="beacon-widget-stats">
         <div>
             <strong class="beacon-widget-stat__value beacon-widget-stat__value--lg">{{ counts.total|number }}</strong>
-            <div class="light"><small>{{ 'Submissions'|t('beacon') }}</small></div>
+            <div class="light"><small>{{ 'widgets.indexNow.submissions.text'|t('beacon') }}</small></div>
         </div>
         <div>
             <strong class="beacon-widget-stat__value beacon-widget-stat__value--lg beacon-widget-stat__value--ok">{{ counts.ok|number }}</strong>
-            <div class="light"><small>{{ 'Accepted'|t('beacon') }}</small></div>
+            <div class="light"><small>{{ 'widgets.indexNow.accepted.text'|t('beacon') }}</small></div>
         </div>
         <div>
             <strong class="beacon-widget-stat__value beacon-widget-stat__value--lg{{ counts.failed > 0 ? ' beacon-widget-stat__value--danger' : ' beacon-widget-stat__value--muted' }}">{{ counts.failed|number }}</strong>
-            <div class="light"><small>{{ 'Rejected'|t('beacon') }}</small></div>
+            <div class="light"><small>{{ 'widgets.indexNow.rejected.text'|t('beacon') }}</small></div>
         </div>
     </div>
 
     {% if rows is empty %}
-        <p class="light">{{ 'No IndexNow submissions in this time range. Set `indexNowEnabled` to true to auto-submit on entry save, then add a per-site key with `craft beacon/index-now/generate-key` (or in config/beacon.php under `indexNowKeys`).'|t('beacon') }}</p>
+        <p class="light">{{ 'widgets.indexNow.no.indexnow.submissions.time.range.text'|t('beacon') }}</p>
     {% else %}
         <table class="data fullwidth">
             <thead>
                 <tr>
-                    <th>{{ 'When'|t('beacon') }}</th>
-                    <th>{{ 'Site'|t('beacon') }}</th>
-                    <th>{{ 'URL'|t('beacon') }}</th>
-                    <th>{{ 'Status'|t('beacon') }}</th>
+                    <th>{{ 'widgets.indexNow.message.text'|t('beacon') }}</th>
+                    <th>{{ 'field.site'|t('beacon') }}</th>
+                    <th>{{ 'widgets.indexNow.url.text'|t('beacon') }}</th>
+                    <th>{{ 'widgets.indexNow.status.text'|t('beacon') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -40,9 +40,9 @@
                     </td>
                     <td>
                         {% if r.succeeded %}
-                            <span class="beacon-status--ok">✓ {{ r.statusCode ?? 'ok'|t('beacon') }}</span>
+                            <span class="beacon-status--ok">✓ {{ r.statusCode ?? 'widgets.indexNow.ok.text'|t('beacon') }}</span>
                         {% else %}
-                            <span class="beacon-status--danger" title="{{ r.note ?? '' }}">✗ {{ r.statusCode ?? 'err'|t('beacon') }}</span>
+                            <span class="beacon-status--danger" title="{{ r.note ?? '' }}">✗ {{ r.statusCode ?? 'widgets.indexNow.err.text'|t('beacon') }}</span>
                         {% endif %}
                     </td>
                 </tr>

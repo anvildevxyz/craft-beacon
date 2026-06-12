@@ -115,7 +115,7 @@ class RedirectImporter extends Component
                 } else {
                     $errors[] = [
                         'lineNumber' => 0,
-                        'reason' => Craft::t('beacon', 'Failed to save redirect for source "{source}".', [
+                        'reason' => Craft::t('beacon', 'import.redirects.failed.save.redirect.source', [
                             'source' => $row['sourceUri'],
                         ]),
                     ];
@@ -142,7 +142,7 @@ class RedirectImporter extends Component
 
         $lines = preg_split('/\r\n|\r|\n/', trim($csv));
         if ($lines === false || count($lines) < 2) {
-            return ['valid' => [], 'errors' => [['lineNumber' => 1, 'reason' => Craft::t('beacon', 'Empty CSV or missing rows.')]]];
+            return ['valid' => [], 'errors' => [['lineNumber' => 1, 'reason' => Craft::t('beacon', 'import.redirects.empty.csv.missing.rows')]]];
         }
 
         $header = str_getcsv((string) array_shift($lines), ',', '"', '\\');
@@ -152,7 +152,7 @@ class RedirectImporter extends Component
         $qsModeIdx = array_search('queryStringMode', $header, true);
 
         if ($sourceIdx === false || $targetIdx === false) {
-            return ['valid' => [], 'errors' => [['lineNumber' => 1, 'reason' => Craft::t('beacon', 'Header must contain `source` and `target` columns.')]]];
+            return ['valid' => [], 'errors' => [['lineNumber' => 1, 'reason' => Craft::t('beacon', 'import.redirects.header.must.contain.source.target')]]];
         }
 
         $defaultStatusCode = RedirectStatusCode::MovedPermanently->value;
@@ -176,17 +176,17 @@ class RedirectImporter extends Component
             $qsModeRaw = $qsModeIdx !== false ? trim($cols[$qsModeIdx] ?? '') : '';
 
             if ($source === '') {
-                $errors[] = ['lineNumber' => $lineNum, 'reason' => Craft::t('beacon', 'Source is empty.')];
+                $errors[] = ['lineNumber' => $lineNum, 'reason' => Craft::t('beacon', 'import.redirects.source.empty')];
                 continue;
             }
             if ($target === '') {
-                $errors[] = ['lineNumber' => $lineNum, 'reason' => Craft::t('beacon', 'Target is empty.')];
+                $errors[] = ['lineNumber' => $lineNum, 'reason' => Craft::t('beacon', 'import.redirects.target.empty')];
                 continue;
             }
 
             $statusCode = $status !== '' ? (int) $status : $defaultStatusCode;
             if (!in_array($statusCode, $validStatusCodes, true)) {
-                $errors[] = ['lineNumber' => $lineNum, 'reason' => Craft::t('beacon', 'Invalid statusCode "{status}" (must be {codes}).', [
+                $errors[] = ['lineNumber' => $lineNum, 'reason' => Craft::t('beacon', 'import.redirects.invalid.statuscode.must', [
                     'status' => $status,
                     'codes' => implode(', ', $validStatusCodes),
                 ])];
@@ -195,7 +195,7 @@ class RedirectImporter extends Component
 
             $qsMode = $qsModeRaw === '' ? RedirectQueryStringMode::Ignore : RedirectQueryStringMode::tryFrom($qsModeRaw);
             if ($qsMode === null) {
-                $errors[] = ['lineNumber' => $lineNum, 'reason' => Craft::t('beacon', 'Invalid queryStringMode "{mode}" (must be {validModes}).', [
+                $errors[] = ['lineNumber' => $lineNum, 'reason' => Craft::t('beacon', 'import.redirects.invalid.querystringmode.must', [
                     'mode' => $qsModeRaw,
                     'validModes' => $validModesStr,
                 ])];
@@ -206,7 +206,7 @@ class RedirectImporter extends Component
                 $sourceUri = substr($source, 6);
                 $regexError = SafeRegex::validate($sourceUri);
                 if ($regexError !== null) {
-                    $errors[] = ['lineNumber' => $lineNum, 'reason' => Craft::t('beacon', 'Invalid regex pattern: {detail}', [
+                    $errors[] = ['lineNumber' => $lineNum, 'reason' => Craft::t('beacon', 'import.redirects.invalid.regex.pattern', [
                         'detail' => $regexError,
                     ])];
                     continue;
@@ -220,19 +220,19 @@ class RedirectImporter extends Component
             // mb_strlen so the limits count characters, matching the field
             // validator (BeaconRedirectSourcesField) rather than raw byte length.
             if (mb_strlen($sourceUri) > 255) {
-                $errors[] = ['lineNumber' => $lineNum, 'reason' => Craft::t('beacon', 'Source exceeds 255 characters.')];
+                $errors[] = ['lineNumber' => $lineNum, 'reason' => Craft::t('beacon', 'import.redirects.source.exceeds.255.characters')];
                 continue;
             }
             if (mb_strlen($target) > 500) {
-                $errors[] = ['lineNumber' => $lineNum, 'reason' => Craft::t('beacon', 'Target exceeds 500 characters.')];
+                $errors[] = ['lineNumber' => $lineNum, 'reason' => Craft::t('beacon', 'import.redirects.target.exceeds.500.characters')];
                 continue;
             }
             if (Strings::containsLineBreaks($sourceUri)) {
-                $errors[] = ['lineNumber' => $lineNum, 'reason' => Craft::t('beacon', 'Source contains invalid line breaks.')];
+                $errors[] = ['lineNumber' => $lineNum, 'reason' => Craft::t('beacon', 'import.redirects.source.contains.invalid.line.breaks')];
                 continue;
             }
             if (Strings::containsLineBreaks($target)) {
-                $errors[] = ['lineNumber' => $lineNum, 'reason' => Craft::t('beacon', 'Target contains invalid line breaks.')];
+                $errors[] = ['lineNumber' => $lineNum, 'reason' => Craft::t('beacon', 'import.redirects.target.contains.invalid.line.breaks')];
                 continue;
             }
             $targetError = RedirectTargets::validateTargetUri($target);

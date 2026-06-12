@@ -40,7 +40,7 @@ final class OutboundCitationDensityPillar implements PillarComputerInterface
                 pillar: $this->pillar(),
                 score: 0,
                 band: GeoPillarScore::BAND_STALE,
-                notes: [Craft::t('beacon', 'No content found to score.')],
+                notes: [Craft::t('beacon', 'geo.pillar.outboundCitation.no.content.found.score')],
                 debug: ['totalWords' => 0, 'tier1' => 0, 'tier2' => 0, 'unclassified' => 0],
             );
         }
@@ -78,7 +78,7 @@ final class OutboundCitationDensityPillar implements PillarComputerInterface
                 pillar: $this->pillar(),
                 score: 1,
                 band: GeoPillarScore::BAND_STALE,
-                notes: [Craft::t('beacon', 'Content too short ({words} words) to score citation density. Aim for at least 200 words.', ['words' => $totalWords])],
+                notes: [Craft::t('beacon', 'geo.pillar.outboundCitation.content.too.short.words.score', ['words' => $totalWords])],
                 debug: ['totalWords' => $totalWords, 'tier1' => $tier1, 'tier2' => $tier2, 'unclassified' => $unclassifiedCount],
             );
         }

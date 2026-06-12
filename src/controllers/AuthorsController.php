@@ -65,11 +65,11 @@ class AuthorsController extends Controller
 
         $session = Craft::$app->getSession();
         if (!Craft::$app->getElements()->saveElement($author)) {
-            $session->setError(Craft::t('beacon', 'Couldn\'t save author.'));
+            $session->setError(Craft::t('beacon', 'flash.authors.couldnt.save'));
             return null;
         }
 
-        $session->setNotice(Craft::t('beacon', 'Author saved.'));
+        $session->setNotice(Craft::t('beacon', 'flash.authors.author.saved'));
         return $this->redirectToPostedUrl($author);
     }
 

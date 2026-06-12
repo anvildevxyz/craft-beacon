@@ -59,7 +59,7 @@ class TrackingController extends Controller
         }
 
         $providerImpl = $plugin->trackingRegistry->get($script->provider)
-            ?? throw new NotFoundHttpException(Craft::t('beacon', 'Unknown provider: {provider}', ['provider' => $script->provider]));
+            ?? throw new NotFoundHttpException(Craft::t('beacon', 'flash.tracking.unknown.provider', ['provider' => $script->provider]));
 
         return $this->renderTemplate('beacon/tracking/_edit', [
             'script' => $script,
@@ -95,7 +95,7 @@ class TrackingController extends Controller
 
         $providerImpl = $plugin->trackingRegistry->get($script->provider);
         if (!$providerImpl) {
-            $session->setError(Craft::t('beacon', 'Unknown provider.'));
+            $session->setError(Craft::t('beacon', 'flash.tracking.unknown.provider.2'));
             return null;
         }
 
@@ -104,11 +104,11 @@ class TrackingController extends Controller
         }
 
         if (!$plugin->tracking->saveScript($script) || $script->hasErrors()) {
-            $session->setError(Craft::t('beacon', 'Couldn\'t save tracking script.'));
+            $session->setError(Craft::t('beacon', 'flash.tracking.couldnt.save'));
             return $this->retainSubmittedForm(['script' => $script]);
         }
 
-        $session->setNotice(Craft::t('beacon', 'Tracking script saved.'));
+        $session->setNotice(Craft::t('beacon', 'flash.tracking.tracking.script.saved'));
         return $this->redirectToPostedUrl();
     }
 
@@ -127,9 +127,9 @@ class TrackingController extends Controller
         Plugin::$plugin->tracking->deleteScript($request->getRequiredBodyParam('uid'));
 
         if ($request->getAcceptsJson()) {
-            return $this->asSuccess(Craft::t('beacon', 'Tracking script deleted.'));
+            return $this->asSuccess(Craft::t('beacon', 'flash.tracking.tracking.script.deleted'));
         }
-        Craft::$app->getSession()->setNotice(Craft::t('beacon', 'Tracking script deleted.'));
+        Craft::$app->getSession()->setNotice(Craft::t('beacon', 'flash.tracking.tracking.script.deleted'));
         return $this->redirectToPostedUrl();
     }
 

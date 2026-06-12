@@ -155,7 +155,7 @@ class SettingsController extends Controller
             }
         }
 
-        Craft::$app->getSession()->setNotice(Craft::t('beacon', 'Settings saved.'));
+        Craft::$app->getSession()->setNotice(Craft::t('beacon', 'flash.settings.settings.saved'));
         return $this->redirect('beacon/settings/' . $this->normalizeTab($params['tab'] ?? null));
     }
 

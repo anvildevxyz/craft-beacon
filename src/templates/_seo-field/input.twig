@@ -19,21 +19,21 @@
     {% set hasSectionDesc  = (sectionDefaults.descriptionTemplate ?? '')|trim != '' %}
     {% if hasSectionTitle or hasSectionDesc %}
         <p class="instructions">
-            {{ 'Section defaults are active for this section.'|t('beacon') }}
-            <a href="{{ cpUrl('beacon/settings/content') }}" target="_blank" rel="noopener">{{ 'Edit section defaults'|t('beacon') }} ↗</a>
+            {{ 'seoField.section.defaults.active.section.text'|t('beacon') }}
+            <a href="{{ cpUrl('beacon/settings/content') }}" target="_blank" rel="noopener">{{ 'seoField.edit.section.defaults.text'|t('beacon') }} ↗</a>
         </p>
     {% endif %}
 
     <details class="beacon-seo-group" open>
         <summary class="beacon-seo-group-summary">
-            <span class="beacon-seo-group-title">{{ 'Search & social (SEO)'|t('beacon') }}</span>
-            <span class="beacon-seo-group-hint">{{ 'Title, description, image, canonical, robots, previews'|t('beacon') }}</span>
+            <span class="beacon-seo-group-title">{{ 'seoField.search.social.seo.text'|t('beacon') }}</span>
+            <span class="beacon-seo-group-hint">{{ 'seoField.title.description.image.canonical.robots.text'|t('beacon') }}</span>
         </summary>
         <div class="beacon-seo-group-body">
 
     {{ forms.textField({
-        label: 'SEO Title'|t('beacon'),
-        instructions: 'Leave blank to inherit. The placeholder shows the live resolved fallback.'|t('beacon'),
+        label: 'seoField.seo.title.label'|t('beacon'),
+        instructions: 'seoField.leave.blank.inherit.placeholder.shows.instructions'|t('beacon'),
         name: name ~ '[title]',
         value: seoTitleValue,
         placeholder: fallbackTitle,
@@ -41,26 +41,26 @@
     }) }}
     <div class="beacon-seo-meter" data-meter-name="{{ name }}[title]" data-meter-suffix="[title]" data-meter-min="50" data-meter-max="60">
         <span class="beacon-seo-meter-count">{{ seoTitleValue|length }}</span>
-        <span class="beacon-seo-meter-range">{{ '/ 50–60 chars'|t('beacon') }}</span>
+        <span class="beacon-seo-meter-range">{{ 'seoField.50.60.chars.text'|t('beacon') }}</span>
         <span class="beacon-seo-meter-bar"><span class="beacon-seo-meter-fill"></span></span>
         <span class="beacon-source-badge" data-bp-source-badge="title"
               data-bp-has-section="{{ hasSectionTitle ? '1' : '0' }}"
-              title="{{ 'Where the resolved SEO title comes from (entry override / section default / global default).'|t('beacon') }}"
+              title="{{ 'seoField.where.resolved.seo.title.comes.text'|t('beacon') }}"
         ></span>
     </div>
     <div class="beacon-source-line" data-bp-source-line="title">
         {% if hasSectionTitle %}
-            <span>{{ 'Inheriting title template from section defaults.'|t('beacon') }}</span>
-            <a href="{{ cpUrl('beacon/settings/content') }}" target="_blank" rel="noopener">{{ 'Edit section defaults'|t('beacon') }} ↗</a>
+            <span>{{ 'seoField.inheriting.title.template.section.defaults.text'|t('beacon') }}</span>
+            <a href="{{ cpUrl('beacon/settings/content') }}" target="_blank" rel="noopener">{{ 'seoField.edit.section.defaults.text'|t('beacon') }} ↗</a>
         {% else %}
-            <span>{{ 'Inheriting title template from global defaults.'|t('beacon') }}</span>
-            <a href="{{ cpUrl('beacon/settings/general') }}" target="_blank" rel="noopener">{{ 'Edit global defaults'|t('beacon') }} ↗</a>
+            <span>{{ 'seoField.inheriting.title.template.global.defaults.text'|t('beacon') }}</span>
+            <a href="{{ cpUrl('beacon/settings/general') }}" target="_blank" rel="noopener">{{ 'seoField.edit.global.defaults.text'|t('beacon') }} ↗</a>
         {% endif %}
     </div>
 
     {{ forms.textareaField({
-        label: 'SEO Description'|t('beacon'),
-        instructions: 'Aim for 150-160 characters. The placeholder shows the live resolved fallback.'|t('beacon'),
+        label: 'seoField.seo.description.label'|t('beacon'),
+        instructions: 'seoField.aim.150.160.characters.placeholder.instructions'|t('beacon'),
         name: name ~ '[description]',
         value: seoDescriptionValue,
         rows: 3,
@@ -69,43 +69,43 @@
     }) }}
     <div class="beacon-seo-meter" data-meter-name="{{ name }}[description]" data-meter-suffix="[description]" data-meter-min="150" data-meter-max="160">
         <span class="beacon-seo-meter-count">{{ seoDescriptionValue|length }}</span>
-        <span class="beacon-seo-meter-range">{{ '/ 150–160 chars'|t('beacon') }}</span>
+        <span class="beacon-seo-meter-range">{{ 'seoField.150.160.chars.text'|t('beacon') }}</span>
         <span class="beacon-seo-meter-bar"><span class="beacon-seo-meter-fill"></span></span>
         <span class="beacon-source-badge" data-bp-source-badge="description"
               data-bp-has-section="{{ hasSectionDesc ? '1' : '0' }}"
-              title="{{ 'Where the resolved description comes from (entry override / section default / global default).'|t('beacon') }}"
+              title="{{ 'seoField.where.resolved.description.comes.entry.text'|t('beacon') }}"
         ></span>
     </div>
     <div class="beacon-source-line" data-bp-source-line="description">
         {% if hasSectionDesc %}
-            <span>{{ 'Inheriting description template from section defaults.'|t('beacon') }}</span>
-            <a href="{{ cpUrl('beacon/settings/content') }}" target="_blank" rel="noopener">{{ 'Edit section defaults'|t('beacon') }} ↗</a>
+            <span>{{ 'seoField.inheriting.description.template.section.defaults.text'|t('beacon') }}</span>
+            <a href="{{ cpUrl('beacon/settings/content') }}" target="_blank" rel="noopener">{{ 'seoField.edit.section.defaults.text'|t('beacon') }} ↗</a>
         {% else %}
-            <span>{{ 'Inheriting description template from global defaults.'|t('beacon') }}</span>
-            <a href="{{ cpUrl('beacon/settings/general') }}" target="_blank" rel="noopener">{{ 'Edit global defaults'|t('beacon') }} ↗</a>
+            <span>{{ 'seoField.inheriting.description.template.global.defaults.text'|t('beacon') }}</span>
+            <a href="{{ cpUrl('beacon/settings/general') }}" target="_blank" rel="noopener">{{ 'seoField.edit.global.defaults.text'|t('beacon') }} ↗</a>
         {% endif %}
     </div>
 
     <section class="beacon-seo-checklist" data-seo-checklist data-field-prefix="{{ name }}">
         <div class="beacon-seo-checklist-header">
-            <strong>{{ 'SEO quality checklist'|t('beacon') }}</strong>
+            <strong>{{ 'seoField.seo.quality.checklist.text'|t('beacon') }}</strong>
             <span class="beacon-seo-checklist-score"><span data-seo-score>0</span>/100</span>
         </div>
         <ul class="beacon-seo-checklist-items">
-            <li data-seo-check="titleLength">{{ 'Title length is in recommended range'|t('beacon') }}</li>
-            <li data-seo-check="descriptionLength">{{ 'Description length is in recommended range'|t('beacon') }}</li>
-            <li data-seo-check="canonical">{{ 'Canonical URL is resolvable'|t('beacon') }}</li>
-            <li data-seo-check="robots">{{ 'Robots directives are not over-restrictive'|t('beacon') }}</li>
-            <li data-seo-check="schema">{{ 'At least one schema source is present'|t('beacon') }}</li>
-            <li data-seo-check="social">{{ 'Social preview has title/description coverage'|t('beacon') }}</li>
+            <li data-seo-check="titleLength">{{ 'seoField.title.length.recommended.range.text'|t('beacon') }}</li>
+            <li data-seo-check="descriptionLength">{{ 'seoField.description.length.recommended.range.text'|t('beacon') }}</li>
+            <li data-seo-check="canonical">{{ 'seoField.canonical.url.resolvable.text'|t('beacon') }}</li>
+            <li data-seo-check="robots">{{ 'seoField.robots.directives.not.over.restrictive.text'|t('beacon') }}</li>
+            <li data-seo-check="schema">{{ 'seoField.least.one.schema.source.present.text'|t('beacon') }}</li>
+            <li data-seo-check="social">{{ 'seoField.social.preview.has.title.description.text'|t('beacon') }}</li>
         </ul>
     </section>
 
     {% set ogImageId = value.ogImageId ?? null %}
     {% set ogImageAsset = ogImageId ? craft.assets().id(ogImageId).status(null).one() : null %}
     {{ forms.elementSelectField({
-        label: 'SEO image'|t('beacon'),
-        instructions: 'Used as the Open Graph / Twitter card image. Recommended 1200×630.'|t('beacon'),
+        label: 'seoField.seo.image.label'|t('beacon'),
+        instructions: 'seoField.used.as.open.graph.twitter.instructions'|t('beacon'),
         id: name ~ '-ogImageId',
         name: name ~ '[ogImageId]',
         elementType: 'craft\\elements\\Asset',
@@ -122,14 +122,14 @@
         data-bp-inherited-image
         {% if ogImageId or fallbackOgImage == '' %}hidden{% endif %}
     >
-        <span class="beacon-seo-inherited-image-label">{{ 'Inherited image:'|t('beacon') }}</span>
+        <span class="beacon-seo-inherited-image-label">{{ 'seoField.inherited.image.text'|t('beacon') }}</span>
         <img data-bp-inherited-image-img src="{{ fallbackOgImage }}" alt="" loading="lazy">
-        <span class="beacon-seo-inherited-image-help light">{{ 'Used when no entry image is set.'|t('beacon') }}</span>
+        <span class="beacon-seo-inherited-image-help light">{{ 'seoField.used.no.entry.image.set.text'|t('beacon') }}</span>
     </div>
 
     {{ forms.textField({
-        label: 'Canonical URL'|t('beacon'),
-        instructions: 'Leave blank for auto.'|t('beacon'),
+        label: 'seoField.canonical.url.label'|t('beacon'),
+        instructions: 'seoField.leave.blank.auto.instructions'|t('beacon'),
         name: name ~ '[canonical]',
         value: value.canonical ?? '',
     }) }}
@@ -137,7 +137,7 @@
     {% set robotsDefs = robotsDirectiveDefs ?? [] %}
     {% if robotsDefs %}
         <section class="beacon-seo-section beacon-seo-robots">
-            <h3 class="beacon-seo-section-title">{{ 'Robots directives'|t('beacon') }}</h3>
+            <h3 class="beacon-seo-section-title">{{ 'seoField.robots.directives.heading'|t('beacon') }}</h3>
             <div class="beacon-seo-robots-warning" data-bp-robots-warn aria-live="polite"></div>
             <div class="beacon-seo-robots-grid">
                 {% for def in robotsDefs %}
@@ -152,7 +152,7 @@
                             }) }}
                         </div>
                     {% elseif def.type == 'enum' %}
-                        {% set enumOptions = [{ label: '— ' ~ ('off'|t('beacon')) ~ ' —', value: '' }] %}
+                        {% set enumOptions = [{ label: '— ' ~ ('seoField.off.text'|t('beacon')) ~ ' —', value: '' }] %}
                         {% for opt in def.options %}
                             {% set enumOptions = enumOptions|merge([{ label: opt, value: opt }]) %}
                         {% endfor %}
@@ -192,7 +192,7 @@
 
     {% if preview %}
         <section class="beacon-seo-section beacon-seo-previews">
-            <h3 class="beacon-seo-section-title">{{ 'Search & social previews'|t('beacon') }}</h3>
+            <h3 class="beacon-seo-section-title">{{ 'seoField.search.social.previews.heading'|t('beacon') }}</h3>
             <div class="beacon-preview-callout" data-bp-missing-fields aria-live="polite" hidden></div>
             {{ preview|raw }}
         </section>
@@ -203,19 +203,19 @@
 
     <details class="beacon-seo-group" open>
         <summary class="beacon-seo-group-summary">
-            <span class="beacon-seo-group-title">{{ 'AI & structured data (GEO)'|t('beacon') }}</span>
-            <span class="beacon-seo-group-hint">{{ 'JSON-LD schema and AI Markdown export'|t('beacon') }}</span>
+            <span class="beacon-seo-group-title">{{ 'seoField.ai.structured.data.geo.text'|t('beacon') }}</span>
+            <span class="beacon-seo-group-hint">{{ 'seoField.json.ld.schema.ai.markdown.text'|t('beacon') }}</span>
         </summary>
         <div class="beacon-seo-group-body">
 
     <section class="beacon-seo-section">
-        <h3 class="beacon-seo-section-title">{{ 'Structured data (JSON-LD)'|t('beacon') }}</h3>
+        <h3 class="beacon-seo-section-title">{{ 'seoField.structured.data.json.ld.heading'|t('beacon') }}</h3>
 
         {% set inherited = inheritedSchemas ?? [] %}
         {% if inherited %}
             <div class="beacon-schema-banner" role="note">
                 <p class="beacon-schema-banner-title">
-                    {{ 'This entry already emits:'|t('beacon') }}
+                    {{ 'seoField.entry.already.emits.text'|t('beacon') }}
                 </p>
                 <ul class="beacon-schema-banner-list">
                     {% for row in inherited %}
@@ -223,17 +223,17 @@
                             <strong>{{ row.type }}</strong>
                             <span class="light">— {{ row.source }}</span>
                             {% if row.editUrl is defined and row.editUrl %}
-                                <a href="{{ row.editUrl }}" class="beacon-schema-banner-edit" target="_blank" rel="noopener">{{ 'Edit'|t('beacon') }} ↗</a>
+                                <a href="{{ row.editUrl }}" class="beacon-schema-banner-edit" target="_blank" rel="noopener">{{ 'seoField.edit.text'|t('beacon') }} ↗</a>
                             {% endif %}
                         </li>
                     {% endfor %}
                 </ul>
                 <p class="beacon-schema-banner-help">
-                    {{ 'Add one below only for extra types.'|t('beacon') }}
+                    {{ 'seoField.add.one.below.only.extra.text'|t('beacon') }}
                 </p>
             </div>
         {% else %}
-            <p class="beacon-seo-section-help">{{ 'Attach entry-specific structured data beyond global defaults.'|t('beacon') }}</p>
+            <p class="beacon-seo-section-help">{{ 'seoField.attach.entry.specific.structured.data.text'|t('beacon') }}</p>
         {% endif %}
 
         {% set addons = value.schemaAddons ?? [] %}
@@ -259,7 +259,7 @@
         >
             {% if not addons %}
                 <p class="beacon-schema-empty" data-beacon-schema-empty>
-                    {{ 'No additional schemas yet.'|t('beacon') }}
+                    {{ 'seoField.no.additional.schemas.yet.text'|t('beacon') }}
                 </p>
             {% endif %}
             {% for i, schema in addons %}
@@ -279,8 +279,8 @@
                     >
                     <div class="beacon-schema-card-body" data-card-body></div>
                     <div class="beacon-schema-card-actions">
-                        <button type="button" class="btn small" data-card-edit>{{ 'Edit'|t('beacon') }}</button>
-                        <button type="button" class="btn small" data-card-remove aria-label="{{ 'Remove schema'|t('beacon') }}">{{ 'Remove'|t('beacon') }}</button>
+                        <button type="button" class="btn small" data-card-edit>{{ 'seoField.edit.text'|t('beacon') }}</button>
+                        <button type="button" class="btn small" data-card-remove aria-label="{{ 'seoField.remove.schema.ariaLabel'|t('beacon') }}">{{ 'seoField.remove.text'|t('beacon') }}</button>
                     </div>
                 </div>
             {% endfor %}
@@ -290,30 +290,30 @@
             type="button"
             class="btn add icon"
             data-beacon-add-schema
-        >{{ 'Add schema'|t('beacon') }}</button>
+        >{{ 'seoField.add.schema.text'|t('beacon') }}</button>
     </section>
 
     <section class="beacon-seo-section beacon-seo-ai-markdown">
-        <h3 class="beacon-seo-section-title">{{ 'AI Markdown'|t('beacon') }}</h3>
-        <p class="light">{{ 'Per-entry overrides for the GEO Markdown export. Inherits from site/section defaults when set to "Inherit".'|t('beacon') }}</p>
+        <h3 class="beacon-seo-section-title">{{ 'seoField.ai.markdown.heading'|t('beacon') }}</h3>
+        <p class="light">{{ 'seoField.per.entry.overrides.geo.markdown.text'|t('beacon') }}</p>
         {% set aiMd = value.aiMarkdown ?? {} %}
         {{ forms.selectField({
-            label: 'Include in Markdown export'|t('beacon'),
+            label: 'seoField.include.markdown.export.label'|t('beacon'),
             name: name ~ '[aiMarkdown][enabled]',
             options: [
-                { label: 'Inherit from site/section settings'|t('beacon'), value: 'inherit' },
-                { label: 'Always include'|t('beacon'), value: 'include' },
-                { label: 'Always exclude'|t('beacon'), value: 'exclude' },
+                { label: 'seoField.inherit.site.section.settings.label'|t('beacon'), value: 'inherit' },
+                { label: 'seoField.always.include.label'|t('beacon'), value: 'include' },
+                { label: 'seoField.always.exclude.label'|t('beacon'), value: 'exclude' },
             ],
             value: aiMd.enabled ?? 'inherit',
         }) }}
         {{ forms.textareaField({
-            label: 'Custom front matter'|t('beacon'),
-            instructions: 'One `key: value` pair per line. Highest precedence — overrides site and section defaults.'|t('beacon'),
+            label: 'seoField.custom.front.matter.label'|t('beacon'),
+            instructions: 'seoField.one.key.value.pair.per.instructions'|t('beacon'),
             name: name ~ '[aiMarkdown][customFrontMatter]',
             value: aiMd.customFrontMatter ?? '',
             rows: 4,
-            placeholder: 'audience: developers'|t('beacon'),
+            placeholder: 'seoField.audience.developers.placeholder'|t('beacon'),
         }) }}
     </section>
 

@@ -44,6 +44,6 @@ class RecomputeGeoScoreJob extends BaseJob
 
     protected function defaultDescription(): ?string
     {
-        return Craft::t('beacon', 'Recomputing GEO score for element {id}', ['id' => $this->elementId]);
+        return Craft::t('beacon', 'jobs.geoScore.recomputing.geo.score.element', ['id' => $this->elementId]);
     }
 }

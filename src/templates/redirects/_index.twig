@@ -1,16 +1,16 @@
 {% extends '_layouts/elementindex' %}
 
-{% set title = 'Redirects'|t('beacon') %}
+{% set title = 'nav.redirects'|t('beacon') %}
 {% set elementType = 'anvildev\\beacon\\elements\\RedirectElement' %}
 {% set selectedSubnavItem = 'redirects' %}
 
 {% block actionButton %}
     <div class="btngroup">
         <a href="{{ url('beacon/redirects/new') }}" class="btn submit add icon">
-            {{ 'New redirect'|t('beacon') }}
+            {{ 'redirects.new.redirect.text'|t('beacon') }}
         </a>
         <a href="{{ url('beacon/redirects/import') }}" class="btn">
-            {{ 'Import'|t('beacon') }}
+            {{ 'redirects.import.text'|t('beacon') }}
         </a>
     </div>
 {% endblock %}

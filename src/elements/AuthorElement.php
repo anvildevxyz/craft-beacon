@@ -44,22 +44,22 @@ class AuthorElement extends Element
 
     public static function displayName(): string
     {
-        return Craft::t('beacon', 'Author');
+        return Craft::t('beacon', 'elements.author.author');
     }
 
     public static function lowerDisplayName(): string
     {
-        return Craft::t('beacon', 'author');
+        return Craft::t('beacon', 'elements.author.author.2');
     }
 
     public static function pluralDisplayName(): string
     {
-        return Craft::t('beacon', 'Authors');
+        return Craft::t('beacon', 'nav.authors');
     }
 
     public static function pluralLowerDisplayName(): string
     {
-        return Craft::t('beacon', 'authors');
+        return Craft::t('beacon', 'settings.authors.authorPagesUriPrefix.placeholder');
     }
 
     public static function refHandle(): ?string
@@ -151,7 +151,7 @@ class AuthorElement extends Element
     {
         $value = $this->$attribute;
         if (is_array($value) && count($value) > 50) {
-            $this->addError($attribute, Craft::t('beacon', '{attribute} may not contain more than 50 entries.', [
+            $this->addError($attribute, Craft::t('beacon', 'elements.author.may.not.contain.more.than', [
                 'attribute' => $attribute,
             ]));
         }
@@ -282,7 +282,7 @@ class AuthorElement extends Element
         return [
             [
                 'key' => '*',
-                'label' => Craft::t('beacon', 'All authors'),
+                'label' => Craft::t('beacon', 'elements.author.all.authors'),
                 'criteria' => [],
             ],
         ];
@@ -292,10 +292,10 @@ class AuthorElement extends Element
     protected static function defineTableAttributes(): array
     {
         return [
-            'jobTitle' => ['label' => Craft::t('beacon', 'Job title')],
-            'sameAsCount' => ['label' => Craft::t('beacon', 'sameAs links')],
-            'lastAttachedEntry' => ['label' => Craft::t('beacon', 'Last attached entry')],
-            'dateUpdated' => ['label' => Craft::t('beacon', 'Updated')],
+            'jobTitle' => ['label' => Craft::t('beacon', 'authors.edit.jobTitle.label')],
+            'sameAsCount' => ['label' => Craft::t('beacon', 'elements.author.sameas.links')],
+            'lastAttachedEntry' => ['label' => Craft::t('beacon', 'elements.author.last.attached.entry')],
+            'dateUpdated' => ['label' => Craft::t('beacon', 'schemas.edit.updated.text')],
         ];
     }
 

@@ -27,7 +27,7 @@ final class MarkdownCoverageWidget extends Widget
 
     public static function displayName(): string
     {
-        return Craft::t('beacon', 'GEO Markdown coverage');
+        return Craft::t('beacon', 'widgets.markdownCoverage.geo.markdown.coverage');
     }
 
     public static function icon(): ?string
@@ -37,7 +37,7 @@ final class MarkdownCoverageWidget extends Widget
 
     public function getTitle(): ?string
     {
-        return Craft::t('beacon', 'GEO Markdown coverage');
+        return Craft::t('beacon', 'widgets.markdownCoverage.geo.markdown.coverage');
     }
 
     public function getBodyHtml(): ?string

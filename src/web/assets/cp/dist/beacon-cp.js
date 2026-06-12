@@ -64,11 +64,11 @@
     Craft.sendActionRequest('POST', config.action, { data: data })
       .then(function () {
         Craft.cp.displayNotice(
-          enabled ? Craft.t('beacon', 'Enabled.') : Craft.t('beacon', 'Disabled.')
+          enabled ? Craft.t('beacon', 'cp.js.enabled') : Craft.t('beacon', 'cp.js.disabled')
         );
       })
       .catch(function () {
-        Craft.cp.displayError(Craft.t('beacon', 'Could not save change.'));
+        Craft.cp.displayError(Craft.t('beacon', 'cp.js.could.not.save.change'));
         $sw.toggleClass('on');
         $sw.attr('aria-checked', $sw.hasClass('on') ? 'true' : 'false');
         var $hidden = $sw.find('input[type="hidden"]');
@@ -799,7 +799,7 @@
         }
       });
       if (countEl) {
-        countEl.textContent = window.__beacon.t('{shown} of {total} shown', {
+        countEl.textContent = window.__beacon.t('cp.js.shown.of.total.shown', {
           shown: shown,
           total: rows.length,
         });

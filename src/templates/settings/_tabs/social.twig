@@ -1,15 +1,15 @@
 {% import "_includes/forms.twig" as forms %}
 
-<h2 class="heading first">{{ 'Social profiles'|t('beacon') }}</h2>
-<p class="light">{{ 'Profile URLs feed Schema.org `sameAs`, the Twitter card `twitter:site` meta, and the `craft.beacon.socials()` Twig helper for footers and contact pages. Leave a row blank to skip that platform.'|t('beacon') }}</p>
+<h2 class="heading first">{{ 'settings.social.social.profiles.heading'|t('beacon') }}</h2>
+<p class="light">{{ 'settings.social.profile.urls.feed.schema.org.text'|t('beacon') }}</p>
 
 {% set socialProfiles = settings.socialProfiles %}
 
 <table class="data fullwidth beacon-social-table">
     <thead>
         <tr>
-            <th scope="col" class="beacon-col--platform">{{ 'Platform'|t('beacon') }}</th>
-            <th scope="col">{{ 'Profile URL'|t('beacon') }}</th>
+            <th scope="col" class="beacon-col--platform">{{ 'settings.social.platform.text'|t('beacon') }}</th>
+            <th scope="col">{{ 'settings.social.profile.url.text'|t('beacon') }}</th>
         </tr>
     </thead>
     <tbody>

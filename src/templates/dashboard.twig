@@ -1,20 +1,20 @@
 {% extends '_layouts/cp.twig' %}
 {% set selectedSubnavItem = 'dashboard' %}
-{% set title = 'Beacon Dashboard'|t('beacon') %}
+{% set title = 'dashboard.beacon.dashboard.title'|t('beacon') %}
 
 {% macro relativeTime(when) %}
     {%- if when is null -%}
-        {{ '—'|t('beacon') }}
+        {{ 'common.emDash'|t('beacon') }}
     {%- else -%}
         {%- set seconds = now.timestamp - when.timestamp -%}
         {%- if seconds < 60 -%}
-            {{ 'just now'|t('beacon') }}
+            {{ 'time.justNow'|t('beacon') }}
         {%- elseif seconds < 3600 -%}
-            {{- (seconds // 60) ~ 'm ' ~ 'ago'|t('beacon') -}}
+            {{- (seconds // 60) ~ 'm ' ~ 'time.ago'|t('beacon') -}}
         {%- elseif seconds < 86400 -%}
-            {{- (seconds // 3600) ~ 'h ' ~ 'ago'|t('beacon') -}}
+            {{- (seconds // 3600) ~ 'h ' ~ 'time.ago'|t('beacon') -}}
         {%- elseif seconds < 2592000 -%}
-            {{- (seconds // 86400) ~ 'd ' ~ 'ago'|t('beacon') -}}
+            {{- (seconds // 86400) ~ 'd ' ~ 'time.ago'|t('beacon') -}}
         {%- else -%}
             {{- when|date('M j, Y') -}}
         {%- endif -%}
@@ -23,11 +23,11 @@
 
 {% macro bytesPretty(bytes) %}
     {%- if bytes < 1024 -%}
-        {{ bytes ~ (' B'|t('beacon')) }}
+        {{ bytes ~ ('units.bytes'|t('beacon')) }}
     {%- elseif bytes < 1048576 -%}
-        {{ (bytes / 1024)|number_format(1) ~ (' KB'|t('beacon')) }}
+        {{ (bytes / 1024)|number_format(1) ~ ('units.kilobytes'|t('beacon')) }}
     {%- else -%}
-        {{ (bytes / 1048576)|number_format(2) ~ (' MB'|t('beacon')) }}
+        {{ (bytes / 1048576)|number_format(2) ~ ('units.megabytes'|t('beacon')) }}
     {%- endif -%}
 {% endmacro %}
 
@@ -37,57 +37,57 @@
     <div class="beacon-dash">
 
         <section>
-            <h2 class="beacon-dash__eyebrow">{{ 'Status'|t('beacon') }}</h2>
+            <h2 class="beacon-dash__eyebrow">{{ 'dashboard.status.heading'|t('beacon') }}</h2>
             <div class="beacon-cards">
 
                 <a href="{{ url('beacon/sitemap') }}" class="pane beacon-card">
                     <div class="beacon-card__head">
-                        <span class="beacon-card__title">{{ 'Sitemap'|t('beacon') }}</span>
+                        <span class="beacon-card__title">{{ 'nav.sitemap'|t('beacon') }}</span>
                         <span class="beacon-card__chevron" aria-hidden="true">›</span>
                     </div>
                     <div class="beacon-card__primary">
                         {% if sitemapCard.urlCount is not null %}
                             {{ sitemapCard.urlCount|number }}
                         {% elseif sitemapCard.enabled %}
-                            ✓ {{ 'Active'|t('beacon') }}
+                            ✓ {{ 'status.active'|t('beacon') }}
                         {% else %}
-                            {{ 'Inactive'|t('beacon') }}
+                            {{ 'status.inactive'|t('beacon') }}
                         {% endif %}
                     </div>
                     <div class="beacon-card__context">
                         {% if sitemapCard.enabled %}
                             {% if sitemapCard.urlCount is not null %}
-                                <span class="beacon-card__ok">{{ 'URLs'|t('beacon') }}</span>
+                                <span class="beacon-card__ok">{{ 'dashboard.urls.text'|t('beacon') }}</span>
                             {% endif %}
                             {% if sitemapCard.lastGenerated %}
-                                <span>{{ 'Generated'|t('beacon') }} {{ h.relativeTime(sitemapCard.lastGenerated) }}</span>
+                                <span>{{ 'dashboard.generated.text'|t('beacon') }} {{ h.relativeTime(sitemapCard.lastGenerated) }}</span>
                             {% endif %}
                             {% if sitemapCard.urlCount is null and not sitemapCard.lastGenerated %}
-                                <span>{{ 'Sections configured'|t('beacon') }}</span>
+                                <span>{{ 'dashboard.sections.configured.text'|t('beacon') }}</span>
                             {% endif %}
                         {% else %}
-                            <span>{{ 'No sections configured'|t('beacon') }}</span>
+                            <span>{{ 'dashboard.no.sections.configured.text'|t('beacon') }}</span>
                         {% endif %}
                     </div>
                 </a>
 
                 <a href="{{ url('beacon/redirects') }}" class="pane beacon-card">
                     <div class="beacon-card__head">
-                        <span class="beacon-card__title">{{ 'Redirects'|t('beacon') }}</span>
+                        <span class="beacon-card__title">{{ 'nav.redirects'|t('beacon') }}</span>
                         <span class="beacon-card__chevron" aria-hidden="true">›</span>
                     </div>
                     <div class="beacon-card__primary">{{ redirectsCard.active|number }}</div>
                     <div class="beacon-card__context">
                         {% if redirectsCard.active == 0 %}
-                            <span>{{ 'No redirects yet'|t('beacon') }}</span>
+                            <span>{{ 'dashboard.no.redirects.yet.text'|t('beacon') }}</span>
                         {% else %}
                             {% if redirectsCard.stale > 0 %}
-                                <span class="beacon-card__warn">⚠ {{ '{n} stale (90d+)'|t('beacon', { n: redirectsCard.stale }) }}</span>
+                                <span class="beacon-card__warn">⚠ {{ 'dashboard.stale.90d.text'|t('beacon', { n: redirectsCard.stale }) }}</span>
                             {% else %}
-                                <span>{{ 'All hit recently'|t('beacon') }}</span>
+                                <span>{{ 'dashboard.all.hit.recently.text'|t('beacon') }}</span>
                             {% endif %}
                             {% if redirectsCard.lastHit %}
-                                <span>{{ 'Last hit'|t('beacon') }} {{ h.relativeTime(redirectsCard.lastHit) }}</span>
+                                <span>{{ 'dashboard.last.hit.text'|t('beacon') }} {{ h.relativeTime(redirectsCard.lastHit) }}</span>
                             {% endif %}
                         {% endif %}
                     </div>
@@ -95,39 +95,39 @@
 
                 <a href="{{ url('beacon/tracking') }}" class="pane beacon-card">
                     <div class="beacon-card__head">
-                        <span class="beacon-card__title">{{ 'Tracking'|t('beacon') }}</span>
+                        <span class="beacon-card__title">{{ 'nav.tracking'|t('beacon') }}</span>
                         <span class="beacon-card__chevron" aria-hidden="true">›</span>
                     </div>
                     {% if trackingCard.total == 0 %}
-                        <div class="beacon-card__primary">{{ 'None'|t('beacon') }}</div>
+                        <div class="beacon-card__primary">{{ 'dashboard.none.text'|t('beacon') }}</div>
                         <div class="beacon-card__context">
-                            <span>{{ 'No tracking configured'|t('beacon') }}</span>
+                            <span>{{ 'dashboard.no.tracking.configured.text'|t('beacon') }}</span>
                         </div>
                     {% else %}
                         <div class="beacon-card__primary">{{ trackingCard.total|number }}</div>
                         <div class="beacon-card__context">
-                            <span>{{ '{n,plural,=1{# script configured}other{# scripts configured}}'|t('beacon', { n: trackingCard.total }) }}</span>
+                            <span>{{ 'dashboard.other.text'|t('beacon', { n: trackingCard.total }) }}</span>
                         </div>
                     {% endif %}
                 </a>
 
                 <div class="pane beacon-card beacon-card--readonly">
                     <div class="beacon-card__head">
-                        <span class="beacon-card__title">{{ 'Breadcrumbs'|t('beacon') }}</span>
+                        <span class="beacon-card__title">{{ 'dashboard.breadcrumbs.text'|t('beacon') }}</span>
                     </div>
                     <div class="beacon-card__primary">
                         {% if breadcrumbsCard.enabled %}
-                            ✓ {{ 'Enabled'|t('beacon') }}
+                            ✓ {{ 'field.enabled'|t('beacon') }}
                         {% else %}
-                            {{ 'Disabled'|t('beacon') }}
+                            {{ 'dashboard.disabled.text'|t('beacon') }}
                         {% endif %}
                     </div>
                     <div class="beacon-card__context">
                         {% if breadcrumbsCard.homeLabel and breadcrumbsCard.homeLabel != 'Home' %}
-                            <span>{{ 'Label'|t('beacon') }}: {{ breadcrumbsCard.homeLabel|slice(0, 30) }}{{ breadcrumbsCard.homeLabel|length > 30 ? '…' }}</span>
+                            <span>{{ 'dashboard.label.text'|t('beacon') }}: {{ breadcrumbsCard.homeLabel|slice(0, 30) }}{{ breadcrumbsCard.homeLabel|length > 30 ? '…' }}</span>
                         {% endif %}
                         {% if breadcrumbsCard.totalSiteCount > 1 %}
-                            <span>{{ '{n}/{total} sites enabled'|t('beacon', { n: breadcrumbsCard.enabledSiteCount, total: breadcrumbsCard.totalSiteCount }) }}</span>
+                            <span>{{ 'dashboard.sites.enabled.text'|t('beacon', { n: breadcrumbsCard.enabledSiteCount, total: breadcrumbsCard.totalSiteCount }) }}</span>
                         {% endif %}
                     </div>
                 </div>
@@ -137,7 +137,7 @@
 
         {% if setupChecklist|length %}
             <section class="pane beacon-dash__section">
-                <h2 class="beacon-dash__eyebrow">{{ 'Setup checklist'|t('beacon') }}</h2>
+                <h2 class="beacon-dash__eyebrow">{{ 'dashboard.setup.checklist.heading'|t('beacon') }}</h2>
                 <ul class="beacon-feed">
                     {% for item in setupChecklist %}
                         <li class="beacon-feed__item">
@@ -146,7 +146,7 @@
                                 <span class="beacon-feed__text">{{ item.label }}</span>
                             </span>
                             <span class="beacon-feed__meta">
-                                <a href="{{ url(item.url) }}">{{ item.done ? 'Configured'|t('beacon') : 'Configure'|t('beacon') }}</a>
+                                <a href="{{ url(item.url) }}">{{ item.done ? 'dashboard.configured.text'|t('beacon') : 'dashboard.configure.text'|t('beacon') }}</a>
                             </span>
                         </li>
                     {% endfor %}
@@ -157,20 +157,20 @@
         <div class="beacon-grid">
 
             <section class="pane beacon-dash__section beacon-grid__feed">
-                <h2 class="beacon-dash__eyebrow">{{ 'Recent activity'|t('beacon') }}</h2>
+                <h2 class="beacon-dash__eyebrow">{{ 'dashboard.recent.activity.heading'|t('beacon') }}</h2>
                 <p class="light">
-                    {{ 'Bot log'|t('beacon') }}: {{ botLogStats.rows|number }} {{ 'rows'|t('beacon') }},
-                    {{ 'retention'|t('beacon') }} {{ botLogStats.retentionDays }}{{ 'd'|t('beacon') }},
-                    {{ 'approx'|t('beacon') }} {{ h.bytesPretty(botLogStats.approxBytes) }},
-                    {{ 'projected'|t('beacon') }} {{ h.bytesPretty(botLogStats.projectedBytes) }}
+                    {{ 'dashboard.bot.log.text'|t('beacon') }}: {{ botLogStats.rows|number }} {{ 'dashboard.rows.text'|t('beacon') }},
+                    {{ 'dashboard.retention.text'|t('beacon') }} {{ botLogStats.retentionDays }}{{ 'dashboard.d.text'|t('beacon') }},
+                    {{ 'dashboard.approx.text'|t('beacon') }} {{ h.bytesPretty(botLogStats.approxBytes) }},
+                    {{ 'dashboard.projected.text'|t('beacon') }} {{ h.bytesPretty(botLogStats.projectedBytes) }}
                 </p>
 
                 {% if activity is empty %}
                     <div class="beacon-feed__empty">
-                        <p>{{ 'No activity yet — set up your first redirect or visit your site to record bot hits.'|t('beacon') }}</p>
+                        <p>{{ 'dashboard.no.activity.yet.set.up.text'|t('beacon') }}</p>
                         <div class="beacon-feed__actions">
-                            <a href="{{ url('beacon/redirects/new') }}">{{ '+ Add redirect'|t('beacon') }}</a>
-                            <a href="{{ url('beacon/sitemap') }}">{{ 'Configure sitemap'|t('beacon') }}</a>
+                            <a href="{{ url('beacon/redirects/new') }}">{{ 'dashboard.add.redirect.text'|t('beacon') }}</a>
+                            <a href="{{ url('beacon/sitemap') }}">{{ 'dashboard.configure.sitemap.text'|t('beacon') }}</a>
                         </div>
                     </div>
                 {% else %}
@@ -200,9 +200,9 @@
                                         <span class="beacon-feed__text">
                                             <strong>{{ event.data.botName }}</strong>
                                             {% if event.data.path %}
-                                                {{ 'hit'|t('beacon') }} <code>{{ event.data.path }}</code>
+                                                {{ 'dashboard.hit.text'|t('beacon') }} <code>{{ event.data.path }}</code>
                                             {% else %}
-                                                {{ 'crawled'|t('beacon') }}
+                                                {{ 'dashboard.crawled.text'|t('beacon') }}
                                             {% endif %}
                                         </span>
                                     </span>
@@ -216,7 +216,7 @@
                                         <span class="beacon-feed__main">
                                             <span class="beacon-feed__icon" aria-hidden="true">🧩</span>
                                             <span class="beacon-feed__text">
-                                                {{ 'Schema updated'|t('beacon') }}:
+                                                {{ 'dashboard.schema.updated.text'|t('beacon') }}:
                                                 <code>{{ event.data.entryTypeHandle }}</code>
                                                 ({{ event.data.schemaType }})
                                             </span>
@@ -230,7 +230,7 @@
                                 <li class="beacon-feed__item">
                                     <span class="beacon-feed__main">
                                         <span class="beacon-feed__icon" aria-hidden="true">🗺</span>
-                                        <span class="beacon-feed__text">{{ 'Sitemap regenerated'|t('beacon') }}</span>
+                                        <span class="beacon-feed__text">{{ 'dashboard.sitemap.regenerated.text'|t('beacon') }}</span>
                                     </span>
                                     <span class="beacon-feed__meta">
                                         <span>{{ h.relativeTime(event.when) }}</span>
@@ -240,7 +240,7 @@
                                 <li class="beacon-feed__item">
                                     <span class="beacon-feed__main">
                                         <span class="beacon-feed__icon" aria-hidden="true">📄</span>
-                                        <span class="beacon-feed__text">{{ 'llms.txt regenerated'|t('beacon') }}</span>
+                                        <span class="beacon-feed__text">{{ 'dashboard.llms.txt.regenerated.text'|t('beacon') }}</span>
                                     </span>
                                     <span class="beacon-feed__meta">
                                         <span>{{ h.relativeTime(event.when) }}</span>
@@ -252,7 +252,7 @@
                                         <span class="beacon-feed__main">
                                             <span class="beacon-feed__icon" aria-hidden="true">⚙</span>
                                             <span class="beacon-feed__text">
-                                                {{ 'Tracking script changed'|t('beacon') }}:
+                                                {{ 'dashboard.tracking.script.changed.text'|t('beacon') }}:
                                                 <strong>{{ event.data.name }}</strong>
                                             </span>
                                         </span>
@@ -268,27 +268,27 @@
             </section>
 
             <section class="pane beacon-dash__section beacon-grid__actions">
-                <h2 class="beacon-dash__eyebrow">{{ 'Quick actions'|t('beacon') }}</h2>
+                <h2 class="beacon-dash__eyebrow">{{ 'dashboard.quick.actions.heading'|t('beacon') }}</h2>
 
                 <div class="beacon-actions">
                     <a href="{{ url('beacon/redirects/new') }}" class="btn submit">
-                        {{ '+ Add redirect'|t('beacon') }}
+                        {{ 'dashboard.add.redirect.text'|t('beacon') }}
                     </a>
 
                     <form method="post">
                         {{ csrfInput() }}
                         <div class="beacon-actions">
                             <button type="submit" formaction="{{ actionUrl('beacon/maintenance/flush-cache') }}" class="btn">
-                                <span class="beacon-actions__icon" aria-hidden="true">⟳</span>{{ 'Flush cache'|t('beacon') }}
+                                <span class="beacon-actions__icon" aria-hidden="true">⟳</span>{{ 'dashboard.flush.cache.text'|t('beacon') }}
                             </button>
                             <button type="submit" formaction="{{ actionUrl('beacon/maintenance/regenerate-sitemap') }}" class="btn">
-                                <span class="beacon-actions__icon" aria-hidden="true">⚓</span>{{ 'Regenerate sitemap'|t('beacon') }}
+                                <span class="beacon-actions__icon" aria-hidden="true">⚓</span>{{ 'dashboard.regenerate.sitemap.text'|t('beacon') }}
                             </button>
                             <button type="submit" formaction="{{ actionUrl('beacon/maintenance/regenerate-llms-txt') }}" class="btn">
-                                <span class="beacon-actions__icon" aria-hidden="true">📄</span>{{ 'Regenerate llms.txt'|t('beacon') }}
+                                <span class="beacon-actions__icon" aria-hidden="true">📄</span>{{ 'dashboard.regenerate.llms.txt.text'|t('beacon') }}
                             </button>
                             <button type="submit" formaction="{{ actionUrl('beacon/maintenance/regenerate-all') }}" class="btn">
-                                <span class="beacon-actions__icon" aria-hidden="true">🔥</span>{{ 'Regenerate all'|t('beacon') }}
+                                <span class="beacon-actions__icon" aria-hidden="true">🔥</span>{{ 'dashboard.regenerate.all.text'|t('beacon') }}
                             </button>
                         </div>
                     </form>

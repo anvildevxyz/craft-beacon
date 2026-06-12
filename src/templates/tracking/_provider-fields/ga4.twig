@@ -1,9 +1,9 @@
 {% import '_includes/forms.twig' as forms %}
 {{ forms.textField({
-    label: 'Measurement ID'|t('beacon'),
+    label: 'tracking.ga4.config.measurementId..label'|t('beacon'),
     name: 'config[measurementId]',
     value: script.config.measurementId ?? '',
-    placeholder: 'G-XXXXXX'|t('beacon'),
+    placeholder: 'tracking.ga4.config.measurementId..placeholder'|t('beacon'),
     required: true,
     errors: script.getErrors('config.measurementId'),
     first: true,

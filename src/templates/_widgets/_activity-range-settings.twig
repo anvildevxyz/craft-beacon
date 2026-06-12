@@ -5,13 +5,13 @@
 {% import '_includes/forms.twig' as forms %}
 
 {{ forms.selectField({
-    label: 'Time range'|t('beacon'),
+    label: 'widgets.activityRange.range.label'|t('beacon'),
     name: 'range',
     value: widget.range,
     options: {
-        '24h': '24 hours'|t('beacon'),
-        '7d': '7 days'|t('beacon'),
-        '30d': '30 days'|t('beacon'),
+        '24h': 'widgets.activityRange.24.hours.text'|t('beacon'),
+        '7d': 'widgets.activityRange.7.days.text'|t('beacon'),
+        '30d': 'widgets.activityRange.30.days.text'|t('beacon'),
     },
     first: true,
 }) }}

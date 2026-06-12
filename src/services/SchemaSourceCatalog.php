@@ -42,15 +42,15 @@ class SchemaSourceCatalog extends Component
     public function forEntry(?ElementInterface $entry): array
     {
         $sources = [
-            ['group' => 'entry', 'token' => '{entry.title}', 'label' => Craft::t('beacon', 'Entry title'), 'hint' => Craft::t('beacon', 'string')],
-            ['group' => 'entry', 'token' => '{entry.slug}', 'label' => Craft::t('beacon', 'Slug'), 'hint' => Craft::t('beacon', 'string')],
-            ['group' => 'entry', 'token' => '{entry.postDate}', 'label' => Craft::t('beacon', 'Post date'), 'hint' => Craft::t('beacon', 'datetime')],
-            ['group' => 'entry', 'token' => '{entry.dateUpdated}', 'label' => Craft::t('beacon', 'Last updated'), 'hint' => Craft::t('beacon', 'datetime')],
-            ['group' => 'entry', 'token' => '{entry.url}', 'label' => Craft::t('beacon', 'Public URL'), 'hint' => Craft::t('beacon', 'url')],
-            ['group' => 'seo', 'token' => '{seo.title}', 'label' => Craft::t('beacon', 'SEO title'), 'hint' => Craft::t('beacon', 'string')],
-            ['group' => 'seo', 'token' => '{seo.description}', 'label' => Craft::t('beacon', 'SEO description'), 'hint' => Craft::t('beacon', 'string')],
-            ['group' => 'seo', 'token' => '{seo.canonical}', 'label' => Craft::t('beacon', 'Canonical URL'), 'hint' => Craft::t('beacon', 'url')],
-            ['group' => 'seo', 'token' => '{seo.openGraph.image}', 'label' => Craft::t('beacon', 'Social image'), 'hint' => Craft::t('beacon', 'url')],
+            ['group' => 'entry', 'token' => '{entry.title}', 'label' => Craft::t('beacon', 'schema.catalog.entry.title'), 'hint' => Craft::t('beacon', 'schema.catalog.string')],
+            ['group' => 'entry', 'token' => '{entry.slug}', 'label' => Craft::t('beacon', 'shortLinks.edit.slug.label.4'), 'hint' => Craft::t('beacon', 'schema.catalog.string')],
+            ['group' => 'entry', 'token' => '{entry.postDate}', 'label' => Craft::t('beacon', 'schema.catalog.post.date'), 'hint' => Craft::t('beacon', 'schema.catalog.datetime')],
+            ['group' => 'entry', 'token' => '{entry.dateUpdated}', 'label' => Craft::t('beacon', 'schema.catalog.last.updated'), 'hint' => Craft::t('beacon', 'schema.catalog.datetime')],
+            ['group' => 'entry', 'token' => '{entry.url}', 'label' => Craft::t('beacon', 'schema.catalog.public.url'), 'hint' => Craft::t('beacon', 'schema.catalog.url')],
+            ['group' => 'seo', 'token' => '{seo.title}', 'label' => Craft::t('beacon', 'schema.catalog.seo.title'), 'hint' => Craft::t('beacon', 'schema.catalog.string')],
+            ['group' => 'seo', 'token' => '{seo.description}', 'label' => Craft::t('beacon', 'schema.catalog.seo.description'), 'hint' => Craft::t('beacon', 'schema.catalog.string')],
+            ['group' => 'seo', 'token' => '{seo.canonical}', 'label' => Craft::t('beacon', 'seoField.canonical.url.label'), 'hint' => Craft::t('beacon', 'schema.catalog.url')],
+            ['group' => 'seo', 'token' => '{seo.openGraph.image}', 'label' => Craft::t('beacon', 'schema.catalog.social.image'), 'hint' => Craft::t('beacon', 'schema.catalog.url')],
         ];
 
         if ($entry instanceof Entry) {
@@ -90,12 +90,12 @@ class SchemaSourceCatalog extends Component
     private function fieldHint(FieldInterface $field): string
     {
         return match (true) {
-            $field instanceof Assets => Craft::t('beacon', 'asset'),
-            $field instanceof Date => Craft::t('beacon', 'datetime'),
-            $field instanceof Number => Craft::t('beacon', 'number'),
-            $field instanceof PlainText => Craft::t('beacon', 'string'),
-            $field instanceof BaseRelationField => Craft::t('beacon', 'relation'),
-            default => Craft::t('beacon', 'mixed'),
+            $field instanceof Assets => Craft::t('beacon', 'schema.catalog.asset'),
+            $field instanceof Date => Craft::t('beacon', 'schema.catalog.datetime'),
+            $field instanceof Number => Craft::t('beacon', 'schema.catalog.number'),
+            $field instanceof PlainText => Craft::t('beacon', 'schema.catalog.string'),
+            $field instanceof BaseRelationField => Craft::t('beacon', 'schema.catalog.relation'),
+            default => Craft::t('beacon', 'schema.catalog.mixed'),
         };
     }
 }

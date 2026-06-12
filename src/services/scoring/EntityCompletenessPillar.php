@@ -40,13 +40,13 @@ final class EntityCompletenessPillar implements PillarComputerInterface
         if (is_string($settings->organizationName) && trim($settings->organizationName) !== '') {
             $points += 2;
         } else {
-            $notes[] = Craft::t('beacon', 'Set the site organization name in Beacon settings.');
+            $notes[] = Craft::t('beacon', 'geo.pillar.entityCompleteness.set.site.organization.name.settings');
         }
 
         if ($settings->organizationLogoAssetId !== null) {
             $points += 1;
         } else {
-            $notes[] = Craft::t('beacon', 'Add an organization logo asset for richer entity markup.');
+            $notes[] = Craft::t('beacon', 'geo.pillar.entityCompleteness.add.organization.logo.asset.richer');
         }
 
         $sameAsCount = count($settings->sameAsUrls());
@@ -102,7 +102,7 @@ final class EntityCompletenessPillar implements PillarComputerInterface
         if ($relations === []) {
             return [
                 'points' => 0,
-                'note' => Craft::t('beacon', 'Attach a Beacon Author to this entry for an author Person node in JSON-LD.'),
+                'note' => Craft::t('beacon', 'geo.pillar.entityCompleteness.attach.author.entry.author.person'),
             ];
         }
 
@@ -119,7 +119,7 @@ final class EntityCompletenessPillar implements PillarComputerInterface
 
         return [
             'points' => 1,
-            'note' => Craft::t('beacon', 'Author attached but no external identifiers — add ORCID, Wikidata, or LinkedIn URLs to the author.'),
+            'note' => Craft::t('beacon', 'geo.pillar.entityCompleteness.author.attached.but.no.external'),
         ];
     }
 }

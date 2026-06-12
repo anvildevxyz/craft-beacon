@@ -1,20 +1,20 @@
 {% import "_includes/forms.twig" as forms %}
 
-<h2 class="heading first">{{ 'General defaults'|t('beacon') }}</h2>
-<p class="light">{{ 'Global title/description fallbacks used when entries do not define SEO values.'|t('beacon') }}</p>
+<h2 class="heading first">{{ 'settings.general.general.defaults.heading'|t('beacon') }}</h2>
+<p class="light">{{ 'settings.general.global.title.description.fallbacks.used.text'|t('beacon') }}</p>
 <hr>
 
 {{ forms.textField({
-    label: 'Title template'|t('beacon'),
-    instructions: 'Used when an entry has no SEO Title set. Tokens: {title}, {siteName}.'|t('beacon'),
+    label: 'settings.general.titleTemplate.label'|t('beacon'),
+    instructions: 'settings.general.titleTemplate.instructions'|t('beacon'),
     name: 'titleTemplate',
     value: settings.titleTemplate,
     first: true,
 }) }}
 
 {{ forms.textareaField({
-    label: 'Default description template'|t('beacon'),
-    instructions: 'Used when an entry has no SEO Description set. Tokens: {title}, {siteName}.'|t('beacon'),
+    label: 'settings.general.descriptionTemplate.label'|t('beacon'),
+    instructions: 'settings.general.descriptionTemplate.instructions'|t('beacon'),
     name: 'descriptionTemplate',
     value: settings.descriptionTemplate,
     rows: 2,
@@ -22,15 +22,15 @@
 
 <hr>
 
-<h2 class="heading">{{ 'Default social image'|t('beacon') }}</h2>
-<p class="light">{{ 'Fallback Open Graph / Twitter image when entries do not set their own.'|t('beacon') }}</p>
+<h2 class="heading">{{ 'settings.general.default.social.image.heading'|t('beacon') }}</h2>
+<p class="light">{{ 'settings.general.fallback.open.graph.twitter.image.text'|t('beacon') }}</p>
 
 {% set defaultSocialImage = settings.defaultSocialImageId
     ? craft.assets().id(settings.defaultSocialImageId).status(null).one()
     : null %}
 {{ forms.elementSelectField({
-    label: 'Default social image'|t('beacon'),
-    instructions: 'Used when an entry has no per-entry image. Recommended 1200×630.'|t('beacon'),
+    label: 'settings.general.defaultSocialImageId.label'|t('beacon'),
+    instructions: 'settings.general.defaultSocialImageId.instructions'|t('beacon'),
     id: 'defaultSocialImageId',
     name: 'defaultSocialImageId',
     elementType: 'craft\\elements\\Asset',

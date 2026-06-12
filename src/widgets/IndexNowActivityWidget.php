@@ -25,7 +25,7 @@ final class IndexNowActivityWidget extends Widget
 
     public static function displayName(): string
     {
-        return Craft::t('beacon', 'IndexNow activity');
+        return Craft::t('beacon', 'widgets.indexNow.indexnow.activity');
     }
 
     public static function icon(): ?string
@@ -35,7 +35,7 @@ final class IndexNowActivityWidget extends Widget
 
     public function getTitle(): ?string
     {
-        return Craft::t('beacon', 'IndexNow activity');
+        return Craft::t('beacon', 'widgets.indexNow.indexnow.activity');
     }
 
     public function getBodyHtml(): ?string

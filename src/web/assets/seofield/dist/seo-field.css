@@ -955,22 +955,6 @@ body.beacon-schema-modal-open {
 }
 .beacon-preview-toolbar-help { font-size: 11px; }
 
-.beacon-preview-callout {
-    margin-bottom: .75rem;
-    padding: .55rem .75rem;
-    border-radius: 3px;
-    background: #fcf6e3;
-    border-left: 3px solid #d4a72c;
-    color: #8a6d3b;
-    font-size: 12px;
-}
-.beacon-preview-callout[hidden] { display: none; }
-.beacon-preview-callout strong { display: block; margin-bottom: .25rem; }
-.beacon-preview-callout ul { margin: 0; padding-left: 1.1rem; }
-.beacon-preview-callout li { margin: .1rem 0; }
-
-/* GEO score chip — compact pill above the SEO field. Full per-pillar
-   breakdown lives on the drill-down page (beacon/geo-score/drill-down). */
 .beacon-geo-score-chip {
     display: inline-flex;
     align-items: center;

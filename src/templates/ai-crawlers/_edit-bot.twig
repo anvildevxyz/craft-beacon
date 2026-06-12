@@ -1,12 +1,12 @@
 {% extends '_layouts/cp.twig' %}
 {% set selectedSubnavItem = 'crawlers' %}
 {% import '_includes/forms.twig' as forms %}
-{% set title = (bot ? 'Edit bot' : 'New bot')|t('beacon') %}
+{% set title = (bot ? 'aiCrawlers.bot.edit.title'|t('beacon') : 'aiCrawlers.bot.new.title'|t('beacon')) %}
 {% set fullPageForm = true %}
 {% set crumbs = [
-    { label: 'Beacon'|t('beacon'), url: cpUrl('beacon') },
-    { label: 'Crawlers'|t('beacon'), url: cpUrl('beacon/crawlers/ai-crawlers') },
-    { label: 'AI crawlers'|t('beacon'), url: cpUrl('beacon/crawlers/ai-crawlers') },
+    { label: 'nav.beacon'|t('beacon'), url: cpUrl('beacon') },
+    { label: 'nav.crawlers'|t('beacon'), url: cpUrl('beacon/crawlers/ai-crawlers') },
+    { label: 'aiCrawlers.bot.ai.crawlers.label'|t('beacon'), url: cpUrl('beacon/crawlers/ai-crawlers') },
 ] %}
 
 {% block content %}
@@ -18,7 +18,7 @@
     {{ csrfInput() }}
 
     {{ forms.textField({
-        label: 'Name'|t('beacon'),
+        label: 'aiCrawlers.bot.name.label'|t('beacon'),
         name: 'name',
         value: bot.name|default(''),
         required: true,
@@ -26,20 +26,20 @@
     }) }}
 
     {{ forms.textField({
-        label: 'User-Agent pattern'|t('beacon'),
-        instructions: 'Regex-like pattern, e.g., GPTBot/.* or just Bytespider.'|t('beacon'),
+        label: 'aiCrawlers.bot.userAgentPattern.label'|t('beacon'),
+        instructions: 'aiCrawlers.bot.userAgentPattern.instructions'|t('beacon'),
         name: 'userAgentPattern',
         value: bot.userAgentPattern|default(''),
         required: true,
     }) }}
 
     {{ forms.lightswitchField({
-        label: 'Enabled'|t('beacon'),
+        label: 'field.enabled'|t('beacon'),
         name: 'enabled',
         on: bot ? bot.enabled : true,
     }) }}
 
     {% if bot and bot.source == 'default' %}
-        <p class="instructions"><strong>{{ 'Source: default.'|t('beacon') }}</strong> {{ 'This bot was seeded by Beacon. You can edit its pattern but cannot delete it.'|t('beacon') }}</p>
+        <p class="instructions"><strong>{{ 'aiCrawlers.bot.source.default.text'|t('beacon') }}</strong> {{ 'aiCrawlers.bot.bot.was.seeded.by.beacon.text'|t('beacon') }}</p>
     {% endif %}
 {% endblock %}

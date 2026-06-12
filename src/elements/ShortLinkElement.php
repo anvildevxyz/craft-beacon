@@ -44,22 +44,22 @@ class ShortLinkElement extends Element
 
     public static function displayName(): string
     {
-        return Craft::t('beacon', 'Short link');
+        return Craft::t('beacon', 'elements.shortLink.short.link');
     }
 
     public static function lowerDisplayName(): string
     {
-        return Craft::t('beacon', 'short link');
+        return Craft::t('beacon', 'elements.shortLink.short.link.2');
     }
 
     public static function pluralDisplayName(): string
     {
-        return Craft::t('beacon', 'Short links');
+        return Craft::t('beacon', 'nav.shortLinks');
     }
 
     public static function pluralLowerDisplayName(): string
     {
-        return Craft::t('beacon', 'short links');
+        return Craft::t('beacon', 'elements.shortLink.short.links');
     }
 
     public static function refHandle(): ?string
@@ -119,7 +119,7 @@ class ShortLinkElement extends Element
             ->andWhere(['not', ['id' => (int) ($this->id ?? 0)]])
             ->exists();
         if ($exists) {
-            $this->addError($attribute, Craft::t('beacon', 'A short link with that slug already exists.'));
+            $this->addError($attribute, Craft::t('beacon', 'elements.shortLink.short.link.slug.already.exists'));
         }
     }
 
@@ -185,7 +185,7 @@ class ShortLinkElement extends Element
         return [
             [
                 'key' => '*',
-                'label' => Craft::t('beacon', 'All short links'),
+                'label' => Craft::t('beacon', 'elements.shortLink.all.short.links'),
                 'criteria' => [],
             ],
         ];
@@ -196,12 +196,12 @@ class ShortLinkElement extends Element
     {
         // The title (= slug, set in beforeSave) is the element's name column.
         return [
-            'title' => ['label' => Craft::t('beacon', 'Slug')],
-            'destination' => ['label' => Craft::t('beacon', 'Destination')],
-            'statusCode' => ['label' => Craft::t('beacon', 'Status')],
-            'clicks' => ['label' => Craft::t('beacon', 'Clicks')],
-            'lastClicked' => ['label' => Craft::t('beacon', 'Last clicked')],
-            'dateUpdated' => ['label' => Craft::t('beacon', 'Updated')],
+            'title' => ['label' => Craft::t('beacon', 'shortLinks.edit.slug.label.4')],
+            'destination' => ['label' => Craft::t('beacon', 'shortLinks.edit.destination.label')],
+            'statusCode' => ['label' => Craft::t('beacon', 'dashboard.status.heading')],
+            'clicks' => ['label' => Craft::t('beacon', 'shortLinks.edit.clicks.text')],
+            'lastClicked' => ['label' => Craft::t('beacon', 'shortLinks.edit.last.clicked.text')],
+            'dateUpdated' => ['label' => Craft::t('beacon', 'schemas.edit.updated.text')],
         ];
     }
 
@@ -215,9 +215,9 @@ class ShortLinkElement extends Element
     protected static function defineSortOptions(): array
     {
         return [
-            ['label' => Craft::t('beacon', 'Slug'), 'orderBy' => 'beacon_short_links.slug', 'attribute' => 'title'],
-            ['label' => Craft::t('beacon', 'Clicks'), 'orderBy' => 'beacon_short_links.clicks', 'attribute' => 'clicks'],
-            ['label' => Craft::t('beacon', 'Last clicked'), 'orderBy' => 'beacon_short_links.lastClicked', 'attribute' => 'lastClicked'],
+            ['label' => Craft::t('beacon', 'shortLinks.edit.slug.label.4'), 'orderBy' => 'beacon_short_links.slug', 'attribute' => 'title'],
+            ['label' => Craft::t('beacon', 'shortLinks.edit.clicks.text'), 'orderBy' => 'beacon_short_links.clicks', 'attribute' => 'clicks'],
+            ['label' => Craft::t('beacon', 'shortLinks.edit.last.clicked.text'), 'orderBy' => 'beacon_short_links.lastClicked', 'attribute' => 'lastClicked'],
             ['label' => Craft::t('app', 'Date Updated'), 'orderBy' => 'elements.dateUpdated', 'attribute' => 'dateUpdated'],
         ];
     }

@@ -1,18 +1,18 @@
 {% import '_includes/forms.twig' as forms %}
 {{ forms.textField({
-    label: 'Matomo URL'|t('beacon'),
+    label: 'tracking.matomo.config.matomoUrl..label'|t('beacon'),
     name: 'config[matomoUrl]',
     value: script.config.matomoUrl ?? '',
-    placeholder: 'https://matomo.example.com'|t('beacon'),
+    placeholder: 'tracking.matomo.config.matomoUrl..placeholder'|t('beacon'),
     required: true,
     errors: script.getErrors('config.matomoUrl'),
     first: true,
 }) }}
 {{ forms.textField({
-    label: 'Site ID'|t('beacon'),
+    label: 'tracking.matomo.config.siteId..label'|t('beacon'),
     name: 'config[siteId]',
     value: script.config.siteId ?? '',
-    placeholder: '1'|t('beacon'),
+    placeholder: 'tracking.matomo.config.siteId..placeholder'|t('beacon'),
     required: true,
     errors: script.getErrors('config.siteId'),
 }) }}

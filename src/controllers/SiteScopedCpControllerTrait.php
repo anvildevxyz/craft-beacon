@@ -105,7 +105,7 @@ trait SiteScopedCpControllerTrait
             array_values(Craft::$app->getEntries()->getAllSections()),
         );
         if (class_exists(\craft\commerce\elements\Product::class)) {
-            $rows[] = ['label' => Craft::t('beacon', 'Products (Commerce)'), 'value' => '__products__'];
+            $rows[] = ['label' => Craft::t('beacon', 'error.site.products.commerce'), 'value' => '__products__'];
         }
         return $rows;
     }

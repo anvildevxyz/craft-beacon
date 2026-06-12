@@ -3,29 +3,29 @@
 
 {% if not hasScores %}
     <p class="light">
-        {{ 'No GEO scores yet. Save an entry in a section covered by the GEO score allowlist (Settings → GEO score) to trigger the first computation.'|t('beacon') }}
+        {{ 'widgets.geoScore.no.geo.scores.yet.save.text'|t('beacon') }}
     </p>
 {% else %}
     <ul class="bullets">
         <li>
             <strong>{{ average }}/100</strong>
-            {{ 'site average composite'|t('beacon') }}
-            <span class="light">({{ distribution.total }} {{ 'scored entries'|t('beacon') }})</span>
+            {{ 'widgets.geoScore.site.average.composite.text'|t('beacon') }}
+            <span class="light">({{ distribution.total }} {{ 'widgets.geoScore.scored.entries.text'|t('beacon') }})</span>
         </li>
     </ul>
 
     {# Distribution histogram: 5 bands rendered as labeled bars proportional
        to share of total. Kept template-side (no JS) so it survives Cache. #}
     <hr>
-    <h2 class="heading">{{ 'Distribution'|t('beacon') }}</h2>
+    <h2 class="heading">{{ 'widgets.geoScore.distribution.heading'|t('beacon') }}</h2>
     <table class="data fullwidth beacon-geo-score-widget-distribution">
         <tbody>
             {% set bands = [
-                { key: 'top',   label: '80–100'|t('beacon'),  cls: 'top' },
-                { key: 'good',  label: '60–79'|t('beacon'),   cls: 'good' },
-                { key: 'fair',  label: '40–59'|t('beacon'),   cls: 'fair' },
-                { key: 'low',   label: '20–39'|t('beacon'),   cls: 'low' },
-                { key: 'stale', label: '0–19'|t('beacon'),    cls: 'stale' },
+                { key: 'top',   label: 'widgets.geoScore.80.100.label'|t('beacon'),  cls: 'top' },
+                { key: 'good',  label: 'widgets.geoScore.60.79.label'|t('beacon'),   cls: 'good' },
+                { key: 'fair',  label: 'widgets.geoScore.40.59.label'|t('beacon'),   cls: 'fair' },
+                { key: 'low',   label: 'widgets.geoScore.20.39.label'|t('beacon'),   cls: 'low' },
+                { key: 'stale', label: 'widgets.geoScore.0.19.label'|t('beacon'),    cls: 'stale' },
             ] %}
             {% for band in bands %}
                 {% set count = attribute(distribution, band.key) %}
@@ -43,14 +43,14 @@
 
     {% if weakest %}
         <hr>
-        <h2 class="heading">{{ 'Worst-scoring entries'|t('beacon') }}</h2>
-        <p class="light">{{ 'Triage these first — the weakest pillar is the highest-leverage single fix.'|t('beacon') }}</p>
+        <h2 class="heading">{{ 'widgets.geoScore.worst.scoring.entries.heading'|t('beacon') }}</h2>
+        <p class="light">{{ 'widgets.geoScore.triage.these.first.weakest.pillar.text'|t('beacon') }}</p>
         <table class="data fullwidth beacon-geo-score-widget-entries">
             <thead>
                 <tr>
-                    <th>{{ 'Entry'|t('beacon') }}</th>
-                    <th>{{ 'Weakest pillar'|t('beacon') }}</th>
-                    <th class="right">{{ 'Score'|t('beacon') }}</th>
+                    <th>{{ 'widgets.geoScore.entry.text'|t('beacon') }}</th>
+                    <th>{{ 'widgets.geoScore.weakest.pillar.text'|t('beacon') }}</th>
+                    <th class="right">{{ 'widgets.geoScore.score.text'|t('beacon') }}</th>
                 </tr>
             </thead>
             <tbody>
@@ -60,9 +60,9 @@
                     <tr>
                         <td>
                             {% if editUrl %}
-                                <a href="{{ editUrl }}">{{ row.title ?: ('Untitled #'|t('beacon') ~ row.elementId) }}</a>
+                                <a href="{{ editUrl }}">{{ row.title ?: ('widgets.geoScore.untitled.text'|t('beacon') ~ row.elementId) }}</a>
                             {% else %}
-                                {{ row.title ?: ('Untitled #'|t('beacon') ~ row.elementId) }}
+                                {{ row.title ?: ('widgets.geoScore.untitled.text'|t('beacon') ~ row.elementId) }}
                             {% endif %}
                             {% if row.url %}
                                 <span class="light"><br><code>{{ row.url|replace({ 'https://': '', 'http://': '' }) }}</code></span>

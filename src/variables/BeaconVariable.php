@@ -766,7 +766,7 @@ class BeaconVariable
         }
 
         if ($appendPageToTitle && $page > 1) {
-            $pageSuffixLabel = Craft::t('beacon', 'Page') . ' ' . $page;
+            $pageSuffixLabel = Craft::t('beacon', 'variable.page') . ' ' . $page;
             $meta->title = trim($meta->title) === '' ? $pageSuffixLabel : ($meta->title . ' — ' . $pageSuffixLabel);
             $meta->openGraph['title'] = isset($meta->openGraph['title']) && (string) $meta->openGraph['title'] !== ''
                 ? ($meta->openGraph['title'] . ' — ' . $pageSuffixLabel)

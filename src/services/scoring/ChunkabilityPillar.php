@@ -29,7 +29,7 @@ final class ChunkabilityPillar implements PillarComputerInterface
                 pillar: $this->pillar(),
                 score: 3,
                 band: GeoPillarScore::BAND_LOW,
-                notes: [Craft::t('beacon', 'No H2 sections found. Break content into H2-led sections and open each with a 40–75-word answer paragraph.')],
+                notes: [Craft::t('beacon', 'geo.pillar.chunkability.no.h2.sections.found.break')],
                 debug: ['totalSections' => 0, 'inRange' => 0],
             );
         }

@@ -8,16 +8,16 @@
 {% include 'beacon/_includes/site-selector' with { sites, site, baseUrl: cpUrl('beacon/crawlers/humans-txt') } only %}
 
 {{ forms.lightswitchField({
-    label: 'Enabled'|t('beacon'),
-    instructions: 'When disabled, /humans.txt returns 404.'|t('beacon'),
+    label: 'field.enabled'|t('beacon'),
+    instructions: 'humansTxt.enabled.instructions'|t('beacon'),
     name: 'enabled',
     on: settings.enabled,
     first: true,
 }) }}
 
 {{ forms.textareaField({
-    label: 'Body'|t('beacon'),
-    instructions: 'Free-form humans.txt content. See https://humanstxt.org for the format.'|t('beacon'),
+    label: 'humansTxt.body.label'|t('beacon'),
+    instructions: 'humansTxt.body.instructions'|t('beacon'),
     name: 'body',
     value: settings.body,
     rows: 16,

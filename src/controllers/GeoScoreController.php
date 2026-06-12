@@ -79,7 +79,7 @@ class GeoScoreController extends Controller
             ?? ($element !== null ? Plugin::$plugin->geoScore->compute($element, $siteId, persist: false) : null);
 
         if ($score === null) {
-            throw new NotFoundHttpException(Craft::t('beacon', 'No GEO score exists for this entry yet. Save the entry to trigger a computation.'));
+            throw new NotFoundHttpException(Craft::t('beacon', 'flash.geoScore.no.geo.score.exists.entry'));
         }
 
         return $this->renderTemplate('beacon/_geo-score/drill-down', [
@@ -141,7 +141,7 @@ class GeoScoreController extends Controller
         $elementId = (int) $request->getRequiredBodyParam('elementId');
         $siteId = (int) $request->getRequiredBodyParam('siteId');
         if ($elementId <= 0 || $siteId <= 0) {
-            return $this->asJson(['success' => false, 'message' => Craft::t('beacon', 'Invalid element or site.')]);
+            return $this->asJson(['success' => false, 'message' => Craft::t('beacon', 'flash.geoScore.invalid.element.site')]);
         }
 
         // Drop the cached row so the job recomputes fresh (sourceHash
@@ -155,7 +155,7 @@ class GeoScoreController extends Controller
 
         return $this->asJson([
             'success' => true,
-            'message' => Craft::t('beacon', 'Recompute queued. Refresh in a few seconds.'),
+            'message' => Craft::t('beacon', 'flash.geoScore.recompute.queued.refresh.few.seconds'),
         ]);
     }
 }

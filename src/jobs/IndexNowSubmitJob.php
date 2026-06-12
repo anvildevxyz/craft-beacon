@@ -50,7 +50,7 @@ class IndexNowSubmitJob extends BaseJob
     protected function defaultDescription(): ?string
     {
         $count = count($this->urls);
-        return Craft::t('beacon', 'IndexNow ping for {url}{more}', [
+        return Craft::t('beacon', 'jobs.indexNow.indexnow.ping', [
             'url' => $this->urls[0] ?? '?',
             'more' => $count > 1 ? sprintf(' (+%d more)', $count - 1) : '',
         ]);

@@ -8,81 +8,81 @@
 {% include 'beacon/_includes/site-selector' with { sites, site, baseUrl: cpUrl('beacon/crawlers/llms-txt') } only %}
 
 {{ forms.lightswitchField({
-    label: 'Enabled'|t('beacon'),
-    instructions: 'When disabled, /llms.txt will return a 404.'|t('beacon'),
+    label: 'field.enabled'|t('beacon'),
+    instructions: 'llms.enabled.instructions'|t('beacon'),
     name: 'enabled',
     on: settings.enabled,
     first: true,
 }) }}
 
 {{ forms.textField({
-    label: 'Title'|t('beacon'),
-    instructions: 'The heading at the top of llms.txt (the `# …` line). Defaults to the Craft site name — override it when that name isn\'t a good public title (e.g. a language name like "English").'|t('beacon'),
+    label: 'llms.siteNameOverride.label'|t('beacon'),
+    instructions: 'llms.siteNameOverride.instructions'|t('beacon'),
     name: 'siteNameOverride',
     value: settings.siteNameOverride,
     placeholder: site.name,
 }) }}
 
 {{ forms.textareaField({
-    label: 'Summary'|t('beacon'),
-    instructions: 'A brief description of this site for AI assistants, shown as a quote under the title. Leave blank to omit.'|t('beacon'),
+    label: 'llms.summary.label'|t('beacon'),
+    instructions: 'llms.summary.instructions'|t('beacon'),
     name: 'summary',
     value: settings.summary,
     rows: 4,
 }) }}
 
 {{ forms.checkboxSelectField({
-    label: 'Sections to include'|t('beacon'),
-    instructions: 'Entries from these sections will be listed in the llms.txt file.'|t('beacon'),
+    label: 'llms.sections.label'|t('beacon'),
+    instructions: 'llms.sections.instructions'|t('beacon'),
     name: 'sections',
     options: allSections,
     values: settings.sections,
 }) }}
 
 <hr>
-<h2>{{ 'Trust block'|t('beacon') }}</h2>
-<p class="instructions">{{ 'Optional usage-policy lines appended to llms.txt for AI consumers. Leave blank to omit.'|t('beacon') }}</p>
+<h2>{{ 'llms.trust.block.heading'|t('beacon') }}</h2>
+<p class="instructions">{{ 'llms.optional.usage.policy.lines.appended.text'|t('beacon') }}</p>
 
 {{ forms.textField({
-    label: 'Policy URL'|t('beacon'),
-    instructions: 'URL to your AI/content usage policy.'|t('beacon'),
+    label: 'llms.policyUrl.label'|t('beacon'),
+    instructions: 'llms.policyUrl.instructions'|t('beacon'),
     name: 'policyUrl',
     value: settings.policyUrl,
-    placeholder: 'https://example.com/ai-policy'|t('beacon'),
+    placeholder: 'llms.policyUrl.placeholder'|t('beacon'),
     first: true,
 }) }}
 
 {{ forms.textField({
-    label: 'License URL'|t('beacon'),
-    instructions: 'URL to a license document (e.g. CC-BY).'|t('beacon'),
+    label: 'llms.licenseUrl.label'|t('beacon'),
+    instructions: 'llms.licenseUrl.instructions'|t('beacon'),
     name: 'licenseUrl',
     value: settings.licenseUrl,
-    placeholder: 'https://creativecommons.org/licenses/by/4.0/'|t('beacon'),
+    placeholder: 'llms.licenseUrl.placeholder'|t('beacon'),
 }) }}
 
 {{ forms.textField({
-    label: 'Contact email'|t('beacon'),
-    instructions: 'Address for permission requests, takedowns, etc.'|t('beacon'),
+    label: 'llms.contactEmail.label'|t('beacon'),
+    instructions: 'llms.contactEmail.instructions'|t('beacon'),
     name: 'contactEmail',
     type: 'email',
     value: settings.contactEmail,
 }) }}
 
 {{ forms.textareaField({
-    label: 'Preferred attribution'|t('beacon'),
-    instructions: 'How AI assistants should credit your content when cited.'|t('beacon'),
+    label: 'llms.preferredAttribution.label'|t('beacon'),
+    instructions: 'llms.preferredAttribution.instructions'|t('beacon'),
     name: 'preferredAttribution',
     value: settings.preferredAttribution,
     rows: 3,
 }) }}
 
 <hr>
-<h2>{{ 'llms-full.txt'|t('beacon') }}</h2>
-<p class="instructions">{{ 'Long-form companion to llms.txt. Served at /llms-full.txt; returns 404 when blank.'|t('beacon') }}</p>
+<h2>{{ 'llms.llms.full.txt.heading'|t('beacon') }}</h2>
+<p class="instructions">{{ 'llms.long.form.companion.llms.txt.text'|t('beacon') }}</p>
 
 {{ forms.textareaField({
-    label: 'Full body'|t('beacon'),
-    instructions: 'Markdown body served verbatim at /llms-full.txt.'|t('beacon'),
+    label: 'llms.fullBody.label'|t('beacon'),
+    instructions: 'llms.fullBody.instructions'|t('beacon'),
     name: 'fullBody',
     value: settings.fullBody,
     rows: 16,

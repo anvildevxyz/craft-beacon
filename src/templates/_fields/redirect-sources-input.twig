@@ -7,9 +7,9 @@
                        name="{{ name }}[]"
                        value="{{ uri }}"
                        class="text fullwidth"
-                       placeholder="{{ '/old/path'|t('beacon') }}"
+                       placeholder="{{ 'redirectSources.old.path.text'|t('beacon') }}"
                        autocomplete="off">
-                <button type="button" class="btn small beacon-redirect-sources__remove" aria-label="{{ 'Remove'|t('beacon') }}">×</button>
+                <button type="button" class="btn small beacon-redirect-sources__remove" aria-label="{{ 'redirectSources.remove.ariaLabel'|t('beacon') }}">×</button>
             </div>
         {% endfor %}
     </div>
@@ -19,7 +19,7 @@
         <input type="hidden" name="{{ name }}[]" value="">
     {% endif %}
     <button type="button" class="btn add icon beacon-redirect-sources__add" id="{{ id }}-add">
-        {{ 'Add legacy URL'|t('beacon') }}
+        {{ 'redirectSources.add.legacy.url.text'|t('beacon') }}
     </button>
-    <p class="light"><small>{{ 'Each URI 301-redirects to this entry. Use a leading slash, e.g. /old-news/foo.'|t('beacon') }}</small></p>
+    <p class="light"><small>{{ 'redirectSources.each.uri.301.redirects.entry.text'|t('beacon') }}</small></p>
 </div>

@@ -31,7 +31,7 @@ final class ClaimBasedHeadingsPillar implements PillarComputerInterface
                 pillar: $this->pillar(),
                 score: 3,
                 band: GeoPillarScore::BAND_LOW,
-                notes: [Craft::t('beacon', 'No H2 or H3 subheadings found. Add subheadings phrased as complete statements so AI engines can quote them as self-contained answers.')],
+                notes: [Craft::t('beacon', 'geo.pillar.claimHeadings.no.h2.h3.subheadings.found')],
                 debug: ['totalHeadings' => 0, 'claimCount' => 0],
             );
         }

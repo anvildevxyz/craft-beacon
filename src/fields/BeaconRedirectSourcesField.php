@@ -30,7 +30,7 @@ class BeaconRedirectSourcesField extends Field
 {
     public static function displayName(): string
     {
-        return Craft::t('beacon', 'Beacon redirect sources');
+        return Craft::t('beacon', 'fields.redirectSources.redirect.sources');
     }
 
     public static function isRequirable(): bool
@@ -98,18 +98,18 @@ class BeaconRedirectSourcesField extends Field
                 continue;
             }
             if (mb_strlen($uri) > 255) {
-                $element->addError($this->handle, Craft::t('beacon', '"{uri}" exceeds 255 characters.', ['uri' => $uri]));
+                $element->addError($this->handle, Craft::t('beacon', 'fields.redirectSources.exceeds.255.characters', ['uri' => $uri]));
                 continue;
             }
             if (Strings::containsLineBreaks($uri)) {
-                $element->addError($this->handle, Craft::t('beacon', '"{uri}" contains invalid line breaks.', ['uri' => $uri]));
+                $element->addError($this->handle, Craft::t('beacon', 'fields.redirectSources.contains.invalid.line.breaks', ['uri' => $uri]));
                 continue;
             }
             if ($uri[0] !== '/') {
-                $element->addError($this->handle, Craft::t('beacon', '"{uri}" must start with a forward slash.', ['uri' => $uri]));
+                $element->addError($this->handle, Craft::t('beacon', 'fields.redirectSources.must.start.forward.slash', ['uri' => $uri]));
             }
             if (str_starts_with($uri, '//')) {
-                $element->addError($this->handle, Craft::t('beacon', '"{uri}" must not be protocol-relative.', ['uri' => $uri]));
+                $element->addError($this->handle, Craft::t('beacon', 'fields.redirectSources.must.not.protocol.relative', ['uri' => $uri]));
             }
         }
     }

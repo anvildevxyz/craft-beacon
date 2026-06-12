@@ -30,7 +30,7 @@ final class BotActivityWidget extends Widget
 
     public static function displayName(): string
     {
-        return Craft::t('beacon', 'AI bot activity');
+        return Craft::t('beacon', 'widgets.botActivity.ai.bot.activity');
     }
 
     public static function icon(): ?string
@@ -40,7 +40,7 @@ final class BotActivityWidget extends Widget
 
     public function getTitle(): ?string
     {
-        return Craft::t('beacon', 'AI bot activity');
+        return Craft::t('beacon', 'widgets.botActivity.ai.bot.activity');
     }
 
     public function getBodyHtml(): ?string

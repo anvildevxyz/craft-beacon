@@ -1,21 +1,21 @@
 {% extends '_layouts/cp.twig' %}
 {% set selectedSubnavItem = 'redirects' %}
-{% set title = 'Unhandled 404s'|t('beacon') %}
+{% set title = 'redirects.notFound.unhandled.404s.title'|t('beacon') %}
 {% set crumbs = [
-    { label: 'Beacon'|t('beacon'), url: cpUrl('beacon') },
-    { label: 'Redirects'|t('beacon'), url: cpUrl('beacon/redirects') },
+    { label: 'nav.beacon'|t('beacon'), url: cpUrl('beacon') },
+    { label: 'nav.redirects'|t('beacon'), url: cpUrl('beacon/redirects') },
 ] %}
 {% set siteHandle = craft.app.sites.currentSite.handle %}
 
 {% block actionButton %}
-    <a href="{{ cpUrl('beacon/redirects', { site: siteHandle }) }}" class="btn">{{ '← Back to redirects'|t('beacon') }}</a>
+    <a href="{{ cpUrl('beacon/redirects', { site: siteHandle }) }}" class="btn">{{ 'redirects.notFound.back.redirects.text'|t('beacon') }}</a>
 {% endblock %}
 
 {% block content %}
     {% if not log404sEnabled %}
         <div class="readable">
             <blockquote class="note warning">
-                {{ '404 logging is disabled. Enable it by setting `log404s => true` in `config/beacon.php` to start collecting unhandled 404s.'|t('beacon')|raw }}
+                {{ 'redirects.notFound.404.logging.disabled.enable.it.text'|t('beacon')|raw }}
             </blockquote>
         </div>
     {% endif %}
@@ -23,8 +23,8 @@
     {% if rows is empty %}
         <div class="beacon-empty">
             <div class="beacon-empty__icon" aria-hidden="true">✓</div>
-            <h3>{{ 'No unhandled 404s'|t('beacon') }}</h3>
-            <p>{{ 'When visitors hit URIs that aren\'t found, they\'ll appear here with suggested redirect targets.'|t('beacon') }}</p>
+            <h3>{{ 'redirects.notFound.no.unhandled.404s.heading'|t('beacon') }}</h3>
+            <p>{{ 'redirects.notFound.visitors.hit.uris.aren.t.text'|t('beacon') }}</p>
         </div>
     {% else %}
         <form id="beacon-404-bulk" method="post" action="{{ url('beacon/redirects/404s/bulk') }}">
@@ -32,33 +32,33 @@
             <input type="hidden" name="bulkAction" value="markHandled">
 
             <div class="toolbar flex beacon-toolbar">
-                <button type="submit" class="btn" id="beacon-404-mark-handled" disabled>{{ 'Mark selected as handled'|t('beacon') }}</button>
+                <button type="submit" class="btn" id="beacon-404-mark-handled" disabled>{{ 'redirects.notFound.mark.selected.as.handled.text'|t('beacon') }}</button>
                 <span id="beacon-404-count" class="light"></span>
             </div>
 
             <table class="data fullwidth beacon-404-table">
                 <thead>
                     <tr>
-                        <th class="thin"><input type="checkbox" id="beacon-404-all" aria-label="{{ 'Select all'|t('beacon') }}"></th>
-                        <th>{{ '404 URI'|t('beacon') }}</th>
-                        <th class="thin">{{ 'Hits'|t('beacon') }}</th>
-                        <th>{{ 'Last seen'|t('beacon') }}</th>
-                        <th>{{ 'Suggested target'|t('beacon') }}</th>
-                        <th class="thin">{{ 'Action'|t('beacon') }}</th>
+                        <th class="thin"><input type="checkbox" id="beacon-404-all" aria-label="{{ 'redirects.notFound.select.all.ariaLabel'|t('beacon') }}"></th>
+                        <th>{{ 'redirects.notFound.404.uri.text'|t('beacon') }}</th>
+                        <th class="thin">{{ 'redirects.notFound.hits.text'|t('beacon') }}</th>
+                        <th>{{ 'redirects.notFound.last.seen.text'|t('beacon') }}</th>
+                        <th>{{ 'redirects.notFound.suggested.target.text'|t('beacon') }}</th>
+                        <th class="thin">{{ 'redirects.notFound.action.text'|t('beacon') }}</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for r in rows %}
                         <tr data-id="{{ r.id }}">
                             <td class="thin">
-                                <input type="checkbox" name="ids[]" value="{{ r.id }}" class="beacon-404-row" aria-label="{{ 'Select 404 entry'|t('beacon') }}">
+                                <input type="checkbox" name="ids[]" value="{{ r.id }}" class="beacon-404-row" aria-label="{{ 'redirects.notFound.select.404.entry.ariaLabel'|t('beacon') }}">
                             </td>
                             <td><code>{{ r.uri }}</code></td>
                             <td>{{ r.hits|number }}</td>
                             <td>{{ r.lastSeen|datetime('short') }}</td>
                             <td>
                                 {% if r.suggestions is empty %}
-                                    <span class="light">{{ 'No close match'|t('beacon') }}</span>
+                                    <span class="light">{{ 'redirects.notFound.no.close.match.text'|t('beacon') }}</span>
                                 {% else %}
                                     <span class="beacon-404-suggestions">
                                         {% for s in r.suggestions %}
@@ -75,7 +75,7 @@
                                        prefillTarget: r.suggestions|first|default(''),
                                        from404: r.id,
                                    }) }}">
-                                    {{ 'Create redirect'|t('beacon') }}
+                                    {{ 'redirects.notFound.create.redirect.text'|t('beacon') }}
                                 </a>
                             </td>
                         </tr>

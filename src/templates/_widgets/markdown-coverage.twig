@@ -1,17 +1,17 @@
 {% set d = data %}
 
 {% if not d.enabled %}
-    <p class="light">{{ 'GEO Markdown is disabled. Enable it in Settings → GEO export and provenance.'|t('beacon') }}</p>
+    <p class="light">{{ 'widgets.markdownCoverage.geo.markdown.disabled.enable.it.text'|t('beacon') }}</p>
 {% else %}
     <ul class="bullets">
         <li>
             <strong>{{ d.coveragePercent }}%</strong>
-            {{ 'coverage'|t('beacon') }}
-            <span class="light">({{ d.totalGenerated }}/{{ d.totalEligible }} {{ 'elements'|t('beacon') }})</span>
+            {{ 'widgets.markdownCoverage.coverage.text'|t('beacon') }}
+            <span class="light">({{ d.totalGenerated }}/{{ d.totalEligible }} {{ 'widgets.markdownCoverage.elements.text'|t('beacon') }})</span>
         </li>
-        <li>{{ 'Queue depth'|t('beacon') }}: <strong>{{ d.queueDepth }}</strong></li>
+        <li>{{ 'widgets.markdownCoverage.queue.depth.text'|t('beacon') }}: <strong>{{ d.queueDepth }}</strong></li>
         {% if d.lastGenerated %}
-            <li>{{ 'Last generated'|t('beacon') }}: <span class="light">{{ d.lastGenerated }}</span></li>
+            <li>{{ 'widgets.markdownCoverage.last.generated.text'|t('beacon') }}: <span class="light">{{ d.lastGenerated }}</span></li>
         {% endif %}
     </ul>
 
@@ -20,10 +20,10 @@
         <table class="data fullwidth">
             <thead>
                 <tr>
-                    <th>{{ 'Section'|t('beacon') }}</th>
-                    <th class="right">{{ 'Generated'|t('beacon') }}</th>
-                    <th class="right">{{ 'Total'|t('beacon') }}</th>
-                    <th class="right">{{ '%'|t('beacon') }}</th>
+                    <th>{{ 'widgets.markdownCoverage.section.text'|t('beacon') }}</th>
+                    <th class="right">{{ 'widgets.markdownCoverage.generated.text'|t('beacon') }}</th>
+                    <th class="right">{{ 'widgets.markdownCoverage.total.text'|t('beacon') }}</th>
+                    <th class="right">{{ 'widgets.markdownCoverage.message.text'|t('beacon') }}</th>
                 </tr>
             </thead>
             <tbody>

@@ -117,7 +117,7 @@ class RedirectsController extends Controller
         }
 
         if (!Craft::$app->getElements()->saveElement($redirect)) {
-            $session->setError(Craft::t('beacon', 'Couldn\'t save redirect.'));
+            $session->setError(Craft::t('beacon', 'flash.redirects.couldnt.save'));
             return $this->retainSubmittedForm(['redirect' => $redirect]);
         }
 
@@ -126,7 +126,7 @@ class RedirectsController extends Controller
             Plugin::$plugin->redirect404Log->markHandled($from404, (int) $redirect->siteId);
         }
 
-        $session->setNotice(Craft::t('beacon', 'Redirect saved.'));
+        $session->setNotice(Craft::t('beacon', 'flash.redirects.redirect.saved'));
         return $this->redirectToPostedUrl($redirect);
     }
 
@@ -143,17 +143,17 @@ class RedirectsController extends Controller
 
         $file = UploadedFile::getInstanceByName('csvFile');
         if ($file === null) {
-            $session->setError(Craft::t('beacon', 'No file uploaded.'));
+            $session->setError(Craft::t('beacon', 'flash.redirects.no.file.uploaded'));
             return null;
         }
 
         if (strtolower($file->getExtension()) !== 'csv') {
-            $session->setError(Craft::t('beacon', 'Uploaded file must be a .csv file.'));
+            $session->setError(Craft::t('beacon', 'flash.redirects.uploaded.file.must.csv.file'));
             return null;
         }
 
         if ($file->size > self::MAX_IMPORT_BYTES) {
-            $session->setError(Craft::t('beacon', 'Uploaded file is too large (max {max} MB).', [
+            $session->setError(Craft::t('beacon', 'flash.redirects.uploaded.file.too.large.max', [
                 'max' => self::MAX_IMPORT_BYTES / 1024 / 1024,
             ]));
             return null;
@@ -161,7 +161,7 @@ class RedirectsController extends Controller
 
         $content = file_get_contents($file->tempName);
         if ($content === false) {
-            $session->setError(Craft::t('beacon', 'Couldn\'t read uploaded file.'));
+            $session->setError(Craft::t('beacon', 'flash.redirects.couldnt.read.upload'));
             return null;
         }
 
@@ -169,7 +169,7 @@ class RedirectsController extends Controller
         $this->requireEditableSite($siteId);
         $result = Plugin::$plugin->redirectImporter->importFromCsv($content, $siteId);
 
-        $session->setNotice(Craft::t('beacon', '{inserted} redirects imported. {skipped} rows skipped.', [
+        $session->setNotice(Craft::t('beacon', 'flash.redirects.redirects.imported.rows.skipped', [
             'inserted' => $result->insertedCount,
             'skipped' => $result->skippedCount,
         ]));

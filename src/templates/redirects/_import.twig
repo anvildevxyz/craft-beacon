@@ -1,14 +1,14 @@
 {% extends '_layouts/cp.twig' %}
 {% set selectedSubnavItem = 'redirects' %}
 {% import '_includes/forms.twig' as forms %}
-{% set title = 'Import redirects'|t('beacon') %}
+{% set title = 'redirects.import.import.redirects.title'|t('beacon') %}
 {% set fullPageForm = true %}
 {# Craft's full-page <form> defaults to enctype="application/x-www-form-urlencoded";
    the CSV file input below requires multipart/form-data or the file payload is dropped. #}
 {% set mainFormAttributes = { enctype: 'multipart/form-data' } %}
 {% set crumbs = [
-    { label: 'Beacon'|t('beacon'), url: cpUrl('beacon') },
-    { label: 'Redirects'|t('beacon'), url: cpUrl('beacon/redirects') },
+    { label: 'nav.beacon'|t('beacon'), url: cpUrl('beacon') },
+    { label: 'nav.redirects'|t('beacon'), url: cpUrl('beacon/redirects') },
 ] %}
 
 {% block content %}
@@ -16,8 +16,8 @@
     {{ redirectInput('beacon/redirects') }}
     {{ csrfInput() }}
 
-    <p class="instructions">{{ 'Upload a CSV with columns: source,target,statusCode (statusCode optional, defaults to 301).'|t('beacon') }}</p>
-    <p class="instructions">{{ 'Prefix the source with `regex:` to use a full PCRE pattern. Use `*` (single-segment) or `**` (multi-segment) for glob patterns.'|t('beacon') }}</p>
+    <p class="instructions">{{ 'redirects.import.upload.csv.columns.source.target.text'|t('beacon') }}</p>
+    <p class="instructions">{{ 'redirects.import.prefix.source.regex.use.full.text'|t('beacon') }}</p>
 
     {# Use the array-of-pairs shape for forms.selectField — assoc arrays
        with integer keys get sequentially re-indexed (English ends up
@@ -30,13 +30,13 @@
     {% endfor %}
 
     {{ forms.field({
-        label: 'CSV file'|t('beacon'),
+        label: 'redirects.import.csv.file.label'|t('beacon'),
         required: true,
         first: true,
     }, '<input type="file" name="csvFile" accept=".csv" required>') }}
 
     {{ forms.selectField({
-        label: 'Target site'|t('beacon'),
+        label: 'redirects.import.siteId.label'|t('beacon'),
         name: 'siteId',
         value: currentSite.id,
         options: siteOptions,
@@ -45,10 +45,10 @@
     {% set errors = craft.app.session.get('beacon.import.errors') %}
     {% if errors %}
         <hr>
-        <h3>{{ 'Last import errors'|t('beacon') }}</h3>
+        <h3>{{ 'redirects.import.last.import.errors.heading'|t('beacon') }}</h3>
         <ul>
         {% for e in errors %}
-            <li>{{ 'Line {number}'|t('beacon', { number: e.lineNumber }) }}: {{ e.reason }}</li>
+            <li>{{ 'redirects.import.line.text'|t('beacon', { number: e.lineNumber }) }}: {{ e.reason }}</li>
         {% endfor %}
         </ul>
     {% endif %}

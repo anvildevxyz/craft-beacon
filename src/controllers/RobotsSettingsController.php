@@ -56,7 +56,7 @@ class RobotsSettingsController extends Controller
             userAgentRules: $this->parseUserAgentRulesText(is_string($rawText) ? $rawText : ''),
         ));
 
-        Craft::$app->getSession()->setNotice(Craft::t('beacon', 'Robots.txt settings saved.'));
+        Craft::$app->getSession()->setNotice(Craft::t('beacon', 'flash.robots.robots.txt.settings.saved'));
         return $this->redirectAfterSiteSave('beacon/crawlers/robots', $siteId);
     }
 

@@ -1,12 +1,12 @@
 {% extends '_layouts/cp.twig' %}
 {% import '_includes/forms.twig' as forms %}
 {% set selectedSubnavItem = 'tracking' %}
-{% set title = 'Tracking Scripts'|t('beacon') %}
-{% set crumbs = [{ label: 'Beacon'|t('beacon'), url: cpUrl('beacon') }] %}
+{% set title = 'tracking.tracking.scripts.title'|t('beacon') %}
+{% set crumbs = [{ label: 'nav.beacon'|t('beacon'), url: cpUrl('beacon') }] %}
 
 {% block actionButton %}
     <div class="btngroup submit">
-        <a class="btn submit add icon" href="{{ url('beacon/tracking/new') }}">{{ 'New Script'|t('beacon') }}</a>
+        <a class="btn submit add icon" href="{{ url('beacon/tracking/new') }}">{{ 'tracking.new.script.text'|t('beacon') }}</a>
         <div class="btn submit menubtn"></div>
         <div class="menu">
             <ul>
@@ -20,22 +20,22 @@
 
 {% block content %}
     {% if scripts is empty %}
-        <div class="zilch">{{ 'No tracking scripts configured.'|t('beacon') }}</div>
+        <div class="zilch">{{ 'tracking.no.tracking.scripts.configured.text'|t('beacon') }}</div>
     {% else %}
-        {% set providerOptions = [{ label: 'All providers'|t('beacon'), value: '' }] %}
+        {% set providerOptions = [{ label: 'tracking.all.providers.label'|t('beacon'), value: '' }] %}
         {% for handle, provider in providers %}
             {% set providerOptions = providerOptions|merge([{ label: provider.displayName, value: handle }]) %}
         {% endfor %}
         {% set placementOptions = [
-            { label: 'All placements'|t('beacon'), value: '' },
-            { label: '<head>'|t('beacon'), value: 'head' },
-            { label: '<body> start'|t('beacon'), value: 'bodyStart' },
-            { label: '<body> end'|t('beacon'), value: 'bodyEnd' },
+            { label: 'tracking.all.placements.label'|t('beacon'), value: '' },
+            { label: 'tracking.head.label'|t('beacon'), value: 'head' },
+            { label: 'tracking.body.start.label'|t('beacon'), value: 'bodyStart' },
+            { label: 'tracking.body.end.label'|t('beacon'), value: 'bodyEnd' },
         ] %}
 
         <div class="toolbar flex beacon-tracking-filters">
             <label class="flex flex-nowrap beacon-filter-group">
-                <span class="light">{{ 'Provider'|t('beacon') }}</span>
+                <span class="light">{{ 'tracking.provider.text'|t('beacon') }}</span>
                 {# Nameless on purpose: client-side filter only, never submitted. #}
                 {{ forms.select({
                     id: 'tracking-filter-provider',
@@ -44,7 +44,7 @@
                 }) }}
             </label>
             <label class="flex flex-nowrap beacon-filter-group">
-                <span class="light">{{ 'Placement'|t('beacon') }}</span>
+                <span class="light">{{ 'tracking.placement.text'|t('beacon') }}</span>
                 {{ forms.select({
                     id: 'tracking-filter-placement',
                     options: placementOptions,
@@ -53,10 +53,10 @@
             </label>
             {{ forms.text({
                 id: 'tracking-filter-search',
-                placeholder: 'Search by name…'|t('beacon'),
+                placeholder: 'tracking.search.by.name.placeholder'|t('beacon'),
                 inputAttributes: { 'data-tracking-filter': 'search', autocomplete: 'off' },
             }) }}
-            <button type="button" class="btn" data-tracking-clear hidden>{{ 'Clear filters'|t('beacon') }}</button>
+            <button type="button" class="btn" data-tracking-clear hidden>{{ 'tracking.clear.filters.text'|t('beacon') }}</button>
             <div class="flex-grow"></div>
             <span class="light" data-tracking-count></span>
         </div>
@@ -64,9 +64,9 @@
         <table class="data fullwidth" id="tracking-scripts-table">
             <thead>
                 <tr>
-                    <th>{{ 'Name'|t('beacon') }}</th>
-                    <th>{{ 'Provider'|t('beacon') }}</th>
-                    <th>{{ 'Placement'|t('beacon') }}</th>
+                    <th>{{ 'tracking.name.text'|t('beacon') }}</th>
+                    <th>{{ 'tracking.provider.text'|t('beacon') }}</th>
+                    <th>{{ 'tracking.placement.text'|t('beacon') }}</th>
                     <th class="thin"></th>
                 </tr>
             </thead>
@@ -87,7 +87,7 @@
                                     {{ csrfInput() }}
                                     {{ actionInput('beacon/tracking/delete') }}
                                     {{ hiddenInput('uid', script.uid) }}
-                                    <button type="submit" class="btn small submit error" data-confirm="{{ 'Delete this script?'|t('beacon') }}">{{ 'Delete'|t('beacon') }}</button>
+                                    <button type="submit" class="btn small submit error" data-confirm="{{ 'tracking.delete.script.text'|t('beacon') }}">{{ 'action.delete'|t('beacon') }}</button>
                                 </form>
                             </div>
                         </td>
@@ -97,7 +97,7 @@
         </table>
 
         <p class="light beacon-tracking-empty" data-tracking-empty hidden>
-            {{ 'No scripts match the selected filters.'|t('beacon') }}
+            {{ 'tracking.no.scripts.match.selected.filters.text'|t('beacon') }}
         </p>
     {% endif %}
 {% endblock %}

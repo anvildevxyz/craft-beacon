@@ -20,7 +20,7 @@ class BeaconSeoField extends Field implements SeoFieldInterface
 {
     public static function displayName(): string
     {
-        return Craft::t('beacon', 'Beacon SEO');
+        return Craft::t('beacon', 'fields.seo.seo');
     }
 
     public function getContentColumnType(): string
@@ -226,7 +226,7 @@ class BeaconSeoField extends Field implements SeoFieldInterface
                 foreach (Plugin::$plugin->bundles->getSchemasForEntryType($typeHandle) as $schema) {
                     $rows[] = [
                         'type' => $schema->schemaType,
-                        'source' => Craft::t('beacon', 'Entry-type bundle ({type})', ['type' => $typeHandle]),
+                        'source' => Craft::t('beacon', 'fields.seo.entry.type.bundle', ['type' => $typeHandle]),
                         'editUrl' => UrlHelper::cpUrl('beacon/schemas/' . $schema->id),
                     ];
                 }
@@ -236,20 +236,20 @@ class BeaconSeoField extends Field implements SeoFieldInterface
         if (is_string($settings->organizationName) && trim($settings->organizationName) !== '') {
             $rows[] = [
                 'type' => $settings->identityType ?: 'Organization',
-                'source' => Craft::t('beacon', 'Site identity'),
+                'source' => Craft::t('beacon', 'fields.seo.site.identity'),
                 'editUrl' => UrlHelper::cpUrl('beacon/settings/organization'),
             ];
         }
 
         $rows[] = [
             'type' => 'BreadcrumbList',
-            'source' => Craft::t('beacon', 'Auto (per-site Breadcrumbs)'),
+            'source' => Craft::t('beacon', 'fields.seo.auto.per.site.breadcrumbs'),
         ];
 
         if ($settings->geoProvenanceSchemaEnabled) {
             $rows[] = [
                 'type' => 'WebPage',
-                'source' => Craft::t('beacon', 'GEO provenance'),
+                'source' => Craft::t('beacon', 'fields.seo.geo.provenance'),
                 'editUrl' => UrlHelper::cpUrl('beacon/settings/geo'),
             ];
         }

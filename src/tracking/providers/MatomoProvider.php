@@ -16,7 +16,7 @@ final class MatomoProvider extends AbstractBeaconTrackingProvider
 
     public function getDisplayName(): string
     {
-        return Craft::t('beacon', 'Matomo');
+        return Craft::t('beacon', 'tracking.matomo.matomo');
     }
 
     public function validateConfig(array $config): array
@@ -24,11 +24,11 @@ final class MatomoProvider extends AbstractBeaconTrackingProvider
         $errors = [];
         $url = (string)($config['matomoUrl'] ?? '');
         if (!str_starts_with($url, 'https://') || !filter_var($url, FILTER_VALIDATE_URL)) {
-            $errors['matomoUrl'] = Craft::t('beacon', 'Matomo URL must be a valid HTTPS URL.');
+            $errors['matomoUrl'] = Craft::t('beacon', 'tracking.matomo.matomo.url.must.valid.https');
         }
         $siteId = (int)($config['siteId'] ?? 0);
         if ($siteId < 1) {
-            $errors['siteId'] = Craft::t('beacon', 'Site ID must be a positive integer.');
+            $errors['siteId'] = Craft::t('beacon', 'tracking.matomo.site.id.must.positive.integer');
         }
         return $errors;
     }

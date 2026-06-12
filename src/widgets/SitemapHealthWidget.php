@@ -24,7 +24,7 @@ final class SitemapHealthWidget extends Widget
 
     public static function displayName(): string
     {
-        return Craft::t('beacon', 'Sitemap health');
+        return Craft::t('beacon', 'widgets.sitemapHealth.sitemap.health');
     }
 
     public static function icon(): ?string
@@ -34,7 +34,7 @@ final class SitemapHealthWidget extends Widget
 
     public function getTitle(): ?string
     {
-        return Craft::t('beacon', 'Sitemap health');
+        return Craft::t('beacon', 'widgets.sitemapHealth.sitemap.health');
     }
 
     public function getBodyHtml(): ?string

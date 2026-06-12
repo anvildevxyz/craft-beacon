@@ -1,60 +1,60 @@
 {% import "_includes/forms.twig" as forms %}
 
-<h2 class="heading first">{{ 'GEO export and provenance'|t('beacon') }}</h2>
-<p class="light">{{ 'Controls markdown export policy and llms.txt provenance schema behavior.'|t('beacon') }}</p>
+<h2 class="heading first">{{ 'settings.geo.geo.export.provenance.heading'|t('beacon') }}</h2>
+<p class="light">{{ 'settings.geo.controls.markdown.export.policy.llms.text'|t('beacon') }}</p>
 <hr>
 
 {{ forms.lightswitchField({
-    label: 'Enable GEO markdown export'|t('beacon'),
+    label: 'settings.geo.geoMarkdownEnabled.label'|t('beacon'),
     name: 'geoMarkdownEnabled',
     on: settings.geoMarkdownEnabled,
 }) }}
 
 {{ forms.lightswitchField({
-    label: 'Enable Accept: text/markdown negotiation'|t('beacon'),
+    label: 'settings.geo.geoMarkdownNegotiateAcceptHeader.label'|t('beacon'),
     name: 'geoMarkdownNegotiateAcceptHeader',
     on: settings.geoMarkdownNegotiateAcceptHeader,
 }) }}
 
 {{ forms.lightswitchField({
-    label: 'Auto-serve Markdown to known AI bots'|t('beacon'),
-    instructions: 'When on, requests from GPTBot, ClaudeBot, ChatGPT-User, and other crawlers in the bot list receive the Markdown representation regardless of the Accept header.'|t('beacon'),
+    label: 'settings.geo.geoMarkdownAutoServeBots.label'|t('beacon'),
+    instructions: 'settings.geo.geoMarkdownAutoServeBots.instructions'|t('beacon'),
     name: 'geoMarkdownAutoServeBots',
     on: settings.geoMarkdownAutoServeBots,
 }) }}
 
 {{ forms.lightswitchField({
-    label: 'Enable .md suffix in markdown export URLs'|t('beacon'),
+    label: 'settings.geo.geoMarkdownMdSuffixEnabled.label'|t('beacon'),
     name: 'geoMarkdownMdSuffixEnabled',
     on: settings.geoMarkdownMdSuffixEnabled,
 }) }}
 
 <hr>
 
-<h2 class="heading">{{ 'Markdown export'|t('beacon') }}</h2>
-<p class="light">{{ 'Render strategy and stripped CSS classes are set in `config/beacon.php`.'|t('beacon') }}</p>
+<h2 class="heading">{{ 'settings.geo.markdown.export.heading'|t('beacon') }}</h2>
+<p class="light">{{ 'settings.geo.render.strategy.stripped.css.classes.text'|t('beacon') }}</p>
 
 {{ forms.lightswitchField({
-    label: 'Fallback excerpt to SEO description'|t('beacon'),
-    instructions: 'When the body is empty, use the entry\'s SEO description as the export instead.'|t('beacon'),
+    label: 'settings.geo.geoMarkdownExcerptFallbackToDescription.label'|t('beacon'),
+    instructions: 'settings.geo.geoMarkdownExcerptFallbackToDescription.instructions'|t('beacon'),
     name: 'geoMarkdownExcerptFallbackToDescription',
     on: settings.geoMarkdownExcerptFallbackToDescription,
 }) }}
 
 {{ forms.lightswitchField({
-    label: 'Enable provenance schema'|t('beacon'),
-    instructions: 'Adds a JSON-LD node telling AI engines how to cite, license, and attribute this page (from your llms.txt trust block).'|t('beacon'),
+    label: 'settings.geo.geoProvenanceSchemaEnabled.label'|t('beacon'),
+    instructions: 'settings.geo.geoProvenanceSchemaEnabled.instructions'|t('beacon'),
     name: 'geoProvenanceSchemaEnabled',
     on: settings.geoProvenanceSchemaEnabled,
 }) }}
 
 <hr>
 
-<h2 class="heading">{{ 'GEO score'|t('beacon') }}</h2>
-<p class="light">{{ 'A 0–100 readiness score shown live in the SEO field as authors edit. See the GEO content scoring guide in the docs.'|t('beacon') }}</p>
+<h2 class="heading">{{ 'settings.geo.geo.score.heading'|t('beacon') }}</h2>
+<p class="light">{{ 'settings.geo.0.100.readiness.score.shown.text'|t('beacon') }}</p>
 
 {{ forms.lightswitchField({
-    label: 'Enable GEO score'|t('beacon'),
+    label: 'settings.geo.geoScoreEnabled.label'|t('beacon'),
     name: 'geoScoreEnabled',
     on: settings.geoScoreEnabled,
 }) }}

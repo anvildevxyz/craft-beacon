@@ -16,14 +16,14 @@ final class GA4Provider extends AbstractBeaconTrackingProvider
 
     public function getDisplayName(): string
     {
-        return Craft::t('beacon', 'Google Analytics 4');
+        return Craft::t('beacon', 'tracking.ga4.google.analytics.4');
     }
 
     public function validateConfig(array $config): array
     {
         $id = (string)($config['measurementId'] ?? '');
         if (!preg_match('/^G-[A-Z0-9]{4,}$/', $id)) {
-            return ['measurementId' => Craft::t('beacon', 'Measurement ID must match format G-XXXXX.')];
+            return ['measurementId' => Craft::t('beacon', 'tracking.ga4.measurement.id.must.match.format')];
         }
         return [];
     }

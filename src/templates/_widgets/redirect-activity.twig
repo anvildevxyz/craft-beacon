@@ -2,31 +2,31 @@
 <div class="beacon-widget-stats">
     <div>
         <strong class="beacon-widget-stat__value">{{ data.totalRedirects|number }}</strong>
-        <div class="light"><small>{{ 'Total'|t('beacon') }}</small></div>
+        <div class="light"><small>{{ 'widgets.redirectActivity.total.text'|t('beacon') }}</small></div>
     </div>
     <div>
         <strong class="beacon-widget-stat__value{{ data.staleCount > 0 ? ' beacon-widget-stat__value--warn' }}">{{ data.staleCount|number }}</strong>
-        <div class="light"><small>{{ 'Stale (>{n} days)'|t('beacon', { n: data.staleThresholdDays }) }}</small></div>
+        <div class="light"><small>{{ 'widgets.redirectActivity.stale.days.text'|t('beacon', { n: data.staleThresholdDays }) }}</small></div>
     </div>
     <div>
         <strong class="beacon-widget-stat__value{{ data.unhandled404s24h > 0 ? ' beacon-widget-stat__value--warn' }}">
             <a href="{{ cpUrl('beacon/redirects/404s') }}">{{ data.unhandled404s24h|number }}</a>
         </strong>
-        <div class="light"><small>{{ 'Unhandled 404s (24h)'|t('beacon') }}</small></div>
+        <div class="light"><small>{{ 'widgets.redirectActivity.unhandled.404s.24h.text'|t('beacon') }}</small></div>
     </div>
 </div>
 
-<h3>{{ 'Recently triggered'|t('beacon') }} <span class="light"><small>({{ range }})</small></span></h3>
+<h3>{{ 'widgets.redirectActivity.recently.triggered.heading'|t('beacon') }} <span class="light"><small>({{ range }})</small></span></h3>
 {% if data.recent is empty %}
-    <p>{{ 'No redirects triggered in this range.'|t('beacon') }}</p>
+    <p>{{ 'widgets.redirectActivity.no.redirects.triggered.range.text'|t('beacon') }}</p>
 {% else %}
     <table class="data fullwidth">
         <thead>
             <tr>
-                <th>{{ 'Source → Target'|t('beacon') }}</th>
-                <th>{{ 'Status'|t('beacon') }}</th>
-                <th>{{ 'Hits'|t('beacon') }}</th>
-                <th>{{ 'Last hit'|t('beacon') }}</th>
+                <th>{{ 'widgets.redirectActivity.source.target.text'|t('beacon') }}</th>
+                <th>{{ 'widgets.redirectActivity.status.text'|t('beacon') }}</th>
+                <th>{{ 'widgets.redirectActivity.hits.text'|t('beacon') }}</th>
+                <th>{{ 'widgets.redirectActivity.last.hit.text'|t('beacon') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -35,23 +35,23 @@
                 <td><a href="{{ url('beacon/redirects/' ~ r.id) }}"><code>{{ r.sourceUri }}</code></a> → <code>{{ r.targetUri }}</code></td>
                 <td>{{ r.statusCode }}</td>
                 <td>{{ r.hits|number }}</td>
-                <td>{{ r.lastHit ? r.lastHit|datetime('short') : '—'|t('beacon') }}</td>
+                <td>{{ r.lastHit ? r.lastHit|datetime('short') : 'common.emDash'|t('beacon') }}</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 {% endif %}
 
-<h3 class="beacon-widget-section-title">{{ 'Top hit (all time)'|t('beacon') }}</h3>
+<h3 class="beacon-widget-section-title">{{ 'widgets.redirectActivity.top.hit.all.time.heading'|t('beacon') }}</h3>
 {% if data.topHits is empty %}
-    <p>{{ 'No redirects yet.'|t('beacon') }}</p>
+    <p>{{ 'widgets.redirectActivity.no.redirects.yet.text'|t('beacon') }}</p>
 {% else %}
     <table class="data fullwidth">
         <thead>
             <tr>
-                <th>{{ 'Source → Target'|t('beacon') }}</th>
-                <th>{{ 'Hits'|t('beacon') }}</th>
-                <th>{{ 'Last hit'|t('beacon') }}</th>
+                <th>{{ 'widgets.redirectActivity.source.target.text'|t('beacon') }}</th>
+                <th>{{ 'widgets.redirectActivity.hits.text'|t('beacon') }}</th>
+                <th>{{ 'widgets.redirectActivity.last.hit.text'|t('beacon') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -59,7 +59,7 @@
             <tr>
                 <td><a href="{{ url('beacon/redirects/' ~ r.id) }}"><code>{{ r.sourceUri }}</code></a> → <code>{{ r.targetUri }}</code></td>
                 <td>{{ r.hits|number }}</td>
-                <td>{{ r.lastHit ? r.lastHit|datetime('short') : '—'|t('beacon') }}</td>
+                <td>{{ r.lastHit ? r.lastHit|datetime('short') : 'common.emDash'|t('beacon') }}</td>
             </tr>
         {% endfor %}
         </tbody>

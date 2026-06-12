@@ -54,10 +54,10 @@ final class SafeRegex
     public static function validate(string $rawPattern, string $delimiter = '#'): ?string
     {
         if ($rawPattern === '') {
-            return Craft::t('beacon', 'Pattern cannot be empty.');
+            return Craft::t('beacon', 'validation.regex.pattern.cannot.empty');
         }
         if (strlen($rawPattern) > self::MAX_PATTERN_LENGTH) {
-            return Craft::t('beacon', 'Pattern exceeds {max} characters.', ['max' => self::MAX_PATTERN_LENGTH]);
+            return Craft::t('beacon', 'validation.regex.pattern.exceeds.characters', ['max' => self::MAX_PATTERN_LENGTH]);
         }
         $delimited = $delimiter . str_replace($delimiter, '\\' . $delimiter, $rawPattern) . $delimiter;
         $previous = ini_set('pcre.backtrack_limit', self::RUNTIME_BACKTRACK_LIMIT);
@@ -68,6 +68,6 @@ final class SafeRegex
                 ini_set('pcre.backtrack_limit', $previous);
             }
         }
-        return $result === false ? Craft::t('beacon', 'Pattern is invalid or too expensive to evaluate.') : null;
+        return $result === false ? Craft::t('beacon', 'validation.regex.pattern.invalid.too.expensive.evaluate') : null;
     }
 }

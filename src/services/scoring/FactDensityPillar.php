@@ -41,7 +41,7 @@ final class FactDensityPillar implements PillarComputerInterface
                 pillar: $this->pillar(),
                 score: 0,
                 band: GeoPillarScore::BAND_STALE,
-                notes: [Craft::t('beacon', 'No content found to score. Add body content with stats, dates, or citations.')],
+                notes: [Craft::t('beacon', 'geo.pillar.factDensity.no.content.found.score.add')],
                 debug: ['totalWords' => 0, 'factCount' => 0, 'target' => $target],
             );
         }
@@ -71,7 +71,7 @@ final class FactDensityPillar implements PillarComputerInterface
                 pillar: $this->pillar(),
                 score: 1,
                 band: GeoPillarScore::BAND_STALE,
-                notes: [Craft::t('beacon', 'Content too short ({words} words) to score fact density. Aim for at least 200 words.', ['words' => $totalWords])],
+                notes: [Craft::t('beacon', 'geo.pillar.factDensity.content.too.short.words.score', ['words' => $totalWords])],
                 debug: ['totalWords' => $totalWords, 'factCount' => 0, 'target' => $target],
             );
         }

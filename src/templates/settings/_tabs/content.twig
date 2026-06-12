@@ -1,14 +1,14 @@
-<h2 class="heading first">{{ 'Content SEO defaults (by section)'|t('beacon') }}</h2>
-<p class="light">{{ 'Click a token to insert it at the cursor.'|t('beacon') }}</p>
+<h2 class="heading first">{{ 'settings.content.content.seo.defaults.by.section.heading'|t('beacon') }}</h2>
+<p class="light">{{ 'settings.content.click.token.insert.it.cursor.text'|t('beacon') }}</p>
 <hr>
 
 {% set tokens = [
-    { token: '{title}', label: 'The entry title'|t('beacon') },
-    { token: '{siteName}', label: 'The site name'|t('beacon') },
-    { token: '{section}', label: 'The section name'|t('beacon') },
-    { token: '{type}', label: 'The entry type name'|t('beacon') },
-    { token: '{author}', label: 'The entry author’s name'|t('beacon') },
-    { token: '{parent}', label: 'The parent entry’s title (Structure sections)'|t('beacon') },
+    { token: '{title}', label: 'settings.content.entry.title.label'|t('beacon') },
+    { token: '{siteName}', label: 'settings.content.site.name.label'|t('beacon') },
+    { token: '{section}', label: 'settings.content.section.name.label'|t('beacon') },
+    { token: '{type}', label: 'settings.content.entry.type.name.label'|t('beacon') },
+    { token: '{author}', label: 'settings.content.entry.author.s.name.label'|t('beacon') },
+    { token: '{parent}', label: 'settings.content.parent.entry.s.title.structure.label'|t('beacon') },
 ] %}
 
 {% macro tokenPills(tokens) %}
@@ -22,8 +22,8 @@
 <table class="data fullwidth beacon-content-table">
     <thead>
         <tr>
-            <th class="beacon-content-table__section-col">{{ 'Section'|t('beacon') }}</th>
-            <th>{{ 'Templates'|t('beacon') }}</th>
+            <th class="beacon-content-table__section-col">{{ 'settings.content.section.text'|t('beacon') }}</th>
+            <th>{{ 'settings.content.templates.text'|t('beacon') }}</th>
         </tr>
     </thead>
     <tbody>
@@ -36,18 +36,18 @@
                 </td>
                 <td>
                     <div class="beacon-field">
-                        <label class="beacon-field__label">{{ 'Title template'|t('beacon') }}</label>
+                        <label class="beacon-field__label">{{ 'settings.content.title.template.text'|t('beacon') }}</label>
                         <input class="text fullwidth beacon-token-input" type="text"
                             name="sectionSeoDefaults[{{ section.handle }}][titleTemplate]"
                             value="{{ defaults.titleTemplate ?? '' }}"
-                            placeholder="{{ '{title} | {siteName}'|t('beacon') }}">
+                            placeholder="{{ 'settings.content.message.text'|t('beacon') }}">
                         {{ _self.tokenPills(tokens) }}
                     </div>
                     <div class="beacon-field">
-                        <label class="beacon-field__label">{{ 'Description template'|t('beacon') }}</label>
+                        <label class="beacon-field__label">{{ 'settings.content.description.template.text'|t('beacon') }}</label>
                         <textarea class="text fullwidth beacon-token-input" rows="4"
                             name="sectionSeoDefaults[{{ section.handle }}][descriptionTemplate]"
-                            placeholder="{{ 'Learn about {title} on {siteName}.'|t('beacon') }}">{{ defaults.descriptionTemplate ?? '' }}</textarea>
+                            placeholder="{{ 'settings.content.learn.about.text'|t('beacon') }}">{{ defaults.descriptionTemplate ?? '' }}</textarea>
                         {{ _self.tokenPills(tokens) }}
                     </div>
                 </td>

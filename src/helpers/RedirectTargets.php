@@ -23,16 +23,16 @@ final class RedirectTargets
     public static function validateTargetUri(string $target): ?string
     {
         if (str_starts_with($target, '//')) {
-            return Craft::t('beacon', 'Target must not be protocol-relative.');
+            return Craft::t('beacon', 'validation.redirect.target.must.not.protocol.relative');
         }
         if (str_starts_with($target, '/')) {
             return null;
         }
         if (!preg_match('#^https?://#i', $target)) {
-            return Craft::t('beacon', 'Target must be a relative path (starting with "/") or an http(s):// URL.');
+            return Craft::t('beacon', 'validation.redirect.target.must.relative.path.starting');
         }
         if (parse_url($target, PHP_URL_HOST) === null) {
-            return Craft::t('beacon', 'Target URL is malformed.');
+            return Craft::t('beacon', 'validation.redirect.target.url.malformed');
         }
         return null;
     }

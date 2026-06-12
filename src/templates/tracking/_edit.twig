@@ -2,11 +2,11 @@
 {% set selectedSubnavItem = 'tracking' %}
 {% import '_includes/forms.twig' as forms %}
 
-{% set title = script.uid ? 'Edit Script'|t('beacon') : 'New Script'|t('beacon') %}
+{% set title = script.uid ? 'tracking.edit.edit.script.text'|t('beacon') : 'tracking.edit.new.script.text'|t('beacon') %}
 {% set fullPageForm = true %}
 {% set crumbs = [
-    { label: 'Beacon'|t('beacon'), url: cpUrl('beacon') },
-    { label: 'Tracking Scripts'|t('beacon'), url: cpUrl('beacon/tracking') },
+    { label: 'nav.beacon'|t('beacon'), url: cpUrl('beacon') },
+    { label: 'tracking.edit.tracking.scripts.label'|t('beacon'), url: cpUrl('beacon/tracking') },
 ] %}
 {% set fixed = provider.fixedPlacements %}
 
@@ -18,7 +18,7 @@
     {{ hiddenInput('provider', script.provider) }}
 
     {{ forms.textField({
-        label: 'Name'|t('beacon'),
+        label: 'tracking.edit.name.label'|t('beacon'),
         id: 'name',
         name: 'name',
         value: script.name,
@@ -28,8 +28,8 @@
     }) }}
 
     {{ forms.textField({
-        label: 'Sort Order'|t('beacon'),
-        instructions: 'Lower numbers render first within the same placement.'|t('beacon'),
+        label: 'tracking.edit.sortOrder.label'|t('beacon'),
+        instructions: 'tracking.edit.sortOrder.instructions'|t('beacon'),
         id: 'sortOrder',
         name: 'sortOrder',
         value: script.sortOrder,
@@ -39,32 +39,32 @@
     {% set fieldsTemplate = provider.fieldsTemplate %}
     {% if fieldsTemplate %}
         <hr>
-        <h2>{{ 'Configuration'|t('beacon') }}</h2>
+        <h2>{{ 'tracking.edit.configuration.heading'|t('beacon') }}</h2>
         {% include fieldsTemplate ignore missing with { script: script, provider: provider } %}
     {% endif %}
 
     {% if not fixed %}
         {{ forms.selectField({
-            label: 'Placement'|t('beacon'),
-            instructions: 'Where the script tag is injected on the rendered page.'|t('beacon'),
+            label: 'tracking.edit.placement.label'|t('beacon'),
+            instructions: 'tracking.edit.placement.instructions'|t('beacon'),
             id: 'placement',
             name: 'placement',
             value: script.placement,
             options: [
-                { label: '<head>'|t('beacon'), value: 'head' },
-                { label: '<body> start'|t('beacon'), value: 'bodyStart' },
-                { label: '<body> end'|t('beacon'), value: 'bodyEnd' },
+                { label: 'tracking.edit.head.label'|t('beacon'), value: 'head' },
+                { label: 'tracking.edit.body.start.label'|t('beacon'), value: 'bodyStart' },
+                { label: 'tracking.edit.body.end.label'|t('beacon'), value: 'bodyEnd' },
             ],
         }) }}
     {% endif %}
 
     {% if sites|length > 1 %}
         <hr>
-        <h2>{{ 'Per-Site Overrides'|t('beacon') }}</h2>
+        <h2>{{ 'tracking.edit.per.site.overrides.heading'|t('beacon') }}</h2>
         <p class="light beacon-site-overrides__help">
-            {{ 'Tick a site to disable this script there. Unticked sites load it normally.'|t('beacon') }}
+            {{ 'tracking.edit.tick.site.disable.script.there.text'|t('beacon') }}
         </p>
-        <div class="beacon-site-overrides__grid" role="group" aria-label="{{ 'Sites to disable this script on'|t('beacon') }}">
+        <div class="beacon-site-overrides__grid" role="group" aria-label="{{ 'tracking.edit.sites.disable.script.ariaLabel'|t('beacon') }}">
             {% for site in sites %}
                 {% set ovr = script.siteOverrides[site.uid] ?? null %}
                 <div class="beacon-site-overrides__item">

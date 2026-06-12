@@ -16,14 +16,14 @@ final class GTMProvider extends AbstractBeaconTrackingProvider
 
     public function getDisplayName(): string
     {
-        return Craft::t('beacon', 'Google Tag Manager');
+        return Craft::t('beacon', 'tracking.gtm.google.tag.manager');
     }
 
     public function validateConfig(array $config): array
     {
         $id = (string)($config['containerId'] ?? '');
         if (!preg_match('/^GTM-[A-Z0-9]+$/', $id)) {
-            return ['containerId' => Craft::t('beacon', 'Container ID must match format GTM-XXXXX.')];
+            return ['containerId' => Craft::t('beacon', 'tracking.gtm.container.id.must.match.format')];
         }
         return [];
     }
