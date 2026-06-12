@@ -821,7 +821,7 @@
             target: '_blank',
             rel: 'noopener',
             text: Craft.t('beacon', 'seoField.js.schema.org.docs'),
-            title: Craft.t('beacon', 'seoField.js.open.type.s.spec.schema.2'),
+            title: Craft.t('beacon', 'seoField.js.open.type.s.spec.schema'),
         });
         typeSelect.addEventListener('change', function() {
             docsLink.setAttribute('href', 'https://schema.org/' + encodeURIComponent(typeSelect.value));
@@ -835,7 +835,7 @@
         if (!config.entryId) {
             suggestBtn.disabled = true;
             suggestBtn.title = Craft.t('beacon', 'seoField.js.save.entry.once.before.requesting');
-            suggestNote.textContent = Craft.t('beacon', 'seoField.js.save.entry.first.needs.entry.2');
+            suggestNote.textContent = Craft.t('beacon', 'seoField.js.save.entry.first.needs.entry');
         }
         body.appendChild(el('div', { class: 'beacon-schema-modal-toolbar' }, [typeField, suggestBtn, suggestNote]));
 
