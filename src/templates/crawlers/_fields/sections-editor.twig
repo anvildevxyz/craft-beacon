@@ -100,33 +100,33 @@
   .sections-editor-container {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 2rem;
+    gap: 1rem;
     border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    padding: 1.5rem;
+    border-radius: 3px;
+    padding: 0.75rem;
     background: #fafafa;
   }
 
   .sections-available h3,
   .sections-selected h3 {
-    font-size: 0.95rem;
+    font-size: 0.85rem;
     font-weight: 600;
-    margin: 0 0 1rem 0;
+    margin: 0 0 0.5rem 0;
     color: #333;
   }
 
   .sections-search {
     display: block;
     width: 100%;
-    margin-bottom: 1rem;
-    padding: 0.5rem;
+    margin-bottom: 0.5rem;
+    padding: 0.35rem 0.5rem;
     border: 1px solid #ddd;
     border-radius: 3px;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
   }
 
   .sections-list {
-    max-height: 400px;
+    max-height: 200px;
     overflow-y: auto;
     border: 1px solid #ddd;
     border-radius: 3px;
@@ -136,8 +136,8 @@
   .section-item {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem;
+    gap: 0.5rem;
+    padding: 0.4rem 0.5rem;
     border-bottom: 1px solid #f0f0f0;
     transition: background 0.15s;
   }
@@ -155,20 +155,20 @@
     flex: 1;
     cursor: pointer;
     margin: 0;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
   }
 
   .section-add-btn {
     flex-shrink: 0;
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
     padding: 0;
     border: 1px solid #ddd;
     border-radius: 3px;
     background: white;
     cursor: pointer;
     font-weight: bold;
-    font-size: 1rem;
+    font-size: 0.9rem;
     transition: all 0.15s;
   }
 
@@ -179,14 +179,14 @@
   }
 
   .sections-chips {
-    min-height: 100px;
+    min-height: 60px;
     border: 2px dashed #ddd;
     border-radius: 3px;
-    padding: 1rem;
+    padding: 0.5rem;
     background: white;
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 0.4rem;
     align-content: flex-start;
     transition: border-color 0.15s;
   }
@@ -199,14 +199,15 @@
   .section-chip {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
+    gap: 0.35rem;
+    padding: 0.3rem 0.6rem;
     background: #0f7a8f;
     color: white;
-    border-radius: 20px;
+    border-radius: 16px;
     cursor: move;
     user-select: none;
     transition: all 0.15s;
+    font-size: 0.8rem;
   }
 
   .section-chip:hover {
@@ -219,7 +220,7 @@
   }
 
   .chip-label {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     font-weight: 500;
   }
 
@@ -230,7 +231,7 @@
     color: white;
     cursor: pointer;
     padding: 0;
-    font-size: 1.2rem;
+    font-size: 1rem;
     line-height: 1;
     transition: transform 0.15s;
   }
@@ -240,8 +241,8 @@
   }
 
   .chip-hint {
-    margin-top: 0.75rem;
-    font-size: 0.85rem;
+    margin-top: 0.4rem;
+    font-size: 0.75rem;
     color: #888;
     font-style: italic;
   }
