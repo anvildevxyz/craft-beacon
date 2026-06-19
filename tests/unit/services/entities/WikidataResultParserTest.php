@@ -77,4 +77,22 @@ class WikidataResultParserTest extends TestCase
         $this->assertSame([], WikidataResultParser::parse([], [], 'en'));
         $this->assertSame([], WikidataResultParser::parse(['search' => 'nope'], [], 'en'));
     }
+
+    public function testOfficialUrlSurvivesMalformedClaim(): void
+    {
+        $search = ['search' => [['id' => 'Q1', 'label' => 'Thing']]];
+        // A malformed P856 claim list from the external API must not raise a
+        // TypeError on offset access — the parser skips bad rows and keeps going.
+        $entities = ['entities' => ['Q1' => ['claims' => ['P856' => [
+            'not-an-array',                                              // scalar claim
+            ['mainsnak' => 'string-not-array'],                         // string mainsnak
+            ['mainsnak' => ['datavalue' => 'string-not-array']],        // string datavalue
+            ['mainsnak' => ['datavalue' => ['value' => 'https://ok.example/']]], // valid
+        ]]]]];
+
+        $rows = WikidataResultParser::parse($search, $entities, 'en');
+
+        $this->assertCount(1, $rows);
+        $this->assertSame('https://ok.example/', $rows[0]['officialUrl']);
+    }
 }

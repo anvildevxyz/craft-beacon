@@ -87,7 +87,15 @@ final class WikidataResultParser
             return '';
         }
         foreach ($claims['P856'] as $claim) {
-            $value = $claim['mainsnak']['datavalue']['value'] ?? null;
+            // Guard every level: a malformed claim from the external API (a
+            // non-array claim, or a string `mainsnak`) would otherwise raise a
+            // TypeError on offset access — `?? null` does not suppress that.
+            if (!is_array($claim)) {
+                continue;
+            }
+            $mainsnak = is_array($claim['mainsnak'] ?? null) ? $claim['mainsnak'] : null;
+            $datavalue = is_array($mainsnak['datavalue'] ?? null) ? $mainsnak['datavalue'] : null;
+            $value = $datavalue['value'] ?? null;
             if (is_string($value) && $value !== '') {
                 return $value;
             }

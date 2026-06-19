@@ -299,13 +299,21 @@ class SettingsService extends Component
             }
             $titleTemplate = trim((string) ($row['titleTemplate'] ?? ''));
             $descriptionTemplate = trim((string) ($row['descriptionTemplate'] ?? ''));
-            if ($titleTemplate === '' && $descriptionTemplate === '') {
+            // Per-section AI-usage policy is stored alongside the SEO templates
+            // by SettingsController::parseSectionSeoDefaults(). Preserve it here
+            // (and keep aiUsage-only rows) so AiUsageService / MetaResolverService
+            // can read it — otherwise section-level policies are silently lost.
+            $aiUsage = is_string($row['aiUsage'] ?? null) ? trim($row['aiUsage']) : '';
+            if ($titleTemplate === '' && $descriptionTemplate === '' && $aiUsage === '') {
                 continue;
             }
             $clean[$sectionHandle] = [
                 'titleTemplate' => $titleTemplate,
                 'descriptionTemplate' => $descriptionTemplate,
             ];
+            if ($aiUsage !== '') {
+                $clean[$sectionHandle]['aiUsage'] = $aiUsage;
+            }
         }
 
         return $clean;
