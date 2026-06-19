@@ -32,6 +32,7 @@ class AiVisibilityController extends Controller
 
         return $this->renderTemplate('beacon/ai-visibility/index', [
             'title' => Craft::t('beacon', 'aiVisibility.title'),
+            'settings' => $settings,
             'prompts' => $plugin->aiVisibility->getPrompts($siteId),
             'results' => $plugin->aiVisibility->latestResults($siteId, 50),
             'citationRate' => $plugin->aiVisibility->citationRate($siteId, 30),
