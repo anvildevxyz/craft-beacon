@@ -3,6 +3,7 @@
 namespace anvildev\beacon\services;
 
 use anvildev\beacon\elements\AuthorElement;
+use anvildev\beacon\helpers\EntitySchema;
 use anvildev\beacon\helpers\Ids;
 use anvildev\beacon\models\SchemaBundle;
 use anvildev\beacon\records\SchemaRecord;
@@ -113,6 +114,20 @@ class SchemaService extends Component
             $rendered = $this->renderOne($schemaConfig, $context);
             if ($rendered !== null) {
                 $output[] = $rendered;
+            }
+        }
+
+        // Bind the page's linked entities (Wikidata `about`/`mentions`) onto the
+        // primary node so AI engines and knowledge graphs can disambiguate the
+        // subject. Only the first node carries them — addon/secondary nodes
+        // describe their own things. A mapping that already declared about/
+        // mentions wins (don't clobber editor intent).
+        if ($output !== []) {
+            $entityNodes = EntitySchema::nodesFor($context['seo']['entities'] ?? null);
+            foreach ($entityNodes as $key => $nodes) {
+                if (!isset($output[0][$key])) {
+                    $output[0][$key] = $nodes;
+                }
             }
         }
 

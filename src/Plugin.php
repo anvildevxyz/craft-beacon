@@ -71,6 +71,7 @@ use anvildev\beacon\services\SitemapService;
 use anvildev\beacon\services\SiteSettingsService;
 use anvildev\beacon\services\TrackingProviderRegistry;
 use anvildev\beacon\services\TrackingService;
+use anvildev\beacon\services\WikidataService;
 use anvildev\beacon\tracking\providers\CustomScriptProvider;
 use anvildev\beacon\tracking\providers\FacebookPixelProvider;
 use anvildev\beacon\tracking\providers\GA4Provider;
@@ -166,6 +167,7 @@ use yii\base\Event;
  * @property-read AiUsageService $aiUsage
  * @property-read McpService $mcp
  * @property-read McpTokenService $mcpTokens
+ * @property-read WikidataService $wikidata
  */
 class Plugin extends BasePlugin
 {
@@ -329,6 +331,7 @@ class Plugin extends BasePlugin
             'mcp' => McpService::class,
             'mcpTokens' => McpTokenService::class,
             'tokenEstimator' => HeuristicTokenEstimator::class,
+            'wikidata' => WikidataService::class,
         ]);
 
         Craft::$app->getProjectConfig()
