@@ -59,11 +59,12 @@ final class GeoScoreDrillDownPresenter
         }
 
         $band = GeoScoreCompositeBand::forScore($score->score);
+        $computedAt = DateTimeHelper::toDateTime($score->computedAt);
 
         return [
             'compositeBand' => $band,
             'compositeBandLabel' => GeoScoreCompositeBand::label($band),
-            'computedAtFormatted' => DateTimeHelper::toDateTime($score->computedAt)->format('Y-m-d H:i'),
+            'computedAtFormatted' => $computedAt !== false ? $computedAt->format('Y-m-d H:i') : '',
             'weakest' => $weakestPillar !== null ? [
                 'label' => $weakestPillar->label(),
                 'score' => $weakestPillar->score,
