@@ -31,6 +31,8 @@ class Install extends Migration
     {
         $this->dropTableIfExists('{{%beacon_short_links}}');
         $this->dropTableIfExists('{{%beacon_redirect_404_log}}');
+        $this->dropTableIfExists('{{%beacon_mcp_audit_log}}');
+        $this->dropTableIfExists('{{%beacon_mcp_tokens}}');
         $this->dropTableIfExists('{{%beacon_ai_visibility_results}}');
         $this->dropTableIfExists('{{%beacon_benchmark_prompts}}');
         $this->dropTableIfExists('{{%beacon_tracking_scripts}}');
@@ -193,10 +195,38 @@ class Install extends Migration
             'aiVisibilityCadence' => $this->string(16)->notNull()->defaultValue('off'),
             'aiUsagePolicy' => $this->string(20)->notNull()->defaultValue('allow'),
             'aiUsagePolicyUrl' => $this->string(255),
+            'mcpEnabled' => $this->boolean()->notNull()->defaultValue(false),
             'dateCreated' => $this->dateTime()->notNull(),
             'dateUpdated' => $this->dateTime()->notNull(),
             'uid' => $this->uid(),
             'PRIMARY KEY([[id]])',
+        ]);
+
+        $this->createTable('{{%beacon_mcp_tokens}}', [
+            'id' => $this->primaryKey(),
+            'name' => $this->string()->notNull(),
+            'userId' => $this->integer()->notNull(),
+            'tokenHash' => $this->string(255)->notNull(),
+            'tokenPrefix' => $this->string(12)->notNull(),
+            'enabled' => $this->boolean()->notNull()->defaultValue(true),
+            'lastUsedAt' => $this->dateTime(),
+            'dateCreated' => $this->dateTime()->notNull(),
+            'dateUpdated' => $this->dateTime()->notNull(),
+            'uid' => $this->uid(),
+        ]);
+
+        $this->createTable('{{%beacon_mcp_audit_log}}', [
+            'id' => $this->primaryKey(),
+            'tokenId' => $this->integer(),
+            'userId' => $this->integer(),
+            'agentLabel' => $this->string()->notNull()->defaultValue(''),
+            'tool' => $this->string()->notNull(),
+            'arguments' => $this->text(),
+            'success' => $this->boolean()->notNull()->defaultValue(true),
+            'error' => $this->text(),
+            'dateCreated' => $this->dateTime()->notNull(),
+            'dateUpdated' => $this->dateTime()->notNull(),
+            'uid' => $this->uid(),
         ]);
 
         $this->createTable('{{%beacon_benchmark_prompts}}', [
@@ -437,6 +467,10 @@ class Install extends Migration
 
         $this->createIndex(null, '{{%beacon_benchmark_prompts}}', ['siteId']);
         $this->createIndex(null, '{{%beacon_ai_visibility_results}}', ['siteId', 'runAt']);
+
+        $this->createIndex(null, '{{%beacon_mcp_tokens}}', ['tokenHash'], true);
+        $this->createIndex(null, '{{%beacon_mcp_tokens}}', ['userId']);
+        $this->createIndex(null, '{{%beacon_mcp_audit_log}}', ['dateCreated']);
     }
 
     private function addForeignKeys(): void
@@ -466,6 +500,7 @@ class Install extends Migration
         $this->addForeignKey(null, '{{%beacon_benchmark_prompts}}', ['siteId'], '{{%sites}}', ['id'], 'CASCADE');
         $this->addForeignKey(null, '{{%beacon_ai_visibility_results}}', ['siteId'], '{{%sites}}', ['id'], 'CASCADE');
         $this->addForeignKey(null, '{{%beacon_ai_visibility_results}}', ['promptId'], '{{%beacon_benchmark_prompts}}', ['id'], 'SET NULL');
+        $this->addForeignKey(null, '{{%beacon_mcp_tokens}}', ['userId'], '{{%users}}', ['id'], 'CASCADE');
 
         $this->addForeignKey(null, '{{%beacon_sitemap_settings}}', ['siteId'], '{{%sites}}', ['id'], 'CASCADE');
         $this->addForeignKey(null, '{{%beacon_llms_settings}}', ['siteId'], '{{%sites}}', ['id'], 'CASCADE');

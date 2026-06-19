@@ -1,0 +1,66 @@
+{% extends "_layouts/cp" %}
+{% import "_includes/forms.twig" as forms %}
+
+{% set title = title %}
+
+{% block content %}
+    {% if not mcpEnabled %}
+        <div class="warning has-icon">
+            <span class="icon" aria-hidden="true"></span>
+            <p>{{ 'settings.mcp.disabledWarning'|t('beacon') }}</p>
+        </div>
+    {% endif %}
+
+    {% if newToken %}
+        <div class="pane">
+            <h2>{{ 'settings.mcp.newTokenHeading'|t('beacon') }}</h2>
+            <p class="light">{{ 'settings.mcp.newTokenInstructions'|t('beacon') }}</p>
+            <code class="break-word">{{ newToken }}</code>
+        </div>
+    {% endif %}
+
+    <form method="post" accept-charset="UTF-8">
+        {{ csrfInput() }}
+        <input type="hidden" name="action" value="beacon/mcp-tokens/create">
+        {{ forms.textField({
+            label: 'settings.mcp.tokenName.label'|t('beacon'),
+            name: 'name',
+            placeholder: 'CI agent',
+        }) }}
+        <button type="submit" class="btn submit">{{ 'settings.mcp.createToken'|t('beacon') }}</button>
+    </form>
+
+    <hr>
+
+    {% if tokens|length %}
+        <table class="data fullwidth">
+            <thead>
+                <tr>
+                    <th>{{ 'settings.mcp.col.name'|t('beacon') }}</th>
+                    <th>{{ 'settings.mcp.col.prefix'|t('beacon') }}</th>
+                    <th>{{ 'settings.mcp.col.lastUsed'|t('beacon') }}</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for token in tokens %}
+                    <tr>
+                        <td>{{ token.name }}</td>
+                        <td><code>{{ token.tokenPrefix }}…</code></td>
+                        <td>{{ token.lastUsedAt ? token.lastUsedAt : '—' }}</td>
+                        <td class="thin">
+                            <form method="post" accept-charset="UTF-8">
+                                {{ csrfInput() }}
+                                <input type="hidden" name="action" value="beacon/mcp-tokens/revoke">
+                                <input type="hidden" name="id" value="{{ token.id }}">
+                                <button type="submit" class="btn small">{{ 'settings.mcp.revoke'|t('beacon') }}</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p class="light">{{ 'settings.mcp.noTokens'|t('beacon') }}</p>
+    {% endif %}
+{% endblock %}

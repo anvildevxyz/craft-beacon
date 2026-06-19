@@ -49,6 +49,8 @@ use anvildev\beacon\services\GeoScoreService;
 use anvildev\beacon\services\HreflangService;
 use anvildev\beacon\services\IndexNowService;
 use anvildev\beacon\services\LlmsTxtService;
+use anvildev\beacon\services\McpService;
+use anvildev\beacon\services\McpTokenService;
 use anvildev\beacon\services\MetaResolverService;
 use anvildev\beacon\services\Redirect404LogService;
 use anvildev\beacon\services\RedirectImporter;
@@ -160,6 +162,8 @@ use yii\base\Event;
  * @property-read AiContentService $aiContent
  * @property-read AiVisibilityService $aiVisibility
  * @property-read AiUsageService $aiUsage
+ * @property-read McpService $mcp
+ * @property-read McpTokenService $mcpTokens
  */
 class Plugin extends BasePlugin
 {
@@ -320,6 +324,8 @@ class Plugin extends BasePlugin
             'aiContent' => AiContentService::class,
             'aiVisibility' => AiVisibilityService::class,
             'aiUsage' => AiUsageService::class,
+            'mcp' => McpService::class,
+            'mcpTokens' => McpTokenService::class,
         ]);
 
         Craft::$app->getProjectConfig()
@@ -520,6 +526,7 @@ class Plugin extends BasePlugin
                     'beacon/settings/<tab:\w+>' => 'beacon/settings/section',
                     'beacon/geo-score/drill-down' => 'beacon/geo-score/drill-down',
                     'beacon/ai-visibility' => 'beacon/ai-visibility/index',
+                    'beacon/mcp-tokens' => 'beacon/mcp-tokens/index',
                 ];
             }
         );
@@ -543,6 +550,7 @@ class Plugin extends BasePlugin
                     'humans.txt' => 'beacon/humans-txt/index',
                     'ads.txt' => 'beacon/ads-txt/index',
                     'geo/export' => 'beacon/geo-export/index',
+                    'beacon/mcp' => 'beacon/mcp/index',
                     'beacon/schemamap.json' => 'beacon/schemamap/index',
                     '<key:[a-zA-Z0-9-]{8,128}>.txt' => 'beacon/index-now-key/file',
                     'feed/<section:[\w-]+>.json' => 'beacon/feed/json',

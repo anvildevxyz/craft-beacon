@@ -121,6 +121,8 @@ class Settings
         public string $aiUsagePolicy = 'allow',
         /** Optional URL to a published AI-usage / licensing policy, emitted as TDMRep `tdm-policy`. */
         public ?string $aiUsagePolicyUrl = null,
+        /** When true, the MCP server endpoint at `/beacon/mcp` accepts authenticated requests. Off by default. */
+        public bool $mcpEnabled = false,
     ) {
     }
 

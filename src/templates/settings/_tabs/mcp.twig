@@ -1,0 +1,18 @@
+{% import "_includes/forms.twig" as forms %}
+
+<h2 class="heading first">{{ 'settings.mcp.heading'|t('beacon') }}</h2>
+<p class="light">{{ 'settings.mcp.intro'|t('beacon') }}</p>
+<hr>
+
+{{ forms.lightswitchField({
+    label: 'settings.mcp.mcpEnabled.label'|t('beacon'),
+    instructions: 'settings.mcp.mcpEnabled.instructions'|t('beacon'),
+    name: 'mcpEnabled',
+    on: settings.mcpEnabled,
+}) }}
+
+<p class="light"><code>POST {{ siteUrl('beacon/mcp') }}</code></p>
+
+<p>
+    <a class="btn" href="{{ cpUrl('beacon/mcp-tokens') }}">{{ 'settings.mcp.manageTokens'|t('beacon') }}</a>
+</p>

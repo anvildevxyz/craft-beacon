@@ -49,6 +49,7 @@ use craft\db\ActiveRecord;
  * @property string $aiVisibilityCadence
  * @property string $aiUsagePolicy
  * @property string|null $aiUsagePolicyUrl
+ * @property bool $mcpEnabled
  */
 class SettingsRecord extends ActiveRecord
 {

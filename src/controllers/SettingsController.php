@@ -28,7 +28,7 @@ class SettingsController extends Controller
     private const ALLOWED_TABS = [
         'general' => true, 'robots' => true, 'content' => true,
         'organization' => true, 'social' => true,
-        'authors' => true, 'geo' => true, 'ai' => true,
+        'authors' => true, 'geo' => true, 'ai' => true, 'mcp' => true,
     ];
 
     /**
@@ -144,6 +144,7 @@ class SettingsController extends Controller
         $apply('aiBaseUrl', static fn(Settings $s, $v) => $s->aiBaseUrl = trim((string) $v) !== '' ? trim((string) $v) : null);
         $apply('aiUsagePolicy', static fn(Settings $s, $v) => $s->aiUsagePolicy = AiUsagePolicy::normalize((string) $v));
         $apply('aiUsagePolicyUrl', $trimNullable('aiUsagePolicyUrl'));
+        $apply('mcpEnabled', $bool('mcpEnabled'));
         // Developer-level GEO knobs (render mode, excluded CSS classes, fact-density
         // target, authority-domain overrides) are set via config/beacon.php, not here.
         $apply('robotsDirectivesEnabled', fn(Settings $s, $v) => $s->robotsDirectivesEnabled = $this->parseRobotsDirectivesEnabled($v));

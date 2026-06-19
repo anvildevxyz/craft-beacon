@@ -116,6 +116,7 @@ class SettingsService extends Component
             aiVisibilityCadence: (is_string($record->aiVisibilityCadence ?? null) && $record->aiVisibilityCadence !== '') ? (string) $record->aiVisibilityCadence : 'off',
             aiUsagePolicy: \anvildev\beacon\helpers\AiUsagePolicy::normalize($record->aiUsagePolicy ?? null),
             aiUsagePolicyUrl: ($record->aiUsagePolicyUrl !== null && $record->aiUsagePolicyUrl !== '') ? (string) $record->aiUsagePolicyUrl : null,
+            mcpEnabled: (bool) ($record->mcpEnabled ?? false),
         );
 
         return $this->cached = $this->applyConfigFileOverrides($settings);
@@ -273,6 +274,7 @@ class SettingsService extends Component
         $record->aiVisibilityCadence = $settings->aiVisibilityCadence;
         $record->aiUsagePolicy = $settings->aiUsagePolicy;
         $record->aiUsagePolicyUrl = $settings->aiUsagePolicyUrl;
+        $record->mcpEnabled = $settings->mcpEnabled;
         $record->dateUpdated = Db::now();
         $record->save(false);
 
