@@ -122,8 +122,14 @@ class SchemaService extends Component
         // subject. Only the first node carries them — addon/secondary nodes
         // describe their own things. A mapping that already declared about/
         // mentions wins (don't clobber editor intent).
-        if ($output !== []) {
-            $entityNodes = EntitySchema::nodesFor($context['seo']['entities'] ?? null);
+        $entityNodes = EntitySchema::nodesFor($context['seo']['entities'] ?? null);
+        if ($entityNodes !== []) {
+            // No schema bundle is mapped for this entry type, so there is no
+            // primary node to host the entities. Emit a minimal WebPage host
+            // instead of silently dropping them.
+            if ($output === []) {
+                $output[] = $this->webPageHostNode($context);
+            }
             foreach ($entityNodes as $key => $nodes) {
                 if (!isset($output[0][$key])) {
                     $output[0][$key] = $nodes;
@@ -132,6 +138,35 @@ class SchemaService extends Component
         }
 
         return $output;
+    }
+
+    /**
+     * Minimal standalone `WebPage` node used to carry linked entities when the
+     * entry has no mapped schema bundle. Uses the entry URL + title already
+     * resolved into the render context.
+     *
+     * @param array<string,mixed> $context
+     * @return array<string,mixed>
+     */
+    private function webPageHostNode(array $context): array
+    {
+        $node = [
+            '@context' => 'https://schema.org',
+            '@type' => 'WebPage',
+        ];
+
+        $url = $context['entry']['url'] ?? null;
+        if (is_string($url) && $url !== '') {
+            $node['@id'] = $url . '#webpage';
+            $node['url'] = $url;
+        }
+
+        $title = $context['title'] ?? '';
+        if (is_string($title) && $title !== '') {
+            $node['name'] = $title;
+        }
+
+        return $node;
     }
 
     /**
