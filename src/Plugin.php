@@ -48,6 +48,7 @@ use anvildev\beacon\services\GeoMarkdownStore;
 use anvildev\beacon\services\GeoScoreService;
 use anvildev\beacon\services\HreflangService;
 use anvildev\beacon\services\IndexNowService;
+use anvildev\beacon\services\llms\HeuristicTokenEstimator;
 use anvildev\beacon\services\LlmsTxtService;
 use anvildev\beacon\services\McpService;
 use anvildev\beacon\services\McpTokenService;
@@ -133,6 +134,7 @@ use yii\base\Event;
  * @property-read SitemapService $sitemap
  * @property-read RobotsService $robots
  * @property-read LlmsTxtService $llmsTxt
+ * @property-read \anvildev\beacon\services\llms\TokenEstimatorInterface $tokenEstimator
  * @property-read BotLogService $botLog
  * @property-read RedirectMatcher $redirectMatcher
  * @property-read RedirectService $redirects
@@ -326,6 +328,7 @@ class Plugin extends BasePlugin
             'aiUsage' => AiUsageService::class,
             'mcp' => McpService::class,
             'mcpTokens' => McpTokenService::class,
+            'tokenEstimator' => HeuristicTokenEstimator::class,
         ]);
 
         Craft::$app->getProjectConfig()

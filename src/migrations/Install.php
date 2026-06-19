@@ -365,6 +365,7 @@ class Install extends Migration
             'contactEmail' => $this->string(255),
             'preferredAttribution' => $this->text(),
             'fullBody' => $this->mediumText(),
+            'llmsFullTokenBudget' => $this->integer()->unsigned(),
             'dateCreated' => $this->dateTime()->notNull(),
             'dateUpdated' => $this->dateTime()->notNull(),
             'uid' => $this->uid(),

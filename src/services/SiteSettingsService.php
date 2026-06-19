@@ -106,6 +106,7 @@ class SiteSettingsService extends Component
             contactEmail: Strings::trimToNull($record->contactEmail),
             preferredAttribution: Strings::trimToNull($record->preferredAttribution),
             fullBody: Strings::trimToNull($record->fullBody),
+            llmsFullTokenBudget: $record->llmsFullTokenBudget !== null ? (int) $record->llmsFullTokenBudget : null,
         );
     }
 
@@ -341,6 +342,7 @@ class SiteSettingsService extends Component
         $record->contactEmail = $s->contactEmail;
         $record->preferredAttribution = $s->preferredAttribution;
         $record->fullBody = $s->fullBody;
+        $record->llmsFullTokenBudget = $s->llmsFullTokenBudget;
         $this->touchAndSave($record);
         $this->invalidate('llms', $s->siteId);
     }

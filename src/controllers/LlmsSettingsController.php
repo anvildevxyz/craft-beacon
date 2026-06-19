@@ -25,10 +25,12 @@ class LlmsSettingsController extends Controller
     public function actionIndex(): Response
     {
         $site = $this->resolveSite();
+        $settings = Plugin::$plugin->siteSettings->getLlms($site->id);
         return $this->renderTemplate('beacon/crawlers/index', [
             'selectedCrawlerTab' => 'llms-txt',
             'site' => $site,
-            'settings' => Plugin::$plugin->siteSettings->getLlms($site->id),
+            'settings' => $settings,
+            'fullBodyTokens' => Plugin::$plugin->tokenEstimator->estimate((string) ($settings->fullBody ?? '')),
             'allSections' => $this->collectSections(),
             'sites' => Craft::$app->getSites()->getAllSites(),
         ]);
@@ -54,6 +56,9 @@ class LlmsSettingsController extends Controller
             return null;
         }
 
+        $budgetRaw = Strings::trimToNull($request->getBodyParam('llmsFullTokenBudget'));
+        $tokenBudget = $budgetRaw !== null ? max(0, (int) $budgetRaw) : 0;
+
         $plugin->siteSettings->saveLlms(new LlmsSettings(
             siteId: $siteId,
             enabled: (bool) $request->getBodyParam('enabled', false),
@@ -65,6 +70,7 @@ class LlmsSettingsController extends Controller
             contactEmail: $get('contactEmail'),
             preferredAttribution: $get('preferredAttribution'),
             fullBody: $fullBody,
+            llmsFullTokenBudget: $tokenBudget > 0 ? $tokenBudget : null,
         ));
 
         return $this->finishSiteScopedSave(

@@ -18,6 +18,8 @@ class LlmsSettings
         public readonly ?string $contactEmail = null,
         public readonly ?string $preferredAttribution = null,
         public readonly ?string $fullBody = null,
+        /** Token ceiling for the served llms-full.txt. null/0 = no token budget (byte ceiling still applies). */
+        public readonly ?int $llmsFullTokenBudget = null,
     ) {
     }
 }
