@@ -203,6 +203,23 @@
         </section>
     {% endif %}
 
+    <section class="beacon-seo-section beacon-seo-ai-usage">
+        <h3 class="beacon-seo-section-title">{{ 'seoField.aiUsage.heading'|t('beacon') }}</h3>
+        {{ forms.selectField({
+            label: 'seoField.aiUsage.label'|t('beacon'),
+            instructions: 'seoField.aiUsage.instructions'|t('beacon'),
+            name: name ~ '[aiUsage]',
+            value: value.aiUsage ?? '',
+            options: [
+                { label: 'seoField.aiUsage.inherit'|t('beacon'), value: '' },
+                { label: 'seoField.aiUsage.allow'|t('beacon'), value: 'allow' },
+                { label: 'seoField.aiUsage.noTrain'|t('beacon'), value: 'no-train' },
+                { label: 'seoField.aiUsage.noGenerative'|t('beacon'), value: 'no-generative-ai' },
+                { label: 'seoField.aiUsage.noAi'|t('beacon'), value: 'no-ai' },
+            ],
+        }) }}
+    </section>
+
     {% if preview %}
         <section class="beacon-seo-section beacon-seo-previews">
             <h3 class="beacon-seo-section-title">{{ 'seoField.search.social.previews.heading'|t('beacon') }}</h3>

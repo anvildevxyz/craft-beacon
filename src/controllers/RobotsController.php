@@ -30,12 +30,21 @@ class RobotsController extends Controller
             $plugin->aiCrawlers->getEnabledRules(),
         );
 
+        $globalSettings = $plugin->settings->get();
+        $scopes = $plugin->aiUsage->gatherSectionScopes($site->id, $globalSettings->sectionSeoDefaults);
+        $contentSignalLines = $plugin->aiUsage->contentSignalLines(
+            $globalSettings->aiUsagePolicy,
+            $scopes['policies'],
+            $scopes['prefixes'],
+        );
+
         return RawResponse::build(
             'text/plain; charset=UTF-8',
             $plugin->robots->render(
                 $settings->userAgentRules,
                 $aiRules,
                 $settings->sitemapUrl === 'auto' ? UrlHelper::siteUrl('sitemap.xml') : $settings->sitemapUrl,
+                $contentSignalLines,
             ),
             cacheTags: ['beacon-robots', "beacon-site-{$site->id}"],
         );

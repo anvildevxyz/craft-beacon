@@ -13,6 +13,13 @@ class SeoMeta
     public ?string $canonical = null;
     /** @var list<string> */
     public array $robots = [];
+    /**
+     * Effective AI-usage policy (`allow` / `no-train` / `no-generative-ai` /
+     * `no-ai`) resolved entry → section → global. Drives the TDMRep meta tags
+     * and the Content-Usage header; its `noai`/`noimageai` tokens are also
+     * folded into {@see self::$robots} so the robots tag + X-Robots-Tag carry them.
+     */
+    public string $aiUsagePolicy = 'allow';
     /** @var array{title?:?string, description?:?string, image?:?string, type?:?string, siteName?:?string, url?:?string, imageWidth?:?int, imageHeight?:?int, imageAlt?:?string, locale?:?string} */
     public array $openGraph = [];
     /** @var array{card?:?string, title?:?string, description?:?string, image?:?string, site?:?string, creator?:?string} */

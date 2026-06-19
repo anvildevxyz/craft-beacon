@@ -32,6 +32,7 @@ use anvildev\beacon\services\AiBotsService;
 use anvildev\beacon\services\AiClient;
 use anvildev\beacon\services\AiContentService;
 use anvildev\beacon\services\AiCrawlerService;
+use anvildev\beacon\services\AiUsageService;
 use anvildev\beacon\services\AiVisibilityService;
 use anvildev\beacon\services\BotLogService;
 use anvildev\beacon\services\BotRegistry;
@@ -158,6 +159,7 @@ use yii\base\Event;
  * @property-read AiClient $aiClient
  * @property-read AiContentService $aiContent
  * @property-read AiVisibilityService $aiVisibility
+ * @property-read AiUsageService $aiUsage
  */
 class Plugin extends BasePlugin
 {
@@ -317,6 +319,7 @@ class Plugin extends BasePlugin
             'aiClient' => AiClient::class,
             'aiContent' => AiContentService::class,
             'aiVisibility' => AiVisibilityService::class,
+            'aiUsage' => AiUsageService::class,
         ]);
 
         Craft::$app->getProjectConfig()
@@ -536,6 +539,7 @@ class Plugin extends BasePlugin
                     'llms-full.txt' => 'beacon/llms-txt/full',
                     '.well-known/llms.txt' => 'beacon/llms-txt/index',
                     '.well-known/llms-full.txt' => 'beacon/llms-txt/full',
+                    '.well-known/tdmrep.json' => 'beacon/tdm-rep/index',
                     'humans.txt' => 'beacon/humans-txt/index',
                     'ads.txt' => 'beacon/ads-txt/index',
                     'geo/export' => 'beacon/geo-export/index',

@@ -20,6 +20,8 @@ namespace anvildev\beacon\models;
  *     socialImageTransform: string,
  *     defaultSocialImageId: int|null,
  *     defaultTwitterSite: string|null,
+ *     aiUsagePolicy: string,
+ *     aiUsagePolicyUrl: string|null,
  * }
  */
 class Settings
@@ -115,6 +117,10 @@ class Settings
         public int $aiVisibilityResultRetentionDays = 365,
         /** Scheduled cadence: `off`, `daily`, or `weekly`. */
         public string $aiVisibilityCadence = 'off',
+        /** Global default AI-usage policy: `allow` (default) / `no-train` / `no-generative-ai` / `no-ai`. */
+        public string $aiUsagePolicy = 'allow',
+        /** Optional URL to a published AI-usage / licensing policy, emitted as TDMRep `tdm-policy`. */
+        public ?string $aiUsagePolicyUrl = null,
     ) {
     }
 
@@ -152,6 +158,8 @@ class Settings
             'socialImageTransform' => $this->socialImageTransform,
             'defaultSocialImageId' => $this->defaultSocialImageId,
             'defaultTwitterSite' => $this->twitterSiteHandle(),
+            'aiUsagePolicy' => $this->aiUsagePolicy,
+            'aiUsagePolicyUrl' => $this->aiUsagePolicyUrl,
         ];
     }
 

@@ -3,6 +3,7 @@
 namespace anvildev\beacon\controllers;
 
 use anvildev\beacon\elements\AuthorElement;
+use anvildev\beacon\helpers\AiUsagePolicy;
 use anvildev\beacon\helpers\BeaconPermissions;
 use anvildev\beacon\helpers\Http;
 use anvildev\beacon\helpers\IdentityTypes;
@@ -141,6 +142,8 @@ class SettingsController extends Controller
             }
         });
         $apply('aiBaseUrl', static fn(Settings $s, $v) => $s->aiBaseUrl = trim((string) $v) !== '' ? trim((string) $v) : null);
+        $apply('aiUsagePolicy', static fn(Settings $s, $v) => $s->aiUsagePolicy = AiUsagePolicy::normalize((string) $v));
+        $apply('aiUsagePolicyUrl', $trimNullable('aiUsagePolicyUrl'));
         // Developer-level GEO knobs (render mode, excluded CSS classes, fact-density
         // target, authority-domain overrides) are set via config/beacon.php, not here.
         $apply('robotsDirectivesEnabled', fn(Settings $s, $v) => $s->robotsDirectivesEnabled = $this->parseRobotsDirectivesEnabled($v));
@@ -189,13 +192,17 @@ class SettingsController extends Controller
             }
             $titleTemplate = trim((string) ($row['titleTemplate'] ?? ''));
             $descriptionTemplate = trim((string) ($row['descriptionTemplate'] ?? ''));
-            if ($titleTemplate === '' && $descriptionTemplate === '') {
+            $aiUsage = AiUsagePolicy::normalizeOrInherit(is_string($row['aiUsage'] ?? null) ? $row['aiUsage'] : null);
+            if ($titleTemplate === '' && $descriptionTemplate === '' && $aiUsage === null) {
                 continue;
             }
             $out[$sectionHandle] = [
                 'titleTemplate' => $titleTemplate,
                 'descriptionTemplate' => $descriptionTemplate,
             ];
+            if ($aiUsage !== null) {
+                $out[$sectionHandle]['aiUsage'] = $aiUsage;
+            }
         }
         return $out;
     }

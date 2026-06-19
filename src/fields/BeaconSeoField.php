@@ -278,6 +278,7 @@ class BeaconSeoField extends Field implements SeoFieldInterface
             'ogImageId' => null,
             'canonical' => null,
             'robots' => RobotsDirectives::defaultFieldValues(),
+            'aiUsage' => '',
             'schemaAddons' => [],
             'authorIds' => [],
             'aiMarkdown' => [

@@ -47,6 +47,8 @@ use craft\db\ActiveRecord;
  * @property int $aiVisibilityMaxPerRun
  * @property int $aiVisibilityResultRetentionDays
  * @property string $aiVisibilityCadence
+ * @property string $aiUsagePolicy
+ * @property string|null $aiUsagePolicyUrl
  */
 class SettingsRecord extends ActiveRecord
 {

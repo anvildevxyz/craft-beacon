@@ -191,6 +191,8 @@ class Install extends Migration
             'aiVisibilityMaxPerRun' => $this->smallInteger()->unsigned()->notNull()->defaultValue(50),
             'aiVisibilityResultRetentionDays' => $this->integer()->unsigned()->notNull()->defaultValue(365),
             'aiVisibilityCadence' => $this->string(16)->notNull()->defaultValue('off'),
+            'aiUsagePolicy' => $this->string(20)->notNull()->defaultValue('allow'),
+            'aiUsagePolicyUrl' => $this->string(255),
             'dateCreated' => $this->dateTime()->notNull(),
             'dateUpdated' => $this->dateTime()->notNull(),
             'uid' => $this->uid(),

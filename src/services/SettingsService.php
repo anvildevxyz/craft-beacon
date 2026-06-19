@@ -114,6 +114,8 @@ class SettingsService extends Component
             aiVisibilityMaxPerRun: (int) ($record->aiVisibilityMaxPerRun ?? 50),
             aiVisibilityResultRetentionDays: (int) ($record->aiVisibilityResultRetentionDays ?? 365),
             aiVisibilityCadence: (is_string($record->aiVisibilityCadence ?? null) && $record->aiVisibilityCadence !== '') ? (string) $record->aiVisibilityCadence : 'off',
+            aiUsagePolicy: \anvildev\beacon\helpers\AiUsagePolicy::normalize($record->aiUsagePolicy ?? null),
+            aiUsagePolicyUrl: ($record->aiUsagePolicyUrl !== null && $record->aiUsagePolicyUrl !== '') ? (string) $record->aiUsagePolicyUrl : null,
         );
 
         return $this->cached = $this->applyConfigFileOverrides($settings);
@@ -269,6 +271,8 @@ class SettingsService extends Component
         $record->aiVisibilityMaxPerRun = $settings->aiVisibilityMaxPerRun;
         $record->aiVisibilityResultRetentionDays = $settings->aiVisibilityResultRetentionDays;
         $record->aiVisibilityCadence = $settings->aiVisibilityCadence;
+        $record->aiUsagePolicy = $settings->aiUsagePolicy;
+        $record->aiUsagePolicyUrl = $settings->aiUsagePolicyUrl;
         $record->dateUpdated = Db::now();
         $record->save(false);
 
