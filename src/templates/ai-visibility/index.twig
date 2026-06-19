@@ -1,0 +1,171 @@
+{% extends "_layouts/cp" %}
+{% import "_includes/forms" as forms %}
+
+{% set selectedSubnavItem = 'aiVisibility' %}
+{% set title = 'aiVisibility.title'|t('beacon') %}
+{% set crumbs = [{ label: 'nav.beacon'|t('beacon'), url: cpUrl('beacon') }] %}
+
+{% block content %}
+
+    {% if not isProviderConfigured %}
+        <div class="pane">
+            <p class="warning">{{ 'aiVisibility.setup.no.provider'|t('beacon') }}
+                <a href="{{ cpUrl('beacon/settings/ai') }}">{{ 'aiVisibility.setup.configure.link'|t('beacon') }}</a>
+            </p>
+        </div>
+    {% endif %}
+
+    <div class="pane">
+        <div class="readable">
+            <h2>{{ 'aiVisibility.summary.heading'|t('beacon') }}</h2>
+            <p>
+                <strong style="font-size: 2em;">{{ citationRate }}%</strong>
+                {{ 'aiVisibility.summary.citation.rate.30d'|t('beacon') }}
+            </p>
+            <form method="post" accept-charset="UTF-8" style="display:inline-block;">
+                {{ csrfInput() }}
+                {{ actionInput('beacon/ai-visibility/run-now') }}
+                <button type="submit" class="btn submit"{% if not isActive %} disabled{% endif %}>
+                    {{ 'aiVisibility.run.now'|t('beacon') }}
+                </button>
+            </form>
+            {% if not isActive and isEnabled %}
+                <p class="light">{{ 'aiVisibility.run.inactive.hint'|t('beacon') }}</p>
+            {% endif %}
+        </div>
+    </div>
+
+    {# --- Settings --- #}
+    <div class="pane">
+        <form method="post" accept-charset="UTF-8">
+            {{ csrfInput() }}
+            {{ actionInput('beacon/ai-visibility/save-settings') }}
+            <h2>{{ 'aiVisibility.settings.heading'|t('beacon') }}</h2>
+
+            {{ forms.lightswitchField({
+                label: 'aiVisibility.settings.enabled.label'|t('beacon'),
+                instructions: 'aiVisibility.settings.enabled.instructions'|t('beacon'),
+                name: 'aiVisibilityEnabled',
+                on: isEnabled,
+            }) }}
+
+            {{ forms.selectField({
+                label: 'aiVisibility.settings.cadence.label'|t('beacon'),
+                instructions: 'aiVisibility.settings.cadence.instructions'|t('beacon'),
+                name: 'aiVisibilityCadence',
+                value: settings.aiVisibilityCadence ?? 'off',
+                options: {
+                    off: 'aiVisibility.settings.cadence.off'|t('beacon'),
+                    daily: 'aiVisibility.settings.cadence.daily'|t('beacon'),
+                    weekly: 'aiVisibility.settings.cadence.weekly'|t('beacon'),
+                },
+            }) }}
+
+            {{ forms.textareaField({
+                label: 'aiVisibility.settings.competitors.label'|t('beacon'),
+                instructions: 'aiVisibility.settings.competitors.instructions'|t('beacon'),
+                name: 'aiVisibilityCompetitorDomains',
+                value: settings.aiVisibilityCompetitorDomains|join('\n'),
+                rows: 4,
+            }) }}
+
+            {{ forms.textField({
+                label: 'aiVisibility.settings.maxPerRun.label'|t('beacon'),
+                instructions: 'aiVisibility.settings.maxPerRun.instructions'|t('beacon'),
+                name: 'aiVisibilityMaxPerRun',
+                type: 'number',
+                value: settings.aiVisibilityMaxPerRun,
+                size: 6,
+            }) }}
+
+            <button type="submit" class="btn submit">{{ 'aiVisibility.settings.save'|t('beacon') }}</button>
+        </form>
+    </div>
+
+    {# --- Benchmark prompts --- #}
+    <div class="pane">
+        <h2>{{ 'aiVisibility.prompts.heading'|t('beacon') }}</h2>
+        {% if prompts is empty %}
+            <p class="light">{{ 'aiVisibility.prompts.empty'|t('beacon') }}</p>
+        {% else %}
+            <table class="data fullwidth">
+                <thead>
+                    <tr>
+                        <th>{{ 'aiVisibility.prompts.col.prompt'|t('beacon') }}</th>
+                        <th>{{ 'aiVisibility.prompts.col.enabled'|t('beacon') }}</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for p in prompts %}
+                    <tr>
+                        <td>{{ p.prompt }}</td>
+                        <td>{{ p.enabled ? '✓' : '—' }}</td>
+                        <td class="thin">
+                            <form method="post" accept-charset="UTF-8">
+                                {{ csrfInput() }}
+                                {{ actionInput('beacon/ai-visibility/delete-prompt') }}
+                                {{ hiddenInput('promptId', p.id) }}
+                                <button type="submit" class="btn small delete">{{ 'aiVisibility.prompts.delete'|t('beacon') }}</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+
+        <form method="post" accept-charset="UTF-8" class="beacon-add-prompt">
+            {{ csrfInput() }}
+            {{ actionInput('beacon/ai-visibility/save-prompt') }}
+            {{ forms.textField({
+                label: 'aiVisibility.prompts.add.label'|t('beacon'),
+                instructions: 'aiVisibility.prompts.add.instructions'|t('beacon'),
+                name: 'prompt',
+                placeholder: 'aiVisibility.prompts.add.placeholder'|t('beacon'),
+            }) }}
+            <button type="submit" class="btn submit">{{ 'aiVisibility.prompts.add.button'|t('beacon') }}</button>
+        </form>
+    </div>
+
+    {# --- Latest results --- #}
+    <div class="pane">
+        <h2>{{ 'aiVisibility.results.heading'|t('beacon') }}</h2>
+        {% if results is empty %}
+            <p class="light">{{ 'aiVisibility.results.empty'|t('beacon') }}</p>
+        {% else %}
+            <table class="data fullwidth">
+                <thead>
+                    <tr>
+                        <th>{{ 'aiVisibility.results.col.prompt'|t('beacon') }}</th>
+                        <th>{{ 'aiVisibility.results.col.engine'|t('beacon') }}</th>
+                        <th>{{ 'aiVisibility.results.col.cited'|t('beacon') }}</th>
+                        <th>{{ 'aiVisibility.results.col.mention'|t('beacon') }}</th>
+                        <th>{{ 'aiVisibility.results.col.competitors'|t('beacon') }}</th>
+                        <th>{{ 'aiVisibility.results.col.when'|t('beacon') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for r in results %}
+                    <tr>
+                        <td title="{{ r.answerExcerpt }}">{{ r.promptText }}</td>
+                        <td>{{ r.engine }}</td>
+                        <td>
+                            {% if r.cited %}
+                                <span class="status green"></span>
+                                {% for u in r.matchedUrls %}<div class="light">{{ u }}</div>{% endfor %}
+                            {% else %}
+                                <span class="status"></span>
+                            {% endif %}
+                        </td>
+                        <td>{{ r.domainMentioned ? '✓' : '—' }}</td>
+                        <td>{{ r.competitorMentions|join(', ') }}</td>
+                        <td>{{ r.runAt ? r.runAt|datetime('short') : '' }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+
+{% endblock %}

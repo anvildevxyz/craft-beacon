@@ -1,0 +1,30 @@
+{% if not isActive %}
+    <p class="light">{{ 'widgets.aiVisibility.inactive'|t('beacon') }}</p>
+{% else %}
+    <p>
+        <strong style="font-size: 1.8em;">{{ citationRate }}%</strong>
+        {{ 'widgets.aiVisibility.citation.rate'|t('beacon') }}
+    </p>
+    {% if results is empty %}
+        <p class="light">{{ 'widgets.aiVisibility.no.results'|t('beacon') }}</p>
+    {% else %}
+        <table class="data fullwidth">
+            <thead>
+                <tr>
+                    <th>{{ 'widgets.aiVisibility.col.prompt'|t('beacon') }}</th>
+                    <th>{{ 'widgets.aiVisibility.col.engine'|t('beacon') }}</th>
+                    <th>{{ 'widgets.aiVisibility.col.cited'|t('beacon') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for r in results %}
+                <tr>
+                    <td>{{ r.promptText }}</td>
+                    <td>{{ r.engine }}</td>
+                    <td>{% if r.cited %}<span class="status green"></span>{% else %}<span class="status"></span>{% endif %}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+{% endif %}

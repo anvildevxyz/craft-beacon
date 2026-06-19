@@ -45,6 +45,12 @@ class SettingsService extends Component
         'aiBaseUrl',
         'aiModel',
         'aiProvider',
+        // AI-visibility operational knobs.
+        'aiVisibilityEngines',
+        'aiVisibilityCompetitorDomains',
+        'aiVisibilityMaxPerRun',
+        'aiVisibilityResultRetentionDays',
+        'aiVisibilityCadence',
     ];
 
     /**
@@ -102,6 +108,12 @@ class SettingsService extends Component
             aiModel: (string) ($record->aiModel ?? ''),
             aiApiKey: ($record->aiApiKey !== null && $record->aiApiKey !== '') ? (string) $record->aiApiKey : null,
             aiBaseUrl: ($record->aiBaseUrl !== null && $record->aiBaseUrl !== '') ? (string) $record->aiBaseUrl : null,
+            aiVisibilityEnabled: (bool) ($record->aiVisibilityEnabled ?? false),
+            aiVisibilityEngines: Json::decodeStringList(is_string($record->aiVisibilityEngines ?? null) ? $record->aiVisibilityEngines : null),
+            aiVisibilityCompetitorDomains: Json::decodeStringList(is_string($record->aiVisibilityCompetitorDomains ?? null) ? $record->aiVisibilityCompetitorDomains : null),
+            aiVisibilityMaxPerRun: (int) ($record->aiVisibilityMaxPerRun ?? 50),
+            aiVisibilityResultRetentionDays: (int) ($record->aiVisibilityResultRetentionDays ?? 365),
+            aiVisibilityCadence: (is_string($record->aiVisibilityCadence ?? null) && $record->aiVisibilityCadence !== '') ? (string) $record->aiVisibilityCadence : 'off',
         );
 
         return $this->cached = $this->applyConfigFileOverrides($settings);
@@ -251,6 +263,12 @@ class SettingsService extends Component
         $record->aiModel = $settings->aiModel;
         $record->aiApiKey = $settings->aiApiKey;
         $record->aiBaseUrl = $settings->aiBaseUrl;
+        $record->aiVisibilityEnabled = $settings->aiVisibilityEnabled;
+        $record->aiVisibilityEngines = Json::encode(array_values($settings->aiVisibilityEngines));
+        $record->aiVisibilityCompetitorDomains = Json::encode(array_values($settings->aiVisibilityCompetitorDomains));
+        $record->aiVisibilityMaxPerRun = $settings->aiVisibilityMaxPerRun;
+        $record->aiVisibilityResultRetentionDays = $settings->aiVisibilityResultRetentionDays;
+        $record->aiVisibilityCadence = $settings->aiVisibilityCadence;
         $record->dateUpdated = Db::now();
         $record->save(false);
 

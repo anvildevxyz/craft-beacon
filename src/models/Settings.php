@@ -97,6 +97,24 @@ class Settings
         public ?string $aiApiKey = null,
         /** Optional base-URL override for self-hosted / gateway endpoints. */
         public ?string $aiBaseUrl = null,
+        /** Master toggle for the answer-engine visibility/citation tracking panel. Dormant when false. */
+        public bool $aiVisibilityEnabled = false,
+        /**
+         * Engine identifiers to probe. Empty = the single configured AI provider.
+         * @var list<string>
+         */
+        public array $aiVisibilityEngines = [],
+        /**
+         * Competitor hostnames to watch for in answers (e.g. `['rival.com']`).
+         * @var list<string>
+         */
+        public array $aiVisibilityCompetitorDomains = [],
+        /** Hard cap on probes (prompts × engines) per run, to bound LLM cost. */
+        public int $aiVisibilityMaxPerRun = 50,
+        /** Days to retain visibility result rows before GC. */
+        public int $aiVisibilityResultRetentionDays = 365,
+        /** Scheduled cadence: `off`, `daily`, or `weekly`. */
+        public string $aiVisibilityCadence = 'off',
     ) {
     }
 

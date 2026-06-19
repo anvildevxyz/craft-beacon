@@ -41,6 +41,12 @@ use craft\db\ActiveRecord;
  * @property string $aiModel
  * @property string|null $aiApiKey
  * @property string|null $aiBaseUrl
+ * @property bool $aiVisibilityEnabled
+ * @property string|null $aiVisibilityEngines
+ * @property string|null $aiVisibilityCompetitorDomains
+ * @property int $aiVisibilityMaxPerRun
+ * @property int $aiVisibilityResultRetentionDays
+ * @property string $aiVisibilityCadence
  */
 class SettingsRecord extends ActiveRecord
 {
