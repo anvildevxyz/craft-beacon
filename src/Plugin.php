@@ -29,6 +29,8 @@ use anvildev\beacon\integrations\CommerceIntegration;
 use anvildev\beacon\jobs\RecomputeGeoScoreJob;
 use anvildev\beacon\schemas\SchemaTemplate;
 use anvildev\beacon\services\AiBotsService;
+use anvildev\beacon\services\AiClient;
+use anvildev\beacon\services\AiContentService;
 use anvildev\beacon\services\AiCrawlerService;
 use anvildev\beacon\services\BotLogService;
 use anvildev\beacon\services\BotRegistry;
@@ -151,6 +153,8 @@ use yii\base\Event;
  * @property-read SchemaSuggestionService $schemaSuggester
  * @property-read SchemamapService $schemamap
  * @property-read IndexNowService $indexNow
+ * @property-read AiClient $aiClient
+ * @property-read AiContentService $aiContent
  */
 class Plugin extends BasePlugin
 {
@@ -307,6 +311,8 @@ class Plugin extends BasePlugin
             'schemaSuggester' => SchemaSuggestionService::class,
             'schemamap' => SchemamapService::class,
             'indexNow' => IndexNowService::class,
+            'aiClient' => AiClient::class,
+            'aiContent' => AiContentService::class,
         ]);
 
         Craft::$app->getProjectConfig()

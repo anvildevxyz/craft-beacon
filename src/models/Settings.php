@@ -87,6 +87,16 @@ class Settings
         public array $geoScoreAuthorityDomainOverrides = [],
         /** When true, the entry SEO field hides checklist, inheritance chrome, soft hints, and extra preview tabs. */
         public bool $seoFieldLiteMode = true,
+        /** Master toggle for AI-assisted content generation. Dormant (no UI, no calls) when false. */
+        public bool $aiEnabled = false,
+        /** LLM provider: `anthropic` or `openai` (any OpenAI-compatible endpoint). */
+        public string $aiProvider = 'anthropic',
+        /** Provider model id, e.g. `claude-3-5-haiku-latest` or `gpt-4o-mini`. */
+        public string $aiModel = '',
+        /** Provider API key. Secret — set via `config/beacon.php` in production. */
+        public ?string $aiApiKey = null,
+        /** Optional base-URL override for self-hosted / gateway endpoints. */
+        public ?string $aiBaseUrl = null,
     ) {
     }
 

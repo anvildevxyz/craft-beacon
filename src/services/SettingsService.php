@@ -40,6 +40,11 @@ class SettingsService extends Component
         'log404RetentionDays',
         'staleThresholdDays',
         'seoFieldLiteMode',
+        // AI provider config — secret key + model belong in config/beacon.php in prod.
+        'aiApiKey',
+        'aiBaseUrl',
+        'aiModel',
+        'aiProvider',
     ];
 
     /**
@@ -92,6 +97,11 @@ class SettingsService extends Component
             geoScoreFactDetectionMode: (string) $record->geoScoreFactDetectionMode,
             // File-only; not stored in DB. Default true (lite SEO field UI).
             seoFieldLiteMode: true,
+            aiEnabled: (bool) ($record->aiEnabled ?? false),
+            aiProvider: (is_string($record->aiProvider) && $record->aiProvider !== '') ? $record->aiProvider : 'anthropic',
+            aiModel: (string) ($record->aiModel ?? ''),
+            aiApiKey: ($record->aiApiKey !== null && $record->aiApiKey !== '') ? (string) $record->aiApiKey : null,
+            aiBaseUrl: ($record->aiBaseUrl !== null && $record->aiBaseUrl !== '') ? (string) $record->aiBaseUrl : null,
         );
 
         return $this->cached = $this->applyConfigFileOverrides($settings);
@@ -236,6 +246,11 @@ class SettingsService extends Component
             : Json::encode($settings->geoScorePillarWeights);
         $record->geoScoreClaimDetectionMode = $this->normalizeDetectionMode($settings->geoScoreClaimDetectionMode);
         $record->geoScoreFactDetectionMode = $this->normalizeDetectionMode($settings->geoScoreFactDetectionMode);
+        $record->aiEnabled = $settings->aiEnabled;
+        $record->aiProvider = $settings->aiProvider;
+        $record->aiModel = $settings->aiModel;
+        $record->aiApiKey = $settings->aiApiKey;
+        $record->aiBaseUrl = $settings->aiBaseUrl;
         $record->dateUpdated = Db::now();
         $record->save(false);
 

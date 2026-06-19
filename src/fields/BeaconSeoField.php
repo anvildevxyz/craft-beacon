@@ -8,6 +8,7 @@ use anvildev\beacon\helpers\SeoFieldReader;
 use anvildev\beacon\models\AiMarkdownOverride;
 use anvildev\beacon\Plugin;
 use anvildev\beacon\schemas\SchemaPropertyRegistry;
+use anvildev\beacon\web\assets\ai\BeaconAiAsset;
 use anvildev\beacon\web\assets\seofield\BeaconSeoFieldAsset;
 use Craft;
 use craft\base\ElementInterface;
@@ -142,6 +143,12 @@ class BeaconSeoField extends Field implements SeoFieldInterface
         }
 
         Craft::$app->getView()->registerAssetBundle(BeaconSeoFieldAsset::class);
+
+        // AI "Generate" affordances load only when a provider is configured, so
+        // an unconfigured install ships no AI script and makes zero requests.
+        if (Plugin::$plugin->aiClient->isConfigured()) {
+            Craft::$app->getView()->registerAssetBundle(BeaconAiAsset::class);
+        }
 
         // Outside the try, settings may not have been loaded — fall back to the
         // plugin singleton here. Reuses the per-request memo regardless.

@@ -27,7 +27,7 @@ class SettingsController extends Controller
     private const ALLOWED_TABS = [
         'general' => true, 'robots' => true, 'content' => true,
         'organization' => true, 'social' => true,
-        'authors' => true, 'geo' => true,
+        'authors' => true, 'geo' => true, 'ai' => true,
     ];
 
     /**
@@ -129,6 +129,18 @@ class SettingsController extends Controller
         $apply('geoMarkdownAutoServeBots', $bool('geoMarkdownAutoServeBots'));
         $apply('geoProvenanceSchemaEnabled', $bool('geoProvenanceSchemaEnabled'));
         $apply('geoScoreEnabled', $bool('geoScoreEnabled'));
+        // AI content generation. The API key is write-once-ish: a blank submit
+        // keeps the stored key so editors don't have to re-paste it on every save.
+        $apply('aiEnabled', $bool('aiEnabled'));
+        $apply('aiProvider', static fn(Settings $s, $v) => $s->aiProvider = in_array((string) $v, ['anthropic', 'openai'], true) ? (string) $v : 'anthropic');
+        $apply('aiModel', static fn(Settings $s, $v) => $s->aiModel = trim((string) $v));
+        $apply('aiApiKey', static function(Settings $s, $v): void {
+            $v = trim((string) $v);
+            if ($v !== '') {
+                $s->aiApiKey = $v;
+            }
+        });
+        $apply('aiBaseUrl', static fn(Settings $s, $v) => $s->aiBaseUrl = trim((string) $v) !== '' ? trim((string) $v) : null);
         // Developer-level GEO knobs (render mode, excluded CSS classes, fact-density
         // target, authority-domain overrides) are set via config/beacon.php, not here.
         $apply('robotsDirectivesEnabled', fn(Settings $s, $v) => $s->robotsDirectivesEnabled = $this->parseRobotsDirectivesEnabled($v));

@@ -1,0 +1,46 @@
+{% import "_includes/forms.twig" as forms %}
+
+<h2 class="heading first">{{ 'settings.ai.heading'|t('beacon') }}</h2>
+<p class="light">{{ 'settings.ai.intro'|t('beacon') }}</p>
+<hr>
+
+{{ forms.lightswitchField({
+    label: 'settings.ai.aiEnabled.label'|t('beacon'),
+    instructions: 'settings.ai.aiEnabled.instructions'|t('beacon'),
+    name: 'aiEnabled',
+    on: settings.aiEnabled,
+}) }}
+
+{{ forms.selectField({
+    label: 'settings.ai.aiProvider.label'|t('beacon'),
+    name: 'aiProvider',
+    value: settings.aiProvider,
+    options: [
+        { label: 'Anthropic', value: 'anthropic' },
+        { label: 'OpenAI-compatible', value: 'openai' },
+    ],
+}) }}
+
+{{ forms.textField({
+    label: 'settings.ai.aiModel.label'|t('beacon'),
+    instructions: 'settings.ai.aiModel.instructions'|t('beacon'),
+    name: 'aiModel',
+    value: settings.aiModel,
+    placeholder: 'claude-3-5-haiku-latest',
+}) }}
+
+{{ forms.passwordField({
+    label: 'settings.ai.aiApiKey.label'|t('beacon'),
+    instructions: 'settings.ai.aiApiKey.instructions'|t('beacon'),
+    name: 'aiApiKey',
+    value: '',
+    placeholder: settings.aiApiKey ? '••••••••••••' : '',
+}) }}
+
+{{ forms.textField({
+    label: 'settings.ai.aiBaseUrl.label'|t('beacon'),
+    instructions: 'settings.ai.aiBaseUrl.instructions'|t('beacon'),
+    name: 'aiBaseUrl',
+    value: settings.aiBaseUrl,
+    placeholder: 'https://api.anthropic.com',
+}) }}
