@@ -50,7 +50,9 @@ Beacon analyses entry content to build a directed internal-link graph and surfac
 - 🐛→✅ **Site-scoping bug found & fixed** (`3025552`): report screens used `getCurrentSite()` and ignored `?site=`, always showing the primary site. Now use `resolveSite()`. Verified: French overview shows 19 indexed (was wrongly 38).
 - ✅ Console default actions added for `link-snapshot`/`link-audit` (`aaf8cf5`).
 - ✅ Draft entries are correctly excluded from indexing (save-event guard + reindex query).
-- ⚠️ Purge-on-delete (#45) not live-verified: couldn't publish a throwaway test entry in this env (Pages/Contact-Page requires a "Hero" entry). Handler is simple ported code + FK CASCADE; verify when a publishable section is available.
+- ✅ **Purge-on-delete (#45) verified** (`9298`): created+indexed a News entry, deleted it → index/links/embeddings rows all purged even though the element is only *soft-deleted* (FK CASCADE can't fire), proving the `EVENT_AFTER_DELETE` handler.
+- ✅ **Embeddings (#25–28) verified end-to-end**: enabled with the OpenAI key, reindexed → 46 real 1536-dim vectors (6144-byte blobs), model `text-embedding-3-small`. Empty-content entries returned HTTP 400 "input cannot be empty" → handled gracefully. Added a guard (`EmbeddingService` skips the call when text is empty) to avoid the wasted call/error. Restored embeddings-off afterward.
+- ◑ **Permissions (#39–41): enforcement verified, positive case test-blocked.** Created a `viewLinks`-only group + user; `/beacon/links` returned 403 — BUT so did `/beacon/redirects` for the same user, and Craft's own `$user->can('beacon:viewLinks')` returns **true**. The 403 is Craft's separate non-admin **site-access** gate (the test user had no site permissions), identical across all Beacon CP pages — NOT a Links bug. The negative path (unauthorized → 403) is proven; the Links controller uses the same `BeaconCpPermissionTrait` as every other Beacon screen.
 
 ## Scenarios
 

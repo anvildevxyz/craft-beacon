@@ -53,6 +53,11 @@ class EmbeddingService extends Component
     /** @return float[]|null */
     public function fetchEmbedding(string $text, string $model, ?string $apiKey = null, ?string $baseUrl = null): ?array
     {
+        // Nothing to embed — skip the request (an empty input is a 400 from
+        // OpenAI-compatible endpoints, and a wasted call/cost otherwise).
+        if (trim($text) === '') {
+            return null;
+        }
         $this->throttle();
         $aiClient = Plugin::getInstance()?->aiClient;
         if ($aiClient === null) {
