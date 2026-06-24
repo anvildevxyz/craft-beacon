@@ -12,6 +12,7 @@ use Craft;
 use craft\base\Component;
 use craft\elements\Entry;
 use craft\errors\InvalidFieldException;
+use craft\helpers\Db;
 use yii\base\Event;
 use yii\caching\TagDependency;
 
@@ -107,39 +108,19 @@ class SuggestionService extends Component
 
     public function recordInteraction(int $sourceElementId, int $targetElementId, int $siteId, string $status, float $score): void
     {
-        $existing = LinkSuggestionRecord::findOne([
+        // Single atomic upsert against the unique
+        // (sourceElementId, targetElementId, siteId) index — no check-then-insert
+        // race window and no triplicated update logic.
+        Db::upsert(LinkSuggestionRecord::tableName(), [
             'sourceElementId' => $sourceElementId,
             'targetElementId' => $targetElementId,
             'siteId' => $siteId,
+            'status' => $status,
+            'score' => $score,
+        ], [
+            'status' => $status,
+            'score' => $score,
         ]);
-        if ($existing !== null) {
-            $existing->status = $status;
-            $existing->score = $score;
-            $existing->save();
-            $this->invalidateCache($sourceElementId, $siteId);
-            return;
-        }
-        $record = new LinkSuggestionRecord();
-        $record->sourceElementId = $sourceElementId;
-        $record->targetElementId = $targetElementId;
-        $record->siteId = $siteId;
-        $record->status = $status;
-        $record->score = $score;
-        try {
-            $record->save();
-        } catch (\yii\db\IntegrityException $e) {
-            // Lost race between check and insert — do update
-            $existing = LinkSuggestionRecord::findOne([
-                'sourceElementId' => $sourceElementId,
-                'targetElementId' => $targetElementId,
-                'siteId' => $siteId,
-            ]);
-            if ($existing !== null) {
-                $existing->status = $status;
-                $existing->score = $score;
-                $existing->save();
-            }
-        }
 
         // Invalidate suggestion + reports cache so dashboard/acceptance rate updates
         $this->invalidateCache($sourceElementId, $siteId);
