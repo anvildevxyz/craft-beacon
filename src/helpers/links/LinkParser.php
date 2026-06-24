@@ -52,6 +52,12 @@ class LinkParser
                 }
             }
             $anchorText = trim(strip_tags($matches[2][$i]));
+            // Protocol-relative URLs (//host/path) resolve against the current
+            // scheme; normalize to https so they classify as external (or
+            // same-site internal) instead of being treated as a root path.
+            if (str_starts_with($href, '//')) {
+                $href = 'https:' . $href;
+            }
             $isExternal = $href[0] !== '/' && !str_starts_with($href, $siteUrl);
             if ($isExternal) {
                 $url = strtok($href, '#') ?: $href;
@@ -81,6 +87,12 @@ class LinkParser
             if ($scheme !== 'http' && $scheme !== 'https') {
                 return null;
             }
+        }
+        // Protocol-relative URLs (//host/path) resolve against the current
+        // scheme; normalize to https before the root-relative check so they
+        // aren't mistakenly prefixed with the site URL.
+        if (str_starts_with($href, '//')) {
+            $href = 'https:' . $href;
         }
         if ($href[0] === '/') {
             $href = $siteUrl . $href;

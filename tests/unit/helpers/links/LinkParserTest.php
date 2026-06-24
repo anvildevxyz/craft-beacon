@@ -196,4 +196,39 @@ class LinkParserTest extends TestCase
         $result = LinkParser::extractLinks($html, 'https://example.com');
         $this->assertSame([], $result);
     }
+
+    // --- Protocol-relative handling ---
+
+    public function testExtractLinksTreatsProtocolRelativeOtherHostAsExternal(): void
+    {
+        $html = '<a href="//cdn.partner.com/asset">CDN</a>';
+        $result = LinkParser::extractLinks($html, 'https://example.com');
+        $this->assertCount(1, $result);
+        $this->assertTrue($result[0]['isExternal']);
+        $this->assertSame('https://cdn.partner.com/asset', $result[0]['url']);
+    }
+
+    public function testExtractLinksTreatsProtocolRelativeSameHostAsInternal(): void
+    {
+        $html = '<a href="//example.com/page">Page</a>';
+        $result = LinkParser::extractLinks($html, 'https://example.com');
+        $this->assertCount(1, $result);
+        $this->assertFalse($result[0]['isExternal']);
+        $this->assertSame('https://example.com/page', $result[0]['url']);
+    }
+
+    public function testExtractUrlsNormalizesProtocolRelativeSameHost(): void
+    {
+        $html = '<a href="//example.com/page">Page</a>';
+        $urls = LinkParser::extractUrls($html, 'https://example.com');
+        $this->assertCount(1, $urls);
+        $this->assertContains('https://example.com/page', $urls);
+    }
+
+    public function testExtractUrlsIgnoresProtocolRelativeOtherHost(): void
+    {
+        $html = '<a href="//cdn.partner.com/asset">CDN</a>';
+        $urls = LinkParser::extractUrls($html, 'https://example.com');
+        $this->assertSame([], $urls);
+    }
 }
