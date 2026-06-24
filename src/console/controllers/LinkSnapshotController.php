@@ -19,6 +19,9 @@ use yii\console\ExitCode;
  */
 class LinkSnapshotController extends Controller
 {
+    /** @var string The only action; lets bare `beacon/link-snapshot` run it. */
+    public $defaultAction = 'run';
+
     // =========================================================================
     // Public Methods
     // =========================================================================

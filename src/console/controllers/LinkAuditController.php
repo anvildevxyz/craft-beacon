@@ -18,6 +18,9 @@ use yii\console\ExitCode;
  */
 class LinkAuditController extends Controller
 {
+    /** @var string The only action; lets bare `beacon/link-audit` run it. */
+    public $defaultAction = 'broken';
+
     // =========================================================================
     // Public Properties
     // =========================================================================
