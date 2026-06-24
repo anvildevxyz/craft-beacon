@@ -272,8 +272,13 @@ trait IndexesEntries
                 ];
                 continue;
             }
+            // Strip only the leading site-URL prefix; str_replace() would remove
+            // every occurrence and corrupt the URI when the host string repeats
+            // in the path or query.
+            $url = $link['url'];
+            $uri = str_starts_with($url, $siteUrl) ? substr($url, strlen($siteUrl)) : $url;
             $element = Craft::$app->getElements()->getElementByUri(
-                ltrim(str_replace($siteUrl, '', $link['url']), '/'),
+                ltrim($uri, '/'),
                 $this->siteId,
             );
             if ($element !== null) {
