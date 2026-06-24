@@ -72,7 +72,7 @@ class AiVisibilityService extends Component
     public function savePrompt(BenchmarkPrompt $prompt): bool
     {
         $record = $prompt->id !== null
-            ? BenchmarkPromptRecord::findOne($prompt->id) ?? new BenchmarkPromptRecord()
+            ? BenchmarkPromptRecord::findOne(['id' => $prompt->id, 'siteId' => $prompt->siteId]) ?? new BenchmarkPromptRecord()
             : new BenchmarkPromptRecord();
         $record->siteId = $prompt->siteId;
         $record->prompt = trim($prompt->prompt);
@@ -87,9 +87,10 @@ class AiVisibilityService extends Component
         return $saved;
     }
 
-    public function deletePrompt(int $id): bool
+    public function deletePrompt(int $id, ?int $siteId = null): bool
     {
-        $record = BenchmarkPromptRecord::findOne($id);
+        $condition = $siteId !== null ? ['id' => $id, 'siteId' => $siteId] : ['id' => $id];
+        $record = BenchmarkPromptRecord::findOne($condition);
         return $record !== null && (bool) $record->delete();
     }
 

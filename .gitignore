@@ -1,4 +1,5 @@
 /vendor/
+/cpresources/
 /.phpunit.cache/
 /.phpunit.integration.cache/
 .phpunit.result.cache

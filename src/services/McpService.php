@@ -32,13 +32,13 @@ class McpService extends Component
         ?User $user,
     ): McpServer {
         $server = new McpServer($authorizer, $audit, 'beacon', Plugin::$plugin->version ?? '1.0.0');
-        $this->registerReadTools($server);
+        $this->registerReadTools($server, $user);
         $this->registerWriteTools($server, $user);
-        $this->registerResources($server);
+        $this->registerResources($server, $user);
         return $server;
     }
 
-    private function registerReadTools(McpServer $server): void
+    private function registerReadTools(McpServer $server, ?User $user): void
     {
         $read = BeaconPermissions::VIEW_DASHBOARD;
 
@@ -46,14 +46,14 @@ class McpService extends Component
             'beacon.get_entry_seo',
             'Resolved SEO/meta for an entry (title, description, canonical, robots).',
             $this->schema(['entryId' => 'integer'], ['siteId' => 'integer'], ['entryId']),
-            fn(array $a): array => $this->getEntrySeo($a),
+            fn(array $a): array => $this->getEntrySeo($a, $user),
             $read,
         ));
         $server->addTool(new McpToolDefinition(
             'beacon.get_geo_score',
             'GEO content score and per-pillar breakdown for an entry.',
             $this->schema(['entryId' => 'integer'], ['siteId' => 'integer'], ['entryId']),
-            fn(array $a): array => $this->getGeoScore($a),
+            fn(array $a): array => $this->getGeoScore($a, $user),
             $read,
         ));
         $server->addTool(new McpToolDefinition(
@@ -110,13 +110,14 @@ class McpService extends Component
                 ['entryId'],
             ),
             fn(array $a): array => $this->setEntryMeta($a, $user),
+            BeaconPermissions::EDIT_SETTINGS,
             readOnly: false,
         ));
         $server->addTool(new McpToolDefinition(
             'beacon.recompute_geo_score',
             'Recompute the GEO score for an entry now.',
             $this->schema(['entryId' => 'integer'], ['siteId' => 'integer'], ['entryId']),
-            fn(array $a): array => $this->recomputeGeoScore($a),
+            fn(array $a): array => $this->recomputeGeoScore($a, $user),
             BeaconPermissions::EDIT_GEO_SCORE,
             readOnly: false,
         ));
@@ -130,7 +131,7 @@ class McpService extends Component
         ));
     }
 
-    private function registerResources(McpServer $server): void
+    private function registerResources(McpServer $server, ?User $user): void
     {
         $read = BeaconPermissions::VIEW_DASHBOARD;
         $json = 'application/json';
@@ -164,7 +165,7 @@ class McpService extends Component
             'Entry SEO',
             'Resolved SEO/meta for a specific entry.',
             $json,
-            fn(string $uri): string => $this->json($this->getEntrySeo(['entryId' => $this->idFromUri($uri)])),
+            fn(string $uri): string => $this->json($this->getEntrySeo(['entryId' => $this->idFromUri($uri)], $user)),
             $read,
             uriPattern: '~^beacon://entry/(\d+)/seo$~',
         ));
@@ -173,7 +174,7 @@ class McpService extends Component
             'Entry GEO score',
             'GEO score and pillars for a specific entry.',
             $json,
-            fn(string $uri): string => $this->json($this->getGeoScore(['entryId' => $this->idFromUri($uri)])),
+            fn(string $uri): string => $this->json($this->getGeoScore(['entryId' => $this->idFromUri($uri)], $user)),
             $read,
             uriPattern: '~^beacon://entry/(\d+)/geo-score$~',
         ));
@@ -185,9 +186,9 @@ class McpService extends Component
      * @param array<string,mixed> $a
      * @return array<string,mixed>
      */
-    private function getEntrySeo(array $a): array
+    private function getEntrySeo(array $a, ?User $user = null): array
     {
-        $entry = $this->entry($a);
+        $entry = $this->entry($a, $user);
         $value = SeoFieldReader::readValueFor($entry) ?? [];
         return [
             'entryId' => $entry->id,
@@ -204,9 +205,9 @@ class McpService extends Component
      * @param array<string,mixed> $a
      * @return array<string,mixed>
      */
-    private function getGeoScore(array $a): array
+    private function getGeoScore(array $a, ?User $user = null): array
     {
-        $entry = $this->entry($a);
+        $entry = $this->entry($a, $user);
         $score = Plugin::$plugin->geoScore->forElement((int) $entry->id, (int) $entry->siteId);
         if ($score === null) {
             return ['entryId' => $entry->id, 'score' => null, 'note' => 'No score computed yet.'];
@@ -319,8 +320,8 @@ class McpService extends Component
      */
     private function setEntryMeta(array $a, ?User $user): array
     {
-        $entry = $this->entry($a);
-        if ($user !== null && !$entry->canSave($user)) {
+        $entry = $this->entry($a, $user);
+        if ($user === null || !$entry->canSave($user)) {
             throw new McpRpcException(McpServer::ERR_FORBIDDEN, 'Token user cannot edit this entry.');
         }
         $handle = SeoFieldReader::handleFor($entry);
@@ -349,9 +350,9 @@ class McpService extends Component
      * @param array<string,mixed> $a
      * @return array<string,mixed>
      */
-    private function recomputeGeoScore(array $a): array
+    private function recomputeGeoScore(array $a, ?User $user = null): array
     {
-        $entry = $this->entry($a);
+        $entry = $this->entry($a, $user);
         $score = Plugin::$plugin->geoScore->compute($entry, (int) $entry->siteId, true);
         return ['entryId' => $entry->id, 'score' => $score->score];
     }
@@ -380,13 +381,18 @@ class McpService extends Component
     /**
      * @param array<string,mixed> $a
      */
-    private function entry(array $a): Entry
+    private function entry(array $a, ?User $user = null): Entry
     {
         $id = (int) ($a['entryId'] ?? 0);
         $siteId = $this->siteId($a);
         $entry = $id > 0 ? Craft::$app->getEntries()->getEntryById($id, $siteId) : null;
         if ($entry === null) {
             throw new McpRpcException(McpServer::ERR_NOT_FOUND, "Unknown entry: {$id}");
+        }
+        // Enforce element-level authorization: the VIEW_DASHBOARD permission only
+        // gates the MCP surface, not which entries the token user may read.
+        if ($user !== null && !Craft::$app->getElements()->canView($entry, $user)) {
+            throw new McpRpcException(McpServer::ERR_FORBIDDEN, "Token user cannot view entry: {$id}");
         }
         return $entry;
     }

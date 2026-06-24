@@ -221,7 +221,7 @@ class Plugin extends BasePlugin
 
     public bool $hasCpSettings = false;
     public bool $hasCpSection = true;
-    public string $schemaVersion = '1.0.0';
+    public string $schemaVersion = '1.1.0';
     public $controllerNamespace = 'anvildev\\beacon\\controllers';
 
     /**

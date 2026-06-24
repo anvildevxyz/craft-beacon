@@ -69,7 +69,8 @@ class AiVisibilityController extends Controller
         $this->requirePostRequest();
         $rawId = Http::request()->getBodyParam('promptId');
         if (is_numeric($rawId)) {
-            Plugin::$plugin->aiVisibility->deletePrompt((int) $rawId);
+            $siteId = Craft::$app->getSites()->getCurrentSite()->id;
+            Plugin::$plugin->aiVisibility->deletePrompt((int) $rawId, $siteId);
         }
         Craft::$app->getSession()->setNotice(Craft::t('beacon', 'aiVisibility.flash.prompt.deleted'));
         return $this->redirect(self::REDIRECT);
@@ -87,7 +88,9 @@ class AiVisibilityController extends Controller
             : 'off';
         $settings->aiVisibilityCompetitorDomains = Strings::splitLines((string) $request->getBodyParam('aiVisibilityCompetitorDomains', ''));
         $maxPerRun = (int) $request->getBodyParam('aiVisibilityMaxPerRun', 50);
-        $settings->aiVisibilityMaxPerRun = max(1, min(1000, $maxPerRun));
+        // Cap per-run probes low: each probe is a sequential blocking LLM call, so a
+        // large ceiling risks blowing the queue-job time limit (e.g. Craft Cloud's 15min).
+        $settings->aiVisibilityMaxPerRun = max(1, min(100, $maxPerRun));
 
         Plugin::$plugin->settings->save($settings);
         Craft::$app->getSession()->setNotice(Craft::t('beacon', 'aiVisibility.flash.settings.saved'));
