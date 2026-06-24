@@ -117,14 +117,17 @@ class LinkBrokenJob extends BaseJob
     private function isBlockedHost(string $url): bool
     {
         $host = parse_url($url, PHP_URL_HOST);
-        if ($host === null || $host === false) {
+        if ($host === null || $host === false || $host === '') {
             return true;
         }
-        // Resolve to IP(s)
-        $ips = @gethostbynamel($host);
-        if ($ips === false) {
-            return false; // Can't resolve — let Guzzle handle and fail
+
+        $ips = $this->resolveHostIps($host);
+        if ($ips === []) {
+            // Unresolvable (including IPv6-only names we couldn't look up):
+            // block rather than let Guzzle reach a potentially internal host.
+            return true;
         }
+
         foreach ($ips as $ip) {
             if (!filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE)) {
                 return true;
@@ -134,7 +137,45 @@ class LinkBrokenJob extends BaseJob
                 return true;
             }
         }
+
         return false;
+    }
+
+    /**
+     * Resolve a host to all of its IPv4 and IPv6 addresses.
+     *
+     * IP literals (including bracketed IPv6 like "[::1]") are returned as-is.
+     * DNS names are resolved over both A and AAAA records so that IPv6-only
+     * hosts are not silently skipped by the SSRF guard in isBlockedHost().
+     *
+     * @return string[]
+     */
+    private function resolveHostIps(string $host): array
+    {
+        // parse_url() keeps IPv6 literals bracketed (e.g. "[::1]").
+        $host = trim($host, '[]');
+
+        if (filter_var($host, FILTER_VALIDATE_IP) !== false) {
+            return [$host];
+        }
+
+        $ips = [];
+
+        $ipv4 = @gethostbynamel($host);
+        if ($ipv4 !== false) {
+            $ips = $ipv4;
+        }
+
+        $records = @dns_get_record($host, DNS_AAAA);
+        if ($records !== false) {
+            foreach ($records as $record) {
+                if (isset($record['ipv6'])) {
+                    $ips[] = $record['ipv6'];
+                }
+            }
+        }
+
+        return array_values(array_unique($ips));
     }
 
     protected function defaultDescription(): string
