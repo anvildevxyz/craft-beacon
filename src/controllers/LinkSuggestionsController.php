@@ -316,11 +316,24 @@ class LinkSuggestionsController extends Controller
         $windowSeconds = 60;
         $maxRequests = 30;
 
-        $count = (int) ($cache->get($key) ?: 0);
-        if ($count >= $maxRequests) {
+        $now = time();
+        $window = $cache->get($key);
+        if (!is_array($window) || ($now - (int) ($window['start'] ?? 0)) >= $windowSeconds) {
+            // Open a fresh window.
+            $cache->set($key, ['start' => $now, 'count' => 1], $windowSeconds);
+            return true;
+        }
+
+        if ((int) $window['count'] >= $maxRequests) {
             return false;
         }
-        $cache->set($key, $count + 1, $windowSeconds);
+
+        // Increment without extending the window: preserve the original start
+        // and cap the TTL to the remaining time, so a steady request stream
+        // can't keep refreshing a 60s expiry and lock the user out forever.
+        $window['count'] = (int) $window['count'] + 1;
+        $remaining = max(1, $windowSeconds - ($now - (int) $window['start']));
+        $cache->set($key, $window, $remaining);
         return true;
     }
 
