@@ -1,4 +1,28 @@
-<h2 class="heading first">{{ 'settings.content.content.seo.defaults.by.section.heading'|t('beacon') }}</h2>
+{% import "_includes/forms.twig" as forms %}
+
+<h2 class="heading first">{{ 'settings.content.aiUsage.heading'|t('beacon') }}</h2>
+<p class="light">{{ 'settings.content.aiUsage.instructions'|t('beacon') }}</p>
+{{ forms.selectField({
+    label: 'settings.content.aiUsage.default.label'|t('beacon'),
+    name: 'aiUsagePolicy',
+    value: settings.aiUsagePolicy ?? 'allow',
+    options: [
+        { label: 'seoField.aiUsage.allow'|t('beacon'), value: 'allow' },
+        { label: 'seoField.aiUsage.noTrain'|t('beacon'), value: 'no-train' },
+        { label: 'seoField.aiUsage.noGenerative'|t('beacon'), value: 'no-generative-ai' },
+        { label: 'seoField.aiUsage.noAi'|t('beacon'), value: 'no-ai' },
+    ],
+}) }}
+{{ forms.textField({
+    label: 'settings.content.aiUsage.policyUrl.label'|t('beacon'),
+    instructions: 'settings.content.aiUsage.policyUrl.instructions'|t('beacon'),
+    name: 'aiUsagePolicyUrl',
+    value: settings.aiUsagePolicyUrl ?? '',
+    placeholder: 'https://example.com/ai-policy',
+}) }}
+<hr>
+
+<h2 class="heading">{{ 'settings.content.content.seo.defaults.by.section.heading'|t('beacon') }}</h2>
 <p class="light">{{ 'settings.content.click.token.insert.it.cursor.text'|t('beacon') }}</p>
 <hr>
 
@@ -49,6 +73,23 @@
                             name="sectionSeoDefaults[{{ section.handle }}][descriptionTemplate]"
                             placeholder="{{ 'settings.content.learn.about.text'|t('beacon') }}">{{ defaults.descriptionTemplate ?? '' }}</textarea>
                         {{ _self.tokenPills(tokens) }}
+                    </div>
+                    <div class="beacon-field">
+                        <label class="beacon-field__label">{{ 'settings.content.aiUsage.label'|t('beacon') }}</label>
+                        {% set aiUsageOptions = {
+                            '': 'settings.content.aiUsage.inherit'|t('beacon'),
+                            'allow': 'seoField.aiUsage.allow'|t('beacon'),
+                            'no-train': 'seoField.aiUsage.noTrain'|t('beacon'),
+                            'no-generative-ai': 'seoField.aiUsage.noGenerative'|t('beacon'),
+                            'no-ai': 'seoField.aiUsage.noAi'|t('beacon'),
+                        } %}
+                        <div class="select">
+                            <select name="sectionSeoDefaults[{{ section.handle }}][aiUsage]">
+                                {% for val, label in aiUsageOptions %}
+                                    <option value="{{ val }}"{{ (defaults.aiUsage ?? '') == val ? ' selected' : '' }}>{{ label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
                     </div>
                 </td>
             </tr>

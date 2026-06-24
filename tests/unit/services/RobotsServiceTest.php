@@ -66,4 +66,25 @@ class RobotsServiceTest extends TestCase
         $output = $service->render([], [], null);
         $this->assertStringNotContainsString('Sitemap:', $output);
     }
+
+    public function testRendersContentSignalLines(): void
+    {
+        $service = new RobotsService();
+        $output = $service->render(
+            baseUserAgentRules: [],
+            aiCrawlerRules: [],
+            sitemapUrl: null,
+            contentSignalLines: ['# AI content-usage signals', 'User-agent: *', 'Content-Signal: ai-train=no'],
+        );
+
+        $this->assertStringContainsString("Content-Signal: ai-train=no\n", $output);
+        $this->assertStringContainsString('# AI content-usage signals', $output);
+    }
+
+    public function testNoContentSignalBlockWhenEmpty(): void
+    {
+        $service = new RobotsService();
+        $output = $service->render([], [], null, []);
+        $this->assertStringNotContainsString('Content-Signal:', $output);
+    }
 }

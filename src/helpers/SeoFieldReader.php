@@ -34,6 +34,23 @@ final class SeoFieldReader
         return null;
     }
 
+    /**
+     * Handle of the element's Beacon SEO field, or null when its layout has none.
+     */
+    public static function handleFor(ElementInterface $element): ?string
+    {
+        $layout = $element->getFieldLayout();
+        if ($layout === null) {
+            return null;
+        }
+        foreach ($layout->getCustomFields() as $field) {
+            if ($field instanceof SeoFieldInterface) {
+                return $field->handle;
+            }
+        }
+        return null;
+    }
+
     public static function isNoIndexFor(ElementInterface $element): bool
     {
         $value = self::readValueFor($element);

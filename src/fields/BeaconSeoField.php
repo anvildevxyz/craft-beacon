@@ -2,12 +2,15 @@
 
 namespace anvildev\beacon\fields;
 
+use anvildev\beacon\helpers\EntitySchema;
 use anvildev\beacon\helpers\GeoScoreScope;
 use anvildev\beacon\helpers\RobotsDirectives;
 use anvildev\beacon\helpers\SeoFieldReader;
 use anvildev\beacon\models\AiMarkdownOverride;
 use anvildev\beacon\Plugin;
 use anvildev\beacon\schemas\SchemaPropertyRegistry;
+use anvildev\beacon\web\assets\ai\BeaconAiAsset;
+use anvildev\beacon\web\assets\entities\BeaconEntitiesAsset;
 use anvildev\beacon\web\assets\seofield\BeaconSeoFieldAsset;
 use Craft;
 use craft\base\ElementInterface;
@@ -35,6 +38,7 @@ class BeaconSeoField extends Field implements SeoFieldInterface
         }
         $value = array_merge($this->defaults(), is_array($value) ? $value : []);
         $value['ogImageId'] = self::normalizeAssetId($value['ogImageId'] ?? null);
+        $value['entities'] = EntitySchema::sanitize($value['entities'] ?? []);
 
         foreach ($value['schemaAddons'] ?? [] as $i => $addon) {
             if (isset($addon['mapping']) && is_string($addon['mapping'])) {
@@ -142,6 +146,13 @@ class BeaconSeoField extends Field implements SeoFieldInterface
         }
 
         Craft::$app->getView()->registerAssetBundle(BeaconSeoFieldAsset::class);
+        Craft::$app->getView()->registerAssetBundle(BeaconEntitiesAsset::class);
+
+        // AI "Generate" affordances load only when a provider is configured, so
+        // an unconfigured install ships no AI script and makes zero requests.
+        if (Plugin::$plugin->aiClient->isConfigured()) {
+            Craft::$app->getView()->registerAssetBundle(BeaconAiAsset::class);
+        }
 
         // Outside the try, settings may not have been loaded — fall back to the
         // plugin singleton here. Reuses the per-request memo regardless.
@@ -168,6 +179,7 @@ class BeaconSeoField extends Field implements SeoFieldInterface
             'siteId' => $entryForSchema?->siteId,
             'fallback' => $fallback,
             'resolveUrl' => UrlHelper::actionUrl('beacon/seo-field/resolve-fallback'),
+            'entitySearchUrl' => UrlHelper::actionUrl('beacon/entities/search'),
         ]);
     }
 
@@ -271,8 +283,10 @@ class BeaconSeoField extends Field implements SeoFieldInterface
             'ogImageId' => null,
             'canonical' => null,
             'robots' => RobotsDirectives::defaultFieldValues(),
+            'aiUsage' => '',
             'schemaAddons' => [],
             'authorIds' => [],
+            'entities' => [],
             'aiMarkdown' => [
                 'enabled' => AiMarkdownOverride::ENABLED_INHERIT,
                 'customFrontMatter' => '',

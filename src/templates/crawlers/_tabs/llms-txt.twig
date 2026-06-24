@@ -105,6 +105,29 @@
       rows: 16,
       class: 'fullwidth code',
   }) }}
+
+  {{ forms.textField({
+      label: 'llms.tokenBudget.label'|t('beacon'),
+      instructions: 'llms.tokenBudget.instructions'|t('beacon'),
+      name: 'llmsFullTokenBudget',
+      type: 'number',
+      size: 10,
+      value: settings.llmsFullTokenBudget,
+      placeholder: '0',
+  }) }}
+
+  <p class="beacon-token-readout light">
+    {{ 'llms.tokenBudget.estimate'|t('beacon') }}:
+    <strong data-beacon-token-count>{{ fullBodyTokens|number_format }}</strong>
+    <span data-beacon-token-budgetnote>
+      {% if settings.llmsFullTokenBudget %}
+        / {{ settings.llmsFullTokenBudget|number_format }}
+        {% if fullBodyTokens > settings.llmsFullTokenBudget %}
+          — <span class="error">{{ 'llms.tokenBudget.overBudget'|t('beacon') }}</span>
+        {% endif %}
+      {% endif %}
+    </span>
+  </p>
 </div>
 
 <style>
@@ -164,6 +187,24 @@
     const helperButtons = document.querySelectorAll('.helper-button');
     const textareaName = document.querySelector('.helper-buttons')?.dataset.textareaName;
     const textarea = textareaName ? document.querySelector(`textarea[name="${textareaName}"]`) : null;
+
+    // Live token estimate — mirrors HeuristicTokenEstimator: average of
+    // chars/4 and words*1.3. Approximate; the server value is authoritative.
+    const fullBody = document.querySelector('textarea[name="fullBody"]');
+    const tokenCount = document.querySelector('[data-beacon-token-count]');
+    if (fullBody && tokenCount) {
+      const estimate = (text) => {
+        const t = text.trim();
+        if (t === '') return 0;
+        const chars = t.length;
+        const words = t.split(/\s+/).length;
+        return Math.max(1, Math.ceil((chars / 4 + words * 1.3) / 2));
+      };
+      const update = () => {
+        tokenCount.textContent = estimate(fullBody.value).toLocaleString();
+      };
+      fullBody.addEventListener('input', update);
+    }
 
     if (!textarea) return;
 

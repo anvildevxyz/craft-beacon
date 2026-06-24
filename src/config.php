@@ -42,6 +42,24 @@ return [
     // Set false here only if you want the full SEO field UI.
     // 'seoFieldLiteMode' => false,
 
+    // --- AI content generation ------------------------------------------------
+    // Provider config for the SEO field's "Generate" buttons (meta, summary,
+    // alt text, FAQ). The toggle (`aiEnabled`) is CP-managed; these power-user
+    // keys are file-overridable so the secret API key can come from an env var.
+    // 'aiProvider' => 'anthropic', // or 'openai' (any OpenAI-compatible endpoint)
+    // 'aiModel' => 'claude-3-5-haiku-latest',
+    // 'aiApiKey' => getenv('BEACON_AI_API_KEY') ?: null,
+    // 'aiBaseUrl' => null, // override for self-hosted / gateway endpoints
+
+    // --- AI visibility tracking -----------------------------------------------
+    // The panel toggle (`aiVisibilityEnabled`) is CP-managed; these operational
+    // knobs are file-overridable. Engines empty = the single configured provider.
+    // 'aiVisibilityEngines' => [], // e.g. ['chatgpt', 'perplexity'] (v1 routes all through the configured provider)
+    // 'aiVisibilityCompetitorDomains' => [], // e.g. ['rival.com']
+    // 'aiVisibilityMaxPerRun' => 50, // hard cap on prompts × engines per run
+    // 'aiVisibilityResultRetentionDays' => 365,
+    // 'aiVisibilityCadence' => 'off', // 'off' | 'daily' | 'weekly' (run via cron + console command)
+
     // --- Social images --------------------------------------------------------
     // Craft image transform handle applied to Open Graph / Twitter images.
     // Use 'none', 'original', or 'full' to serve the asset URL untransformed.

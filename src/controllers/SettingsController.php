@@ -3,6 +3,7 @@
 namespace anvildev\beacon\controllers;
 
 use anvildev\beacon\elements\AuthorElement;
+use anvildev\beacon\helpers\AiUsagePolicy;
 use anvildev\beacon\helpers\BeaconPermissions;
 use anvildev\beacon\helpers\Http;
 use anvildev\beacon\helpers\IdentityTypes;
@@ -27,7 +28,7 @@ class SettingsController extends Controller
     private const ALLOWED_TABS = [
         'general' => true, 'robots' => true, 'content' => true,
         'organization' => true, 'social' => true,
-        'authors' => true, 'geo' => true,
+        'authors' => true, 'geo' => true, 'ai' => true, 'mcp' => true,
     ];
 
     /**
@@ -129,6 +130,21 @@ class SettingsController extends Controller
         $apply('geoMarkdownAutoServeBots', $bool('geoMarkdownAutoServeBots'));
         $apply('geoProvenanceSchemaEnabled', $bool('geoProvenanceSchemaEnabled'));
         $apply('geoScoreEnabled', $bool('geoScoreEnabled'));
+        // AI content generation. The API key is write-once-ish: a blank submit
+        // keeps the stored key so editors don't have to re-paste it on every save.
+        $apply('aiEnabled', $bool('aiEnabled'));
+        $apply('aiProvider', static fn(Settings $s, $v) => $s->aiProvider = in_array((string) $v, ['anthropic', 'openai'], true) ? (string) $v : 'anthropic');
+        $apply('aiModel', static fn(Settings $s, $v) => $s->aiModel = trim((string) $v));
+        $apply('aiApiKey', static function(Settings $s, $v): void {
+            $v = trim((string) $v);
+            if ($v !== '') {
+                $s->aiApiKey = $v;
+            }
+        });
+        $apply('aiBaseUrl', static fn(Settings $s, $v) => $s->aiBaseUrl = trim((string) $v) !== '' ? trim((string) $v) : null);
+        $apply('aiUsagePolicy', static fn(Settings $s, $v) => $s->aiUsagePolicy = AiUsagePolicy::normalize((string) $v));
+        $apply('aiUsagePolicyUrl', $trimNullable('aiUsagePolicyUrl'));
+        $apply('mcpEnabled', $bool('mcpEnabled'));
         // Developer-level GEO knobs (render mode, excluded CSS classes, fact-density
         // target, authority-domain overrides) are set via config/beacon.php, not here.
         $apply('robotsDirectivesEnabled', fn(Settings $s, $v) => $s->robotsDirectivesEnabled = $this->parseRobotsDirectivesEnabled($v));
@@ -177,13 +193,17 @@ class SettingsController extends Controller
             }
             $titleTemplate = trim((string) ($row['titleTemplate'] ?? ''));
             $descriptionTemplate = trim((string) ($row['descriptionTemplate'] ?? ''));
-            if ($titleTemplate === '' && $descriptionTemplate === '') {
+            $aiUsage = AiUsagePolicy::normalizeOrInherit(is_string($row['aiUsage'] ?? null) ? $row['aiUsage'] : null);
+            if ($titleTemplate === '' && $descriptionTemplate === '' && $aiUsage === null) {
                 continue;
             }
             $out[$sectionHandle] = [
                 'titleTemplate' => $titleTemplate,
                 'descriptionTemplate' => $descriptionTemplate,
             ];
+            if ($aiUsage !== null) {
+                $out[$sectionHandle]['aiUsage'] = $aiUsage;
+            }
         }
         return $out;
     }

@@ -3,6 +3,7 @@
 namespace anvildev\beacon\tests\unit\services;
 
 use anvildev\beacon\models\Settings;
+use anvildev\beacon\services\SettingsService;
 use PHPUnit\Framework\TestCase;
 
 class SettingsServiceTest extends TestCase
@@ -59,6 +60,33 @@ class SettingsServiceTest extends TestCase
         $this->assertSame(['blog', 'docs'], $settings->geoMarkdownSectionAllowlist);
         $this->assertSame(600, $settings->geoMarkdownExcerptLength);
         $this->assertFalse($settings->geoMarkdownExcerptFallbackToDescription);
+    }
+
+    /**
+     * Regression: a per-section AI-usage policy must survive the decode that
+     * runs on every settings read. It used to be stripped (only title/description
+     * templates were preserved), silently disabling section-level no-train/no-ai.
+     */
+    public function testDecodeSectionSeoDefaultsPreservesAiUsage(): void
+    {
+        $json = (string) json_encode([
+            'blog' => ['titleTemplate' => '{title}', 'descriptionTemplate' => '', 'aiUsage' => 'no-train'],
+            'docs' => ['aiUsage' => 'no-ai'], // aiUsage-only row, no SEO templates
+            'news' => ['titleTemplate' => '{title}'], // no policy
+        ]);
+
+        $method = new \ReflectionMethod(SettingsService::class, 'decodeSectionSeoDefaults');
+        $method->setAccessible(true);
+        /** @var array<string,array<string,string>> $decoded */
+        $decoded = $method->invoke(new SettingsService(), $json);
+
+        // Policy survives alongside templates...
+        $this->assertSame('no-train', $decoded['blog']['aiUsage'] ?? null);
+        // ...and an aiUsage-only section is NOT dropped.
+        $this->assertArrayHasKey('docs', $decoded);
+        $this->assertSame('no-ai', $decoded['docs']['aiUsage'] ?? null);
+        // Sections without a policy don't gain the key.
+        $this->assertArrayNotHasKey('aiUsage', $decoded['news']);
     }
 
 }

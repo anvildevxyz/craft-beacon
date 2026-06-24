@@ -20,6 +20,8 @@ namespace anvildev\beacon\models;
  *     socialImageTransform: string,
  *     defaultSocialImageId: int|null,
  *     defaultTwitterSite: string|null,
+ *     aiUsagePolicy: string,
+ *     aiUsagePolicyUrl: string|null,
  * }
  */
 class Settings
@@ -87,6 +89,40 @@ class Settings
         public array $geoScoreAuthorityDomainOverrides = [],
         /** When true, the entry SEO field hides checklist, inheritance chrome, soft hints, and extra preview tabs. */
         public bool $seoFieldLiteMode = true,
+        /** Master toggle for AI-assisted content generation. Dormant (no UI, no calls) when false. */
+        public bool $aiEnabled = false,
+        /** LLM provider: `anthropic` or `openai` (any OpenAI-compatible endpoint). */
+        public string $aiProvider = 'anthropic',
+        /** Provider model id, e.g. `claude-3-5-haiku-latest` or `gpt-4o-mini`. */
+        public string $aiModel = '',
+        /** Provider API key. Secret — set via `config/beacon.php` in production. */
+        public ?string $aiApiKey = null,
+        /** Optional base-URL override for self-hosted / gateway endpoints. */
+        public ?string $aiBaseUrl = null,
+        /** Master toggle for the answer-engine visibility/citation tracking panel. Dormant when false. */
+        public bool $aiVisibilityEnabled = false,
+        /**
+         * Engine identifiers to probe. Empty = the single configured AI provider.
+         * @var list<string>
+         */
+        public array $aiVisibilityEngines = [],
+        /**
+         * Competitor hostnames to watch for in answers (e.g. `['rival.com']`).
+         * @var list<string>
+         */
+        public array $aiVisibilityCompetitorDomains = [],
+        /** Hard cap on probes (prompts × engines) per run, to bound LLM cost. */
+        public int $aiVisibilityMaxPerRun = 50,
+        /** Days to retain visibility result rows before GC. */
+        public int $aiVisibilityResultRetentionDays = 365,
+        /** Scheduled cadence: `off`, `daily`, or `weekly`. */
+        public string $aiVisibilityCadence = 'off',
+        /** Global default AI-usage policy: `allow` (default) / `no-train` / `no-generative-ai` / `no-ai`. */
+        public string $aiUsagePolicy = 'allow',
+        /** Optional URL to a published AI-usage / licensing policy, emitted as TDMRep `tdm-policy`. */
+        public ?string $aiUsagePolicyUrl = null,
+        /** When true, the MCP server endpoint at `/beacon/mcp` accepts authenticated requests. Off by default. */
+        public bool $mcpEnabled = false,
     ) {
     }
 
@@ -124,6 +160,8 @@ class Settings
             'socialImageTransform' => $this->socialImageTransform,
             'defaultSocialImageId' => $this->defaultSocialImageId,
             'defaultTwitterSite' => $this->twitterSiteHandle(),
+            'aiUsagePolicy' => $this->aiUsagePolicy,
+            'aiUsagePolicyUrl' => $this->aiUsagePolicyUrl,
         ];
     }
 

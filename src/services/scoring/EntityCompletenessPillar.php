@@ -3,6 +3,8 @@
 namespace anvildev\beacon\services\scoring;
 
 use anvildev\beacon\enums\GeoScorePillar;
+use anvildev\beacon\helpers\EntitySchema;
+use anvildev\beacon\helpers\SeoFieldReader;
 use anvildev\beacon\models\GeoPillarScore;
 use anvildev\beacon\Plugin;
 use Craft;
@@ -69,6 +71,18 @@ final class EntityCompletenessPillar implements PillarComputerInterface
             $notes[] = $authorCoverage['note'];
         }
 
+        // Linked entities (Wikidata `about`/`mentions` on the SEO field) are a
+        // direct disambiguation signal: +1 for any, +2 for two or more. Purely
+        // additive — entries without linked entities are scored exactly as
+        // before, so the credit only ever lifts a page.
+        $entityCount = $this->countLinkedEntities($ctx->element);
+        $entityPoints = match (true) {
+            $entityCount >= 2 => 2,
+            $entityCount >= 1 => 1,
+            default => 0,
+        };
+        $points += $entityPoints;
+
         $score = GeoPillarScore::clampScore($points);
         return new GeoPillarScore(
             pillar: $this->pillar(),
@@ -79,8 +93,23 @@ final class EntityCompletenessPillar implements PillarComputerInterface
                 'organizationNamed' => $points >= 2,
                 'sameAsCount' => $sameAsCount,
                 'authorPoints' => $authorCoverage['points'],
+                'linkedEntityCount' => $entityCount,
             ],
         );
+    }
+
+    /**
+     * Count valid linked entities stored on the element's Beacon SEO field.
+     * Reuses {@see EntitySchema::sanitize()} so only rows with a label and at
+     * least one external URL count.
+     */
+    private function countLinkedEntities(ElementInterface $element): int
+    {
+        $value = SeoFieldReader::readValueFor($element);
+        if ($value === null) {
+            return 0;
+        }
+        return count(EntitySchema::sanitize($value['entities'] ?? []));
     }
 
     /**

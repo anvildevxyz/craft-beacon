@@ -4,6 +4,7 @@ namespace anvildev\beacon\services;
 
 use anvildev\beacon\elements\AuthorElement;
 use anvildev\beacon\enums\Environment;
+use anvildev\beacon\helpers\AiUsagePolicy;
 use anvildev\beacon\helpers\Assets;
 use anvildev\beacon\helpers\Ids;
 use anvildev\beacon\helpers\RobotsDirectives;
@@ -99,6 +100,16 @@ class MetaResolverService extends Component
         if ($this->shouldForceNoindexOnCurrentEnvironment() && !in_array('noindex', $meta->robots, true)) {
             $meta->robots[] = 'noindex';
             $meta->sourceMap['robots'] = 'runtime';
+        }
+
+        // AI-usage policy (entry → section → global). Its noai/noimageai tokens
+        // ride on $meta->robots so the robots tag and X-Robots-Tag both carry
+        // them; the policy itself drives TDMRep meta + the Content-Usage header.
+        $meta->aiUsagePolicy = $this->resolveAiUsagePolicy($entryFieldValue, $entry, $geoDefaults);
+        foreach (AiUsagePolicy::robotsTokens($meta->aiUsagePolicy) as $token) {
+            if (!in_array($token, $meta->robots, true)) {
+                $meta->robots[] = $token;
+            }
         }
 
         $effectiveUrl = $meta->canonical ?? $this->normalizePublicUrl($entryUrl);
@@ -519,6 +530,39 @@ class MetaResolverService extends Component
         }
 
         return UrlHelper::siteUrl($trimmed);
+    }
+
+    /**
+     * Effective AI-usage policy with entry beating section beating the global
+     * default. Pure (no Plugin lookup) so it works in unit tests; reads the
+     * per-section value straight from `sectionSeoDefaults[<handle>][aiUsage]`.
+     *
+     * @param array<string,mixed> $entryFieldValue
+     * @param array<string,mixed> $geoDefaults
+     */
+    private function resolveAiUsagePolicy(array $entryFieldValue, ?Entry $entry, array $geoDefaults): string
+    {
+        $entryPolicy = AiUsagePolicy::normalizeOrInherit(
+            is_string($entryFieldValue['aiUsage'] ?? null) ? $entryFieldValue['aiUsage'] : null,
+        );
+
+        $sectionPolicy = null;
+        $handle = $entry instanceof Entry ? ($entry->getSection()?->handle ?? null) : null;
+        if (is_string($handle) && $handle !== '') {
+            $sectionDefaults = $geoDefaults['sectionSeoDefaults'] ?? null;
+            $row = is_array($sectionDefaults) ? ($sectionDefaults[$handle] ?? null) : null;
+            if (is_array($row)) {
+                $sectionPolicy = AiUsagePolicy::normalizeOrInherit(
+                    is_string($row['aiUsage'] ?? null) ? $row['aiUsage'] : null,
+                );
+            }
+        }
+
+        $global = AiUsagePolicy::normalize(
+            is_string($geoDefaults['aiUsagePolicy'] ?? null) ? $geoDefaults['aiUsagePolicy'] : null,
+        );
+
+        return $entryPolicy ?? $sectionPolicy ?? $global;
     }
 
     /**

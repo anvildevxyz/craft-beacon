@@ -8,6 +8,7 @@ use anvildev\beacon\events\AfterResolveMetaEvent;
 use anvildev\beacon\events\DefineMetaEvent;
 use anvildev\beacon\events\DefineMetaTagsEvent;
 use anvildev\beacon\events\DefineSchemasEvent;
+use anvildev\beacon\helpers\AiUsagePolicy;
 use anvildev\beacon\helpers\Assets;
 use anvildev\beacon\helpers\Http;
 use anvildev\beacon\helpers\Ids;
@@ -129,6 +130,7 @@ class BeaconVariable
         // Repeatable auto-derived tags (og:locale:alternate, article:author) that
         // can't be keyed by name; rendered with the same skip-empty loop.
         $html .= $this->renderMetaTagMap($meta->extraMetaTags);
+        $html .= $this->renderAiUsageMetaTags($meta);
 
         if (!empty($schemas)) {
             $payload = count($schemas) === 1 ? $schemas[0] : $schemas;
@@ -938,6 +940,28 @@ class BeaconVariable
         return $html;
     }
 
+    /**
+     * TDMRep meta tags for the resolved AI-usage policy. `tdm-reservation: 1`
+     * reserves text-and-data-mining rights; `tdm-policy` points at the
+     * operator's published policy when configured. Emits nothing for `allow`.
+     */
+    private function renderAiUsageMetaTags(SeoMeta $meta): string
+    {
+        if (!AiUsagePolicy::isRestrictive($meta->aiUsagePolicy)) {
+            return '';
+        }
+        $h = static fn(string $s): string => htmlspecialchars($s, ENT_QUOTES);
+        $html = sprintf(
+            '<meta name="tdm-reservation" content="%d">' . "\n",
+            AiUsagePolicy::tdmReservation($meta->aiUsagePolicy),
+        );
+        $policyUrl = Plugin::$plugin?->settings->get()->aiUsagePolicyUrl;
+        if (is_string($policyUrl) && trim($policyUrl) !== '') {
+            $html .= sprintf('<meta name="tdm-policy" content="%s">' . "\n", $h(trim($policyUrl)));
+        }
+        return $html;
+    }
+
     private function applySeoHeaders(SeoMeta $meta): void
     {
         if (Craft::$app === null || Plugin::$plugin === null) {
@@ -946,6 +970,10 @@ class BeaconVariable
         $headers = Http::response()->getHeaders();
         if (!empty($meta->robots)) {
             $headers->set('X-Robots-Tag', implode(', ', $meta->robots));
+        }
+        $contentUsage = AiUsagePolicy::contentUsage($meta->aiUsagePolicy);
+        if ($contentUsage !== null) {
+            $headers->set('Content-Usage', $contentUsage);
         }
         if (is_string($meta->canonical) && $meta->canonical !== '') {
             // Strip CR/LF/NUL so a stray newline in the canonical can't break the

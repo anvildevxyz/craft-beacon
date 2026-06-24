@@ -47,6 +47,65 @@ class MetaResolverServiceTest extends TestCase
         $this->assertSame('About Entry T on Site.', $meta->description);
     }
 
+    public function testAiUsageDefaultAllowEmitsNoTokens(): void
+    {
+        $service = new MetaResolverService();
+        $meta = $service->resolve(
+            entryFieldValue: [],
+            entryTitle: 'X',
+            siteName: 'S',
+            geoDefaults: [],
+        );
+
+        $this->assertSame('allow', $meta->aiUsagePolicy);
+        $this->assertNotContains('noai', $meta->robots);
+        $this->assertNotContains('noimageai', $meta->robots);
+    }
+
+    public function testAiUsageGlobalPolicyAddsRobotsTokens(): void
+    {
+        $service = new MetaResolverService();
+        $meta = $service->resolve(
+            entryFieldValue: [],
+            entryTitle: 'X',
+            siteName: 'S',
+            geoDefaults: ['aiUsagePolicy' => 'no-train'],
+        );
+
+        $this->assertSame('no-train', $meta->aiUsagePolicy);
+        $this->assertContains('noai', $meta->robots);
+        $this->assertContains('noimageai', $meta->robots);
+    }
+
+    public function testAiUsageEntryOverrideBeatsGlobal(): void
+    {
+        $service = new MetaResolverService();
+        $meta = $service->resolve(
+            entryFieldValue: ['aiUsage' => 'allow'],
+            entryTitle: 'X',
+            siteName: 'S',
+            geoDefaults: ['aiUsagePolicy' => 'no-ai'],
+        );
+
+        $this->assertSame('allow', $meta->aiUsagePolicy);
+        $this->assertNotContains('noai', $meta->robots);
+    }
+
+    public function testAiUsageGenerativePolicyAddsOnlyNoai(): void
+    {
+        $service = new MetaResolverService();
+        $meta = $service->resolve(
+            entryFieldValue: ['aiUsage' => 'no-generative-ai'],
+            entryTitle: 'X',
+            siteName: 'S',
+            geoDefaults: [],
+        );
+
+        $this->assertSame('no-generative-ai', $meta->aiUsagePolicy);
+        $this->assertContains('noai', $meta->robots);
+        $this->assertNotContains('noimageai', $meta->robots);
+    }
+
     public function testRobotsFlagsAggregate(): void
     {
         $service = new MetaResolverService();

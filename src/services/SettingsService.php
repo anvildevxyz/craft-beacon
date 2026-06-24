@@ -40,6 +40,17 @@ class SettingsService extends Component
         'log404RetentionDays',
         'staleThresholdDays',
         'seoFieldLiteMode',
+        // AI provider config — secret key + model belong in config/beacon.php in prod.
+        'aiApiKey',
+        'aiBaseUrl',
+        'aiModel',
+        'aiProvider',
+        // AI-visibility operational knobs.
+        'aiVisibilityEngines',
+        'aiVisibilityCompetitorDomains',
+        'aiVisibilityMaxPerRun',
+        'aiVisibilityResultRetentionDays',
+        'aiVisibilityCadence',
     ];
 
     /**
@@ -92,6 +103,20 @@ class SettingsService extends Component
             geoScoreFactDetectionMode: (string) $record->geoScoreFactDetectionMode,
             // File-only; not stored in DB. Default true (lite SEO field UI).
             seoFieldLiteMode: true,
+            aiEnabled: (bool) ($record->aiEnabled ?? false),
+            aiProvider: (is_string($record->aiProvider) && $record->aiProvider !== '') ? $record->aiProvider : 'anthropic',
+            aiModel: (string) ($record->aiModel ?? ''),
+            aiApiKey: ($record->aiApiKey !== null && $record->aiApiKey !== '') ? (string) $record->aiApiKey : null,
+            aiBaseUrl: ($record->aiBaseUrl !== null && $record->aiBaseUrl !== '') ? (string) $record->aiBaseUrl : null,
+            aiVisibilityEnabled: (bool) ($record->aiVisibilityEnabled ?? false),
+            aiVisibilityEngines: Json::decodeStringList(is_string($record->aiVisibilityEngines ?? null) ? $record->aiVisibilityEngines : null),
+            aiVisibilityCompetitorDomains: Json::decodeStringList(is_string($record->aiVisibilityCompetitorDomains ?? null) ? $record->aiVisibilityCompetitorDomains : null),
+            aiVisibilityMaxPerRun: (int) ($record->aiVisibilityMaxPerRun ?? 50),
+            aiVisibilityResultRetentionDays: (int) ($record->aiVisibilityResultRetentionDays ?? 365),
+            aiVisibilityCadence: (is_string($record->aiVisibilityCadence ?? null) && $record->aiVisibilityCadence !== '') ? (string) $record->aiVisibilityCadence : 'off',
+            aiUsagePolicy: \anvildev\beacon\helpers\AiUsagePolicy::normalize($record->aiUsagePolicy ?? null),
+            aiUsagePolicyUrl: ($record->aiUsagePolicyUrl !== null && $record->aiUsagePolicyUrl !== '') ? (string) $record->aiUsagePolicyUrl : null,
+            mcpEnabled: (bool) ($record->mcpEnabled ?? false),
         );
 
         return $this->cached = $this->applyConfigFileOverrides($settings);
@@ -236,6 +261,20 @@ class SettingsService extends Component
             : Json::encode($settings->geoScorePillarWeights);
         $record->geoScoreClaimDetectionMode = $this->normalizeDetectionMode($settings->geoScoreClaimDetectionMode);
         $record->geoScoreFactDetectionMode = $this->normalizeDetectionMode($settings->geoScoreFactDetectionMode);
+        $record->aiEnabled = $settings->aiEnabled;
+        $record->aiProvider = $settings->aiProvider;
+        $record->aiModel = $settings->aiModel;
+        $record->aiApiKey = $settings->aiApiKey;
+        $record->aiBaseUrl = $settings->aiBaseUrl;
+        $record->aiVisibilityEnabled = $settings->aiVisibilityEnabled;
+        $record->aiVisibilityEngines = Json::encode(array_values($settings->aiVisibilityEngines));
+        $record->aiVisibilityCompetitorDomains = Json::encode(array_values($settings->aiVisibilityCompetitorDomains));
+        $record->aiVisibilityMaxPerRun = $settings->aiVisibilityMaxPerRun;
+        $record->aiVisibilityResultRetentionDays = $settings->aiVisibilityResultRetentionDays;
+        $record->aiVisibilityCadence = $settings->aiVisibilityCadence;
+        $record->aiUsagePolicy = $settings->aiUsagePolicy;
+        $record->aiUsagePolicyUrl = $settings->aiUsagePolicyUrl;
+        $record->mcpEnabled = $settings->mcpEnabled;
         $record->dateUpdated = Db::now();
         $record->save(false);
 
@@ -260,13 +299,21 @@ class SettingsService extends Component
             }
             $titleTemplate = trim((string) ($row['titleTemplate'] ?? ''));
             $descriptionTemplate = trim((string) ($row['descriptionTemplate'] ?? ''));
-            if ($titleTemplate === '' && $descriptionTemplate === '') {
+            // Per-section AI-usage policy is stored alongside the SEO templates
+            // by SettingsController::parseSectionSeoDefaults(). Preserve it here
+            // (and keep aiUsage-only rows) so AiUsageService / MetaResolverService
+            // can read it — otherwise section-level policies are silently lost.
+            $aiUsage = is_string($row['aiUsage'] ?? null) ? trim($row['aiUsage']) : '';
+            if ($titleTemplate === '' && $descriptionTemplate === '' && $aiUsage === '') {
                 continue;
             }
             $clean[$sectionHandle] = [
                 'titleTemplate' => $titleTemplate,
                 'descriptionTemplate' => $descriptionTemplate,
             ];
+            if ($aiUsage !== '') {
+                $clean[$sectionHandle]['aiUsage'] = $aiUsage;
+            }
         }
 
         return $clean;

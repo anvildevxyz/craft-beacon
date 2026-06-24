@@ -71,7 +71,7 @@ final class GeoScoreDrillDownNoteLink
     }
 
     /**
-     * @param array<string, scalar> $params
+     * @param array<array-key, scalar> $params
      */
     private static function matchesKey(string $noteText, string $key, array $params = []): bool
     {

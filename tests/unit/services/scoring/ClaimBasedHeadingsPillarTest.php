@@ -40,8 +40,10 @@ class ClaimBasedHeadingsPillarTest extends TestCase
         $this->assertSame(0, $score->score);
         $this->assertNotEmpty($score->notes);
         $this->assertStringContainsString('geo.pillar.claimHeadings.topic.not.claim', $score->notes[0]);
-        $this->assertContains('Composer plugins', $score->debug['topicHeadings']);
-        $this->assertContains('GEO scoring', $score->debug['topicHeadings']);
+        /** @var list<string> $topicHeadings */
+        $topicHeadings = $score->debug['topicHeadings'];
+        $this->assertContains('Composer plugins', $topicHeadings);
+        $this->assertContains('GEO scoring', $topicHeadings);
     }
 
     public function testMixedHeadingsScoreInProportion(): void
@@ -59,7 +61,9 @@ class ClaimBasedHeadingsPillarTest extends TestCase
         // The lone topic heading is named in the note so authors know
         // exactly which one to rewrite.
         $this->assertStringContainsString('geo.pillar.claimHeadings.topic.not.claim', $score->notes[0]);
-        $this->assertContains('Installation', $score->debug['topicHeadings']);
+        /** @var list<string> $topicHeadings */
+        $topicHeadings = $score->debug['topicHeadings'];
+        $this->assertContains('Installation', $topicHeadings);
     }
 
     public function testGermanSiteLanguageUsesGermanVerbStems(): void

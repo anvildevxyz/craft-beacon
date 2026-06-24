@@ -71,10 +71,16 @@ class GeoMarkdownExportService extends Component
             $body = $this->truncateBody($body, $settings->geoMarkdownExcerptLength);
         }
 
-        $front = $this->buildFrontMatter($element, $settings);
         $title = trim((string) $element->title);
         $heading = $title !== '' ? '# ' . $title . "\n\n" : '';
-        $markdown = $front . $heading . trim($body);
+        $content = $heading . trim($body);
+
+        // Token estimate of the body lets agents size the fetch against a context
+        // window before requesting it; emitted as a front-matter key (and as an
+        // X-Token-Estimate response header by the controller).
+        $tokens = Plugin::$plugin->tokenEstimator->estimate($content);
+        $front = $this->buildFrontMatter($element, $settings, $tokens);
+        $markdown = $front . $content;
 
         $this->logExportDebug(sprintf(
             'GEO export built for elementId=%d siteId=%d chars=%d',
@@ -141,9 +147,10 @@ class GeoMarkdownExportService extends Component
      * Layers Site → Section → Element → per-element SEO field front matter.
      * The SEO field override wins even over auto-derived keys (title, canonical, lastUpdated).
      */
-    private function buildFrontMatter(ElementInterface $element, \anvildev\beacon\models\Settings $settings): string
+    private function buildFrontMatter(ElementInterface $element, \anvildev\beacon\models\Settings $settings, int $tokens = 0): string
     {
         return GeoMarkdownFrontMatter::render(GeoMarkdownFrontMatter::mergeLayers(
+            $tokens > 0 ? ['tokens' => $tokens] : [],
             $settings->geoMarkdownFrontMatterDefaults,
             $this->sectionFrontMatter($element),
             $this->elementFrontMatter($element),

@@ -203,6 +203,23 @@
         </section>
     {% endif %}
 
+    <section class="beacon-seo-section beacon-seo-ai-usage">
+        <h3 class="beacon-seo-section-title">{{ 'seoField.aiUsage.heading'|t('beacon') }}</h3>
+        {{ forms.selectField({
+            label: 'seoField.aiUsage.label'|t('beacon'),
+            instructions: 'seoField.aiUsage.instructions'|t('beacon'),
+            name: name ~ '[aiUsage]',
+            value: value.aiUsage ?? '',
+            options: [
+                { label: 'seoField.aiUsage.inherit'|t('beacon'), value: '' },
+                { label: 'seoField.aiUsage.allow'|t('beacon'), value: 'allow' },
+                { label: 'seoField.aiUsage.noTrain'|t('beacon'), value: 'no-train' },
+                { label: 'seoField.aiUsage.noGenerative'|t('beacon'), value: 'no-generative-ai' },
+                { label: 'seoField.aiUsage.noAi'|t('beacon'), value: 'no-ai' },
+            ],
+        }) }}
+    </section>
+
     {% if preview %}
         <section class="beacon-seo-section beacon-seo-previews">
             <h3 class="beacon-seo-section-title">{{ 'seoField.search.social.previews.heading'|t('beacon') }}</h3>
@@ -307,6 +324,19 @@
             data-beacon-add-schema
         >{{ 'seoField.add.schema.text'|t('beacon') }}</button>
     </section>
+
+    {% if entitySearchUrl is defined and entitySearchUrl %}
+    <section class="beacon-seo-section beacon-seo-entities">
+        <h3 class="beacon-seo-section-title">{{ 'seoField.entities.heading'|t('beacon') }}</h3>
+        <p class="beacon-seo-section-help">{{ 'seoField.entities.help'|t('beacon') }}</p>
+        <div
+            data-beacon-entities
+            data-name="{{ name }}"
+            data-search-url="{{ entitySearchUrl }}"
+            data-entities="{{ (value.entities ?? [])|json_encode(constant('JSON_HEX_TAG') b-or constant('JSON_HEX_AMP') b-or constant('JSON_HEX_APOS') b-or constant('JSON_HEX_QUOT') b-or constant('JSON_UNESCAPED_UNICODE')) }}"
+        ></div>
+    </section>
+    {% endif %}
 
     <section class="beacon-seo-section beacon-seo-ai-markdown">
         <h3 class="beacon-seo-section-title">{{ 'seoField.ai.markdown.heading'|t('beacon') }}</h3>

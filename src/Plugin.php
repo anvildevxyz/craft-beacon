@@ -29,7 +29,11 @@ use anvildev\beacon\integrations\CommerceIntegration;
 use anvildev\beacon\jobs\RecomputeGeoScoreJob;
 use anvildev\beacon\schemas\SchemaTemplate;
 use anvildev\beacon\services\AiBotsService;
+use anvildev\beacon\services\AiClient;
+use anvildev\beacon\services\AiContentService;
 use anvildev\beacon\services\AiCrawlerService;
+use anvildev\beacon\services\AiUsageService;
+use anvildev\beacon\services\AiVisibilityService;
 use anvildev\beacon\services\BotLogService;
 use anvildev\beacon\services\BotRegistry;
 use anvildev\beacon\services\BreadcrumbService;
@@ -44,7 +48,10 @@ use anvildev\beacon\services\GeoMarkdownStore;
 use anvildev\beacon\services\GeoScoreService;
 use anvildev\beacon\services\HreflangService;
 use anvildev\beacon\services\IndexNowService;
+use anvildev\beacon\services\llms\HeuristicTokenEstimator;
 use anvildev\beacon\services\LlmsTxtService;
+use anvildev\beacon\services\McpService;
+use anvildev\beacon\services\McpTokenService;
 use anvildev\beacon\services\MetaResolverService;
 use anvildev\beacon\services\Redirect404LogService;
 use anvildev\beacon\services\RedirectImporter;
@@ -64,6 +71,7 @@ use anvildev\beacon\services\SitemapService;
 use anvildev\beacon\services\SiteSettingsService;
 use anvildev\beacon\services\TrackingProviderRegistry;
 use anvildev\beacon\services\TrackingService;
+use anvildev\beacon\services\WikidataService;
 use anvildev\beacon\tracking\providers\CustomScriptProvider;
 use anvildev\beacon\tracking\providers\FacebookPixelProvider;
 use anvildev\beacon\tracking\providers\GA4Provider;
@@ -72,6 +80,7 @@ use anvildev\beacon\tracking\providers\MatomoProvider;
 use anvildev\beacon\twig\GeoMarkdownExtension;
 use anvildev\beacon\web\assets\cp\BeaconCpAsset;
 use anvildev\beacon\web\GeoMarkdownNegotiator;
+use anvildev\beacon\widgets\AiVisibilityWidget;
 use anvildev\beacon\widgets\BotActivityWidget;
 use anvildev\beacon\widgets\GeoScoreWidget;
 use anvildev\beacon\widgets\IndexNowActivityWidget;
@@ -126,6 +135,7 @@ use yii\base\Event;
  * @property-read SitemapService $sitemap
  * @property-read RobotsService $robots
  * @property-read LlmsTxtService $llmsTxt
+ * @property-read \anvildev\beacon\services\llms\TokenEstimatorInterface $tokenEstimator
  * @property-read BotLogService $botLog
  * @property-read RedirectMatcher $redirectMatcher
  * @property-read RedirectService $redirects
@@ -151,6 +161,13 @@ use yii\base\Event;
  * @property-read SchemaSuggestionService $schemaSuggester
  * @property-read SchemamapService $schemamap
  * @property-read IndexNowService $indexNow
+ * @property-read AiClient $aiClient
+ * @property-read AiContentService $aiContent
+ * @property-read AiVisibilityService $aiVisibility
+ * @property-read AiUsageService $aiUsage
+ * @property-read McpService $mcp
+ * @property-read McpTokenService $mcpTokens
+ * @property-read WikidataService $wikidata
  */
 class Plugin extends BasePlugin
 {
@@ -204,7 +221,7 @@ class Plugin extends BasePlugin
 
     public bool $hasCpSettings = false;
     public bool $hasCpSection = true;
-    public string $schemaVersion = '1.0.0';
+    public string $schemaVersion = '1.1.0';
     public $controllerNamespace = 'anvildev\\beacon\\controllers';
 
     /**
@@ -307,6 +324,14 @@ class Plugin extends BasePlugin
             'schemaSuggester' => SchemaSuggestionService::class,
             'schemamap' => SchemamapService::class,
             'indexNow' => IndexNowService::class,
+            'aiClient' => AiClient::class,
+            'aiContent' => AiContentService::class,
+            'aiVisibility' => AiVisibilityService::class,
+            'aiUsage' => AiUsageService::class,
+            'mcp' => McpService::class,
+            'mcpTokens' => McpTokenService::class,
+            'tokenEstimator' => HeuristicTokenEstimator::class,
+            'wikidata' => WikidataService::class,
         ]);
 
         Craft::$app->getProjectConfig()
@@ -399,6 +424,7 @@ class Plugin extends BasePlugin
                     MarkdownCoverageWidget::class,
                     IndexNowActivityWidget::class,
                     GeoScoreWidget::class,
+                    AiVisibilityWidget::class,
                 );
             }
         );
@@ -505,6 +531,8 @@ class Plugin extends BasePlugin
                     'beacon/settings' => 'beacon/settings/index',
                     'beacon/settings/<tab:\w+>' => 'beacon/settings/section',
                     'beacon/geo-score/drill-down' => 'beacon/geo-score/drill-down',
+                    'beacon/ai-visibility' => 'beacon/ai-visibility/index',
+                    'beacon/mcp-tokens' => 'beacon/mcp-tokens/index',
                 ];
             }
         );
@@ -524,9 +552,11 @@ class Plugin extends BasePlugin
                     'llms-full.txt' => 'beacon/llms-txt/full',
                     '.well-known/llms.txt' => 'beacon/llms-txt/index',
                     '.well-known/llms-full.txt' => 'beacon/llms-txt/full',
+                    '.well-known/tdmrep.json' => 'beacon/tdm-rep/index',
                     'humans.txt' => 'beacon/humans-txt/index',
                     'ads.txt' => 'beacon/ads-txt/index',
                     'geo/export' => 'beacon/geo-export/index',
+                    'beacon/mcp' => 'beacon/mcp/index',
                     'beacon/schemamap.json' => 'beacon/schemamap/index',
                     '<key:[a-zA-Z0-9-]{8,128}>.txt' => 'beacon/index-now-key/file',
                     'feed/<section:[\w-]+>.json' => 'beacon/feed/json',
@@ -778,6 +808,7 @@ class Plugin extends BasePlugin
                 $settings = self::$plugin->settings->get();
                 self::$plugin->botLog->gc($settings->botLogRetentionDays);
                 self::$plugin->redirect404Log->prune($settings->log404RetentionDays);
+                self::$plugin->aiVisibility->gc($settings->aiVisibilityResultRetentionDays);
             }
         );
 
@@ -964,6 +995,7 @@ class Plugin extends BasePlugin
             'sitemap' => ['perm' => BeaconPermissions::EDIT_SITEMAP, 'label' => 'Sitemap', 'url' => 'beacon/sitemap'],
             'tracking' => ['perm' => BeaconPermissions::EDIT_TRACKING, 'label' => Craft::t('beacon', 'nav.tracking'), 'url' => 'beacon/tracking'],
             'crawlers' => ['perm' => BeaconPermissions::EDIT_CRAWLERS, 'label' => Craft::t('beacon', 'nav.crawlers'), 'url' => 'beacon/crawlers'],
+            'aiVisibility' => ['perm' => BeaconPermissions::EDIT_AI_VISIBILITY, 'label' => Craft::t('beacon', 'nav.aiVisibility'), 'url' => 'beacon/ai-visibility'],
             'settings' => ['perm' => BeaconPermissions::EDIT_SETTINGS, 'label' => 'Settings', 'url' => 'beacon/settings'],
         ];
 

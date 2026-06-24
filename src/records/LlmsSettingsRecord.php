@@ -16,6 +16,7 @@ use craft\db\ActiveRecord;
  * @property string|null $contactEmail
  * @property string|null $preferredAttribution
  * @property string|null $fullBody
+ * @property int|null $llmsFullTokenBudget
  */
 class LlmsSettingsRecord extends ActiveRecord
 {

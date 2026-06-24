@@ -24,6 +24,8 @@ final class BeaconPermissions
     public const EDIT_CRAWLERS = 'beacon:editCrawlers';
     public const EDIT_SETTINGS = 'beacon:editSettings';
     public const EDIT_GEO_SCORE = 'beacon:editGeoScore';
+    public const USE_AI_GENERATION = 'beacon:useAiGeneration';
+    public const EDIT_AI_VISIBILITY = 'beacon:editAiVisibility';
 
     /**
      * Definitions registered with Craft. Keep order = display order.
@@ -44,6 +46,8 @@ final class BeaconPermissions
             self::EDIT_CRAWLERS => ['label' => $t('Edit crawler settings (AI crawlers, llms.txt, robots.txt, humans.txt, ads.txt)')],
             self::EDIT_SETTINGS => ['label' => $t('Edit Beacon settings')],
             self::EDIT_GEO_SCORE => ['label' => $t('Manually recompute GEO scores (drill-down recompute button)')],
+            self::USE_AI_GENERATION => ['label' => $t('Use AI content generation (Generate buttons in the SEO field)')],
+            self::EDIT_AI_VISIBILITY => ['label' => $t('Manage AI visibility tracking (benchmark prompts, runs)')],
         ];
     }
 

@@ -36,6 +36,20 @@ use craft\db\ActiveRecord;
  * @property string|null $geoScorePillarWeights
  * @property string $geoScoreClaimDetectionMode
  * @property string $geoScoreFactDetectionMode
+ * @property bool $aiEnabled
+ * @property string $aiProvider
+ * @property string $aiModel
+ * @property string|null $aiApiKey
+ * @property string|null $aiBaseUrl
+ * @property bool $aiVisibilityEnabled
+ * @property string|null $aiVisibilityEngines
+ * @property string|null $aiVisibilityCompetitorDomains
+ * @property int $aiVisibilityMaxPerRun
+ * @property int $aiVisibilityResultRetentionDays
+ * @property string $aiVisibilityCadence
+ * @property string $aiUsagePolicy
+ * @property string|null $aiUsagePolicyUrl
+ * @property bool $mcpEnabled
  */
 class SettingsRecord extends ActiveRecord
 {

@@ -6,6 +6,7 @@ use anvildev\beacon\enums\RenderCacheType;
 use anvildev\beacon\helpers\RawResponse;
 use anvildev\beacon\helpers\SeoFieldReader;
 use anvildev\beacon\Plugin;
+use anvildev\beacon\services\llms\MarkdownBudgetTrimmer;
 use Craft;
 use craft\elements\Entry;
 use craft\models\Site;
@@ -74,12 +75,25 @@ class LlmsTxtController extends Controller
             throw new NotFoundHttpException();
         }
 
-        Craft::info("llms-full.txt rendered for siteId={$site->id} bytes=" . strlen($body), 'beacon');
-        return RawResponse::build(
+        $result = (new MarkdownBudgetTrimmer(Plugin::$plugin->tokenEstimator))
+            ->trim($body, (int) ($settings->llmsFullTokenBudget ?? 0));
+        $body = $result->markdown;
+
+        Craft::info(sprintf(
+            'llms-full.txt rendered for siteId=%d bytes=%d tokens=%d truncated=%s',
+            $site->id,
+            strlen($body),
+            $result->estimatedTokens,
+            $result->truncated ? 'yes' : 'no',
+        ), 'beacon');
+
+        $response = RawResponse::build(
             'text/markdown; charset=UTF-8',
             $body,
             cacheTags: ['beacon-llms-full', "beacon-site-{$site->id}"],
         );
+        $response->headers->set('X-Token-Estimate', (string) $result->estimatedTokens);
+        return $response;
     }
 
     /**
