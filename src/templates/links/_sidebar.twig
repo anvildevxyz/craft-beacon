@@ -1,0 +1,21 @@
+{% do view.registerAssetBundle('anvildev\\beacon\\web\\assets\\links\\LinksCpAsset') %}
+
+<div class="beacon-links-panel" id="beacon-links-panel">
+    <h3>
+        {{ 'links.sidebar.title'|t('beacon') }}
+        <span class="beacon-links-header-actions">
+            <button type="button" class="btn small" data-beacon-links-action="toggle-highlights" title="{{ 'links.sidebar.highlight.title'|t('beacon') }}">{{ 'links.sidebar.show.in.content'|t('beacon') }}</button>
+            <button type="button" class="btn small" data-beacon-links-action="refresh">{{ 'links.sidebar.refresh'|t('beacon') }}</button>
+        </span>
+    </h3>
+
+    <div id="beacon-links-suggestions">
+        <div class="beacon-links-loading">{{ 'links.sidebar.loading'|t('beacon') }}</div>
+        <div class="beacon-links-list" style="display: none;"></div>
+        <div class="beacon-links-empty" style="display: none;">{{ 'links.sidebar.empty'|t('beacon') }}</div>
+    </div>
+</div>
+
+{% js %}
+    BeaconLinksSidebar.init({{ entryId }}, {{ siteId }});
+{% endjs %}

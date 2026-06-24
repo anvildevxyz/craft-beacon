@@ -26,6 +26,7 @@ use anvildev\beacon\helpers\BeaconPermissions;
 use anvildev\beacon\helpers\GeoScoreScope;
 use anvildev\beacon\helpers\Http;
 use anvildev\beacon\integrations\CommerceIntegration;
+use anvildev\beacon\jobs\LinkIndexEntryJob;
 use anvildev\beacon\jobs\RecomputeGeoScoreJob;
 use anvildev\beacon\schemas\SchemaTemplate;
 use anvildev\beacon\services\AiBotsService;
@@ -48,6 +49,7 @@ use anvildev\beacon\services\GeoMarkdownStore;
 use anvildev\beacon\services\GeoScoreService;
 use anvildev\beacon\services\HreflangService;
 use anvildev\beacon\services\IndexNowService;
+use anvildev\beacon\services\Links;
 use anvildev\beacon\services\llms\HeuristicTokenEstimator;
 use anvildev\beacon\services\LlmsTxtService;
 use anvildev\beacon\services\McpService;
@@ -84,6 +86,7 @@ use anvildev\beacon\widgets\AiVisibilityWidget;
 use anvildev\beacon\widgets\BotActivityWidget;
 use anvildev\beacon\widgets\GeoScoreWidget;
 use anvildev\beacon\widgets\IndexNowActivityWidget;
+use anvildev\beacon\widgets\LinkGraphWidget;
 use anvildev\beacon\widgets\MarkdownCoverageWidget;
 use anvildev\beacon\widgets\RedirectActivityWidget;
 use anvildev\beacon\widgets\SitemapHealthWidget;
@@ -93,6 +96,7 @@ use craft\base\Plugin as BasePlugin;
 use craft\elements\Entry;
 use craft\events\DefineAttributeHtmlEvent;
 use craft\events\DefineGqlTypeFieldsEvent;
+use craft\events\DefineHtmlEvent;
 use craft\events\ModelEvent;
 use craft\events\MoveElementEvent;
 use craft\events\RegisterComponentTypesEvent;
@@ -168,6 +172,7 @@ use yii\base\Event;
  * @property-read McpService $mcp
  * @property-read McpTokenService $mcpTokens
  * @property-read WikidataService $wikidata
+ * @property-read \anvildev\beacon\services\Links $links
  */
 class Plugin extends BasePlugin
 {
@@ -221,7 +226,7 @@ class Plugin extends BasePlugin
 
     public bool $hasCpSettings = false;
     public bool $hasCpSection = true;
-    public string $schemaVersion = '1.1.0';
+    public string $schemaVersion = '1.1.1';
     public $controllerNamespace = 'anvildev\\beacon\\controllers';
 
     /**
@@ -332,6 +337,7 @@ class Plugin extends BasePlugin
             'mcpTokens' => McpTokenService::class,
             'tokenEstimator' => HeuristicTokenEstimator::class,
             'wikidata' => WikidataService::class,
+            'links' => Links::class,
         ]);
 
         Craft::$app->getProjectConfig()
@@ -425,6 +431,7 @@ class Plugin extends BasePlugin
                     IndexNowActivityWidget::class,
                     GeoScoreWidget::class,
                     AiVisibilityWidget::class,
+                    LinkGraphWidget::class,
                 );
             }
         );
@@ -533,6 +540,16 @@ class Plugin extends BasePlugin
                     'beacon/geo-score/drill-down' => 'beacon/geo-score/drill-down',
                     'beacon/ai-visibility' => 'beacon/ai-visibility/index',
                     'beacon/mcp-tokens' => 'beacon/mcp-tokens/index',
+                    'beacon/links' => 'beacon/links/index',
+                    'beacon/links/orphans' => 'beacon/links/orphans',
+                    'beacon/links/link-map' => 'beacon/links/link-map',
+                    'beacon/links/link-detail' => 'beacon/links/link-detail',
+                    'beacon/links/suggestions' => 'beacon/links/suggestions',
+                    'beacon/links/click-depth' => 'beacon/links/click-depth',
+                    'beacon/links/broken-links' => 'beacon/links/broken-links',
+                    'beacon/links/anchor-text' => 'beacon/links/anchor-text',
+                    'beacon/links/external-links' => 'beacon/links/external-links',
+                    'beacon/links/settings' => 'beacon/link-settings/index',
                 ];
             }
         );
@@ -691,6 +708,66 @@ class Plugin extends BasePlugin
                 if ((int) $entry->id > 0) {
                     self::$plugin->geoMarkdownStore->clear(null, (int) $entry->id);
                 }
+            }
+        );
+
+        // Links: queue (re)indexing on save, with a short dedup window so a
+        // single editor save doesn't enqueue duplicate jobs.
+        Event::on(
+            Entry::class,
+            Element::EVENT_AFTER_SAVE,
+            static function(ModelEvent $event): void {
+                $entry = $event->sender;
+                if (!$entry instanceof Entry || !$entry->id || $entry->getIsDraft() || $entry->getIsRevision() || $entry->propagating) {
+                    return;
+                }
+                if (!self::$plugin->links->getSettings()->indexOnSave) {
+                    return;
+                }
+                $cacheKey = "beacon:linkIndexPending:{$entry->id}:{$entry->siteId}";
+                if (Craft::$app->getCache()->get($cacheKey)) {
+                    return;
+                }
+                Craft::$app->getCache()->set($cacheKey, true, 10);
+                Craft::$app->getQueue()->push(new LinkIndexEntryJob([
+                    'entryId' => (int) $entry->id,
+                    'siteId' => (int) $entry->siteId,
+                ]));
+            }
+        );
+
+        // Links: purge the entry's index/links/suggestions when it's deleted.
+        Event::on(
+            Entry::class,
+            Element::EVENT_AFTER_DELETE,
+            static function(Event $event): void {
+                $entry = $event->sender;
+                if (!$entry instanceof Entry || !$entry->id || $entry->getIsDraft() || $entry->getIsRevision()) {
+                    return;
+                }
+                self::$plugin->links->index->deleteByElementId((int) $entry->id);
+                self::$plugin->links->linkScan->deleteByElementId((int) $entry->id);
+                self::$plugin->links->suggestions->deleteByElementId((int) $entry->id);
+                self::$plugin->links->reports->invalidateCache();
+            }
+        );
+
+        // Links: render the internal-link suggestions panel in the entry sidebar.
+        Event::on(
+            Entry::class,
+            Entry::EVENT_DEFINE_SIDEBAR_HTML,
+            static function(DefineHtmlEvent $event): void {
+                if (!self::$plugin->links->getSettings()->showSidebarSuggestions) {
+                    return;
+                }
+                $entry = $event->sender;
+                if (!$entry instanceof Entry || $entry->id === null || $entry->getIsDraft() || $entry->getIsRevision() || $entry->ownerId !== null) {
+                    return;
+                }
+                $event->html .= Craft::$app->getView()->renderTemplate('beacon/links/_sidebar', [
+                    'entryId' => $entry->id,
+                    'siteId' => $entry->siteId,
+                ]);
             }
         );
 
@@ -992,6 +1069,7 @@ class Plugin extends BasePlugin
             'redirects' => ['perm' => BeaconPermissions::EDIT_REDIRECTS, 'label' => 'Redirects', 'url' => 'beacon/redirects'],
             'shortLinks' => ['perm' => BeaconPermissions::EDIT_SHORT_LINKS, 'label' => Craft::t('beacon', 'nav.shortLinks'), 'url' => 'beacon/short-links'],
             'schemas' => ['perm' => BeaconPermissions::EDIT_SCHEMAS, 'label' => 'Schemas', 'url' => 'beacon/schemas'],
+            'links' => ['perm' => BeaconPermissions::VIEW_LINKS, 'label' => Craft::t('beacon', 'nav.links'), 'url' => 'beacon/links'],
             'sitemap' => ['perm' => BeaconPermissions::EDIT_SITEMAP, 'label' => 'Sitemap', 'url' => 'beacon/sitemap'],
             'tracking' => ['perm' => BeaconPermissions::EDIT_TRACKING, 'label' => Craft::t('beacon', 'nav.tracking'), 'url' => 'beacon/tracking'],
             'crawlers' => ['perm' => BeaconPermissions::EDIT_CRAWLERS, 'label' => Craft::t('beacon', 'nav.crawlers'), 'url' => 'beacon/crawlers'],

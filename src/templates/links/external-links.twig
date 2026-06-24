@@ -1,0 +1,60 @@
+{% extends "_layouts/cp" %}
+
+{% set title = 'links.nav.external.links'|t('beacon') %}
+{% set selectedSubnavItem = 'links' %}
+{% set crumbs = [
+    { label: 'nav.beacon'|t('beacon'), url: cpUrl('beacon') },
+    { label: 'links.nav.overview'|t('beacon'), url: cpUrl('beacon/links') },
+] %}
+
+{% do view.registerAssetBundle('anvildev\\beacon\\web\\assets\\links\\LinksCpAsset') %}
+
+{% block content %}
+    <div class="beacon-links-toolbar">
+        <a href="{{ url(craft.app.request.url, { format: 'csv' }) }}" class="btn">{{ 'links.report.export.csv'|t('beacon') }}</a>
+    </div>
+
+    {% if links|length %}
+        <div class="beacon-links-card">
+            <table class="data fullwidth">
+                <thead>
+                    <tr>
+                        <th>{{ 'links.report.source'|t('beacon') }}</th>
+                        <th>{{ 'links.report.url'|t('beacon') }}</th>
+                        <th>{{ 'links.report.anchor.text'|t('beacon') }}</th>
+                        <th>{{ 'links.report.http.status'|t('beacon') }}</th>
+                        <th>{{ 'links.report.last.checked'|t('beacon') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for link in links %}
+                        <tr>
+                            <td><a href="{{ link.sourceCpEditUrl }}"><strong>{{ link.sourceTitle }}</strong></a></td>
+                            <td><a href="{{ link.url }}" target="_blank" rel="noopener noreferrer"><code>{{ link.url }}</code></a></td>
+                            <td>{{ link.anchorText ?? '—' }}</td>
+                            <td>
+                                {% if link.httpStatus %}
+                                    {% if link.httpStatus >= 200 and link.httpStatus < 300 %}
+                                        <span class="beacon-links-badge beacon-links-badge--success">{{ link.httpStatus }}</span>
+                                    {% else %}
+                                        <span class="beacon-links-badge beacon-links-badge--error">{{ link.httpStatus }}</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="beacon-links-badge">{{ 'links.report.not.checked'|t('beacon') }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ link.httpCheckedAt ?? '—' }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="beacon-links-card">
+            <div class="beacon-links-empty-state">
+                <p class="beacon-links-empty-title">{{ 'links.report.external.none.title'|t('beacon') }}</p>
+                <p class="beacon-links-empty-text">{{ 'links.report.external.none.text'|t('beacon') }}</p>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

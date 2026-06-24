@@ -1,0 +1,102 @@
+{% extends "_layouts/cp" %}
+
+{% set title = entry.title %}
+{% set selectedSubnavItem = 'links' %}
+{% set crumbs = [
+    { label: 'nav.beacon'|t('beacon'), url: cpUrl('beacon') },
+    { label: 'links.nav.overview'|t('beacon'), url: cpUrl('beacon/links') },
+    { label: 'links.nav.link.map'|t('beacon'), url: cpUrl('beacon/links/link-map') },
+] %}
+
+{% do view.registerAssetBundle('anvildev\\beacon\\web\\assets\\links\\LinksCpAsset') %}
+
+{% block actionButton %}
+    <div class="btngroup">
+        <a href="{{ url(craft.app.request.url, { format: 'csv' }) }}" class="btn">{{ 'links.report.export.csv'|t('beacon') }}</a>
+        <a href="{{ entry.cpEditUrl }}" class="btn">{{ 'links.detail.edit.entry'|t('beacon') }}</a>
+        {% if entry.url %}
+            <a href="{{ entry.url }}" class="btn" target="_blank">{{ 'links.report.view'|t('beacon') }}</a>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block content %}
+    <div class="beacon-links-grid-2 beacon-links-mb-24">
+        <div class="beacon-links-kpi-card">
+            <div class="beacon-links-kpi-label">{{ 'links.detail.inbound.links'|t('beacon') }}</div>
+            <div class="beacon-links-kpi-value beacon-links-color-primary">{{ inbound|length }}</div>
+        </div>
+        <div class="beacon-links-kpi-card">
+            <div class="beacon-links-kpi-label">{{ 'links.detail.outbound.links'|t('beacon') }}</div>
+            <div class="beacon-links-kpi-value">{{ outbound|length }}</div>
+        </div>
+    </div>
+
+    <div class="beacon-links-widget-card beacon-links-mb-24">
+        <div class="beacon-links-widget-header">
+            <h3 class="beacon-links-widget-title">{{ 'links.detail.inbound.links'|t('beacon') }}</h3>
+        </div>
+        {% if inbound|length %}
+            <table class="data fullwidth">
+                <thead>
+                    <tr>
+                        <th>{{ 'links.report.from'|t('beacon') }}</th>
+                        <th>{{ 'links.report.section'|t('beacon') }}</th>
+                        <th>{{ 'links.report.field'|t('beacon') }}</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for link in inbound %}
+                        <tr>
+                            <td><a href="{{ link.cpEditUrl }}">{{ link.title }}</a></td>
+                            <td><span class="beacon-links-badge">{{ link.sectionName }}</span></td>
+                            <td><code>{{ link.fieldHandle }}</code></td>
+                            <td class="thin">
+                                {% if link.url %}<a href="{{ link.url }}" class="btn small" target="_blank">{{ 'links.report.view'|t('beacon') }}</a>{% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="beacon-links-empty-state">
+                <p class="beacon-links-empty-text">{{ 'links.detail.no.inbound'|t('beacon') }}</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="beacon-links-widget-card">
+        <div class="beacon-links-widget-header">
+            <h3 class="beacon-links-widget-title">{{ 'links.detail.outbound.links'|t('beacon') }}</h3>
+        </div>
+        {% if outbound|length %}
+            <table class="data fullwidth">
+                <thead>
+                    <tr>
+                        <th>{{ 'links.report.to'|t('beacon') }}</th>
+                        <th>{{ 'links.report.section'|t('beacon') }}</th>
+                        <th>{{ 'links.report.field'|t('beacon') }}</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for link in outbound %}
+                        <tr>
+                            <td><a href="{{ link.cpEditUrl }}">{{ link.title }}</a></td>
+                            <td><span class="beacon-links-badge">{{ link.sectionName }}</span></td>
+                            <td><code>{{ link.fieldHandle }}</code></td>
+                            <td class="thin">
+                                {% if link.url %}<a href="{{ link.url }}" class="btn small" target="_blank">{{ 'links.report.view'|t('beacon') }}</a>{% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="beacon-links-empty-state">
+                <p class="beacon-links-empty-text">{{ 'links.detail.no.outbound'|t('beacon') }}</p>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

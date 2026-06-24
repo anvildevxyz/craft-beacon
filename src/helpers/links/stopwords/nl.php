@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'aan', 'al', 'alles', 'als', 'altijd', 'andere', 'ben', 'bij', 'daar',
+    'dan', 'dat', 'de', 'der', 'deze', 'die', 'dit', 'doch', 'doen', 'door',
+    'dus', 'een', 'eens', 'elk', 'en', 'er', 'ga', 'ge', 'geen', 'geweest',
+    'haar', 'had', 'heb', 'hebben', 'heeft', 'hem', 'hen', 'het', 'hier',
+    'hij', 'hoe', 'hun', 'iemand', 'iets', 'ik', 'in', 'is', 'ja', 'je',
+    'jij', 'jou', 'jouw', 'jullie', 'kan', 'kom', 'kon', 'kunnen', 'maar',
+    'me', 'meer', 'mee', 'men', 'met', 'mij', 'mijn', 'moet', 'moeten',
+    'na', 'naar', 'nadat', 'niet', 'niets', 'nog', 'nu', 'of', 'om',
+    'omdat', 'onder', 'ons', 'onze', 'ook', 'op', 'over', 'reeds', 'se',
+    'sommige', 'te', 'tegen', 'toch', 'toen', 'tot', 'u', 'uit', 'van',
+    'veel', 'voor', 'want', 'waren', 'was', 'wat', 'we', 'wel', 'werd',
+    'werden', 'wij', 'wil', 'worden', 'wordt', 'ze', 'zei', 'zelf', 'zich',
+    'zij', 'zijn', 'zo', 'zoals', 'zonder', 'zou', 'zouden',
+    'echter', 'elke', 'elkar', 'enige', 'geleden', 'geworden', 'graag',
+    'hebben', 'heeft', 'hiervan', 'hierin', 'hierna', 'hoewel', 'indien',
+    'ieder', 'iedere', 'inmiddels', 'intussen', 'juist', 'langs', 'liever',
+    'mede', 'meest', 'minder', 'misschien', 'mogelijk', 'naast', 'nergens',
+    'nimmer', 'nooit', 'overal', 'reeds', 'sedert', 'soms', 'steeds',
+    'tenzij', 'terwijl', 'tussen', 'twijfelen', 'vandaar', 'verder',
+    'vervolgens', 'voorbij', 'vóóren', 'vroeger', 'welk', 'welke', 'wiens',
+    'wier', 'zeker', 'zolang', 'zover',
+];

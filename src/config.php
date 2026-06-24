@@ -148,4 +148,19 @@ return [
     // Ship the full ~900-type schema.org catalogue in the dropdown. Off by
     // default because the list gets long. Default: false.
     // 'fullSchemaCatalogue' => false,
+
+    // --- Links (internal-link graph) ------------------------------------------
+    // Power-user / secret overrides for the Links feature. These layer over the
+    // CP settings (Beacon → Links → Settings). Most installs won't need them;
+    // the embeddings keys are the usual reason to use a config file (keep the
+    // API key out of the database). Any LinkSettings property is overridable.
+    // 'links' => [
+    //     // Use AI embeddings for semantic suggestion scoring (in addition to
+    //     // keyword matching). Embeddings route through Beacon's AiClient.
+    //     'embeddingsEnabled' => true,
+    //     'embeddingsModel' => 'text-embedding-3-small',
+    //     // OpenAI-compatible host. Leave blank to reuse the global AI base URL.
+    //     'embeddingsBaseUrl' => 'https://api.openai.com',
+    //     'embeddingsApiKey' => '$OPENAI_API_KEY',
+    // ],
 ];

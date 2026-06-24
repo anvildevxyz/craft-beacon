@@ -56,6 +56,18 @@ class BeaconVariable
     private string $metaCacheStatus = 'n/a';
     private string $schemaCacheStatus = 'n/a';
 
+    private ?LinksVariable $links = null;
+
+    /**
+     * Internal-link helpers, exposed at `craft.beacon.links.*`
+     * (suggestionsFor, inboundLinks, outboundLinks, outboundLinksByType,
+     * interactionStatus).
+     */
+    public function getLinks(): LinksVariable
+    {
+        return $this->links ??= new LinksVariable();
+    }
+
     public function head(): Markup
     {
         // head() runs inside the page <head>; a throw in any sub-step (a meta-tag

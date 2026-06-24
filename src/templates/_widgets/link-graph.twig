@@ -1,0 +1,30 @@
+{% set stats = data.stats %}
+{% set brokenCount = data.brokenCount %}
+
+<div class="beacon-links-widget">
+    <div class="beacon-links-grid-4">
+        <div class="beacon-links-kpi-card">
+            <div class="beacon-links-kpi-label">{{ 'links.widget.indexed'|t('beacon') }}</div>
+            <div class="beacon-links-kpi-value">{{ stats.totalIndexed }}</div>
+        </div>
+
+        <div class="beacon-links-kpi-card">
+            <div class="beacon-links-kpi-label">{{ 'links.widget.orphans'|t('beacon') }}</div>
+            <div class="beacon-links-kpi-value beacon-links-color-warning">{{ stats.orphanCount }}</div>
+        </div>
+
+        <div class="beacon-links-kpi-card">
+            <div class="beacon-links-kpi-label">{{ 'links.widget.broken.links'|t('beacon') }}</div>
+            <div class="beacon-links-kpi-value beacon-links-color-error">{{ brokenCount }}</div>
+        </div>
+
+        <div class="beacon-links-kpi-card">
+            <div class="beacon-links-kpi-label">{{ 'links.widget.avg.links'|t('beacon') }}</div>
+            <div class="beacon-links-kpi-value">{{ stats.averageLinks|number_format(1) }}</div>
+        </div>
+    </div>
+
+    <div class="beacon-links-kpi-footer">
+        <a href="{{ cpUrl('beacon/links') }}">{{ 'links.widget.view.overview'|t('beacon') }} &rarr;</a>
+    </div>
+</div>

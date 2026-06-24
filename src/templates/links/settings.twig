@@ -1,0 +1,217 @@
+{% extends "_layouts/cp" %}
+{% import '_includes/forms' as forms %}
+
+{% set title = 'links.nav.settings'|t('beacon') %}
+{% set selectedSubnavItem = 'links' %}
+{% set fullPageForm = true %}
+{% set crumbs = [
+    { label: 'nav.beacon'|t('beacon'), url: cpUrl('beacon') },
+    { label: 'links.nav.overview'|t('beacon'), url: cpUrl('beacon/links') },
+] %}
+
+{% block content %}
+    {{ actionInput('beacon/link-settings/save') }}
+    {{ redirectInput('beacon/links/settings') }}
+
+    <h2>{{ 'links.settings.scope'|t('beacon') }}</h2>
+
+    {% set sectionOptions = [] %}
+    {% for section in sections %}
+        {% set sectionOptions = sectionOptions|merge([{ label: section.name, value: section.uid }]) %}
+    {% endfor %}
+
+    {{ forms.checkboxSelectField({
+        label: 'links.settings.enabled.sections'|t('beacon'),
+        instructions: 'links.settings.enabled.sections.instructions'|t('beacon'),
+        name: 'enabledSections',
+        values: settings.enabledSections,
+        options: sectionOptions,
+    }) }}
+
+    <hr>
+    <h2>{{ 'links.settings.indexing'|t('beacon') }}</h2>
+
+    {{ forms.textField({
+        label: 'links.settings.max.keywords'|t('beacon'),
+        name: 'maxKeywordsPerEntry',
+        value: settings.maxKeywordsPerEntry,
+        type: 'number',
+        min: 1,
+        size: 5,
+    }) }}
+
+    {{ forms.selectField({
+        label: 'links.settings.stop.words.language'|t('beacon'),
+        name: 'stopWordsLanguage',
+        value: settings.stopWordsLanguage,
+        options: [
+            { label: 'English', value: 'en' },
+            { label: 'Deutsch', value: 'de' },
+            { label: 'Español', value: 'es' },
+            { label: 'Français', value: 'fr' },
+            { label: 'Italiano', value: 'it' },
+            { label: '日本語', value: 'ja' },
+            { label: 'Nederlands', value: 'nl' },
+            { label: 'Português', value: 'pt' },
+        ],
+    }) }}
+
+    {{ forms.textField({
+        label: 'links.settings.min.keyword.length'|t('beacon'),
+        name: 'minKeywordLength',
+        value: settings.minKeywordLength,
+        type: 'number',
+        min: 1,
+        size: 5,
+    }) }}
+
+    {{ forms.lightswitchField({
+        label: 'links.settings.index.on.save'|t('beacon'),
+        instructions: 'links.settings.index.on.save.instructions'|t('beacon'),
+        name: 'indexOnSave',
+        on: settings.indexOnSave,
+    }) }}
+
+    <hr>
+    <h2>{{ 'links.settings.suggestions'|t('beacon') }}</h2>
+
+    {{ forms.lightswitchField({
+        label: 'links.settings.show.sidebar'|t('beacon'),
+        instructions: 'links.settings.show.sidebar.instructions'|t('beacon'),
+        name: 'showSidebarSuggestions',
+        on: settings.showSidebarSuggestions,
+    }) }}
+
+    {{ forms.textField({
+        label: 'links.settings.max.suggestions'|t('beacon'),
+        name: 'maxSuggestions',
+        value: settings.maxSuggestions,
+        type: 'number',
+        min: 1,
+        size: 5,
+    }) }}
+
+    {{ forms.textField({
+        label: 'links.settings.min.score'|t('beacon'),
+        instructions: 'links.settings.min.score.instructions'|t('beacon'),
+        name: 'minScore',
+        value: settings.minScore,
+        size: 5,
+    }) }}
+
+    {{ forms.textField({
+        label: 'links.settings.max.df.ratio'|t('beacon'),
+        instructions: 'links.settings.max.df.ratio.instructions'|t('beacon'),
+        name: 'maxDocumentFrequencyRatio',
+        value: settings.maxDocumentFrequencyRatio,
+        size: 5,
+    }) }}
+
+    {{ forms.lightswitchField({
+        label: 'links.settings.exclude.same.section'|t('beacon'),
+        instructions: 'links.settings.exclude.same.section.instructions'|t('beacon'),
+        name: 'excludeSameSection',
+        on: settings.excludeSameSection,
+    }) }}
+
+    <hr>
+    <h2>{{ 'links.settings.ai.embeddings'|t('beacon') }}</h2>
+
+    {{ forms.lightswitchField({
+        label: 'links.settings.enable.embeddings'|t('beacon'),
+        instructions: 'links.settings.enable.embeddings.instructions'|t('beacon'),
+        name: 'embeddingsEnabled',
+        on: settings.embeddingsEnabled,
+        toggle: '#embeddings-fields',
+    }) }}
+
+    <div id="embeddings-fields" class="{% if not settings.embeddingsEnabled %}hidden{% endif %}">
+        {{ forms.textField({
+            label: 'links.settings.embeddings.base.url'|t('beacon'),
+            instructions: 'links.settings.embeddings.base.url.instructions'|t('beacon'),
+            name: 'embeddingsBaseUrl',
+            value: settings.embeddingsBaseUrl,
+            placeholder: 'https://api.openai.com/v1',
+        }) }}
+
+        {% set hasSavedKey = settings.embeddingsApiKey is not empty %}
+        {{ forms.textField({
+            label: 'links.settings.api.key'|t('beacon'),
+            instructions: hasSavedKey
+                ? 'links.settings.api.key.saved'|t('beacon')
+                : 'links.settings.api.key.env'|t('beacon'),
+            id: 'embeddingsApiKey',
+            name: 'embeddingsApiKey',
+            type: 'password',
+            value: '',
+            placeholder: hasSavedKey ? '••••••••' : '',
+        }) }}
+
+        {{ forms.textField({
+            label: 'links.settings.embedding.model'|t('beacon'),
+            name: 'embeddingsModel',
+            value: settings.embeddingsModel,
+        }) }}
+    </div>
+
+    <hr>
+    <h2>{{ 'links.settings.scheduled.reindexing'|t('beacon') }}</h2>
+
+    {{ forms.textField({
+        label: 'links.settings.auto.reindex.interval'|t('beacon'),
+        instructions: 'links.settings.auto.reindex.interval.instructions'|t('beacon'),
+        name: 'autoReindexInterval',
+        value: settings.autoReindexInterval,
+        type: 'number',
+        min: 0,
+        size: 8,
+    }) }}
+
+    <hr>
+    <h2>{{ 'links.settings.http.audit'|t('beacon') }}</h2>
+
+    {{ forms.textField({
+        label: 'links.settings.http.audit.timeout'|t('beacon'),
+        instructions: 'links.settings.http.audit.timeout.instructions'|t('beacon'),
+        name: 'httpAuditTimeout',
+        value: settings.httpAuditTimeout,
+        type: 'number',
+        min: 0,
+        size: 5,
+    }) }}
+
+    {{ forms.textField({
+        label: 'links.settings.http.audit.delay'|t('beacon'),
+        instructions: 'links.settings.http.audit.delay.instructions'|t('beacon'),
+        name: 'httpAuditDelay',
+        value: settings.httpAuditDelay,
+        type: 'number',
+        min: 0,
+        size: 8,
+    }) }}
+
+    <hr>
+    <h2>{{ 'links.settings.reporting'|t('beacon') }}</h2>
+
+    {{ forms.textField({
+        label: 'links.settings.report.cache.duration'|t('beacon'),
+        instructions: 'links.settings.report.cache.duration.instructions'|t('beacon'),
+        name: 'reportCacheDuration',
+        value: settings.reportCacheDuration,
+        type: 'number',
+        min: 0,
+        size: 8,
+    }) }}
+
+    <hr>
+    <h2>{{ 'links.settings.anchor.analysis'|t('beacon') }}</h2>
+
+    {{ forms.textareaField({
+        label: 'links.settings.generic.anchor.patterns'|t('beacon'),
+        instructions: 'links.settings.generic.anchor.patterns.instructions'|t('beacon'),
+        id: 'genericAnchorPatterns',
+        name: 'genericAnchorPatterns',
+        value: settings.genericAnchorPatterns|join("\n"),
+        rows: 6,
+    }) }}
+{% endblock %}

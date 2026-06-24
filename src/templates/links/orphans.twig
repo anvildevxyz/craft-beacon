@@ -1,0 +1,66 @@
+{% extends "_layouts/cp" %}
+
+{% set title = 'links.nav.orphans'|t('beacon') %}
+{% set selectedSubnavItem = 'links' %}
+{% set crumbs = [
+    { label: 'nav.beacon'|t('beacon'), url: cpUrl('beacon') },
+    { label: 'links.nav.overview'|t('beacon'), url: cpUrl('beacon/links') },
+] %}
+
+{% do view.registerAssetBundle('anvildev\\beacon\\web\\assets\\links\\LinksCpAsset') %}
+
+{% block content %}
+    <div class="beacon-links-toolbar">
+        <div class="flex">
+            <form method="get">
+                <div class="flex">
+                    <div class="select">
+                        <select name="section" onchange="this.form.submit()">
+                            <option value="">{{ 'links.report.all.sections'|t('beacon') }}</option>
+                            {% for section in sections %}
+                                <option value="{{ section.handle }}" {{ selectedSection == section.handle ? 'selected' }}>{{ section.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            </form>
+            <a href="{{ url(craft.app.request.url, { format: 'csv' }) }}" class="btn">{{ 'links.report.export.csv'|t('beacon') }}</a>
+        </div>
+    </div>
+
+    {% if orphans|length %}
+        <div class="beacon-links-card">
+            <table class="data fullwidth">
+                <thead>
+                    <tr>
+                        <th>{{ 'links.report.title'|t('beacon') }}</th>
+                        <th>{{ 'links.report.section'|t('beacon') }}</th>
+                        <th>{{ 'links.report.outbound.links'|t('beacon') }}</th>
+                        <th>{{ 'links.report.date.created'|t('beacon') }}</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for orphan in orphans %}
+                        <tr>
+                            <td><strong>{{ orphan.title }}</strong></td>
+                            <td><span class="beacon-links-badge">{{ orphan.sectionName }}</span></td>
+                            <td>{{ orphan.outboundCount }}</td>
+                            <td>{{ orphan.dateCreated }}</td>
+                            <td class="thin">
+                                <a href="{{ cpUrl('beacon/links/link-detail', { entryId: orphan.elementId }) }}" class="btn small">{{ 'links.report.details'|t('beacon') }}</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="beacon-links-card">
+            <div class="beacon-links-empty-state">
+                <p class="beacon-links-empty-title">{{ 'links.report.orphans.none.title'|t('beacon') }}</p>
+                <p class="beacon-links-empty-text">{{ 'links.report.orphans.none.text'|t('beacon') }}</p>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
