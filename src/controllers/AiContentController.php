@@ -5,6 +5,7 @@ namespace anvildev\beacon\controllers;
 use anvildev\beacon\helpers\BeaconPermissions;
 use anvildev\beacon\helpers\Http;
 use anvildev\beacon\Plugin;
+use anvildev\beacon\services\ai\AiException;
 use Craft;
 use craft\elements\Asset;
 use craft\elements\Entry;
@@ -37,29 +38,31 @@ class AiContentController extends Controller
     public function actionGenerateTitle(): Response
     {
         $entry = $this->prepareForEntry();
-        return $this->asJson(['value' => Plugin::$plugin->aiContent->generateTitle($entry)]);
+        return $this->generate(fn() => ['value' => Plugin::$plugin->aiContent->generateTitle($entry)]);
     }
 
     public function actionGenerateDescription(): Response
     {
         $entry = $this->prepareForEntry();
-        return $this->asJson(['value' => Plugin::$plugin->aiContent->generateDescription($entry)]);
+        return $this->generate(fn() => ['value' => Plugin::$plugin->aiContent->generateDescription($entry)]);
     }
 
     public function actionGenerateSummary(): Response
     {
         $entry = $this->prepareForEntry();
-        return $this->asJson(['value' => Plugin::$plugin->aiContent->generateSummary($entry)]);
+        return $this->generate(fn() => ['value' => Plugin::$plugin->aiContent->generateSummary($entry)]);
     }
 
     public function actionGenerateFaq(): Response
     {
         $entry = $this->prepareForEntry();
-        $faq = Plugin::$plugin->aiContent->generateFaq($entry);
-        return $this->asJson([
-            'faq' => $faq,
-            'schema' => Plugin::$plugin->aiContent->faqSchema($faq),
-        ]);
+        return $this->generate(function() use ($entry) {
+            $faq = Plugin::$plugin->aiContent->generateFaq($entry);
+            return [
+                'faq' => $faq,
+                'schema' => Plugin::$plugin->aiContent->faqSchema($faq),
+            ];
+        });
     }
 
     public function actionGenerateAltText(): Response
@@ -76,9 +79,28 @@ class AiContentController extends Controller
         $entryId = (int) ($request->getBodyParam('entryId') ?: 0);
         $entry = $entryId > 0 ? Entry::find()->id($entryId)->status(null)->drafts(null)->provisionalDrafts(null)->siteId('*')->one() : null;
 
-        return $this->asJson([
+        return $this->generate(fn() => [
             'value' => Plugin::$plugin->aiContent->generateAltText($asset, $entry instanceof Entry ? $entry : null),
         ]);
+    }
+
+    /**
+     * Run a generation closure, translating a provider AiException into a JSON
+     * error response (HTTP 502) instead of letting it surface as a fatal 500.
+     * The front-end reads the `error` key to surface the provider's reason.
+     *
+     * @param callable(): array<string, mixed> $fn
+     */
+    private function generate(callable $fn): Response
+    {
+        try {
+            return $this->asJson($fn());
+        } catch (AiException $e) {
+            Craft::warning('Beacon AI generation failed: ' . $e->getMessage(), __METHOD__);
+            $response = $this->asJson(['error' => $e->getMessage()]);
+            $response->setStatusCode(502);
+            return $response;
+        }
     }
 
     /**
