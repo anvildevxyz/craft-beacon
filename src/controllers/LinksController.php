@@ -52,7 +52,7 @@ class LinksController extends \craft\web\Controller
     public function actionIndex(): Response
     {
         $this->getView()->registerAssetBundle(LinksCpAsset::class);
-        $siteId = Craft::$app->getSites()->getCurrentSite()->id;
+        $siteId = $this->resolveSite()->id;
         $settings = Plugin::$plugin->links->getSettings();
         $stats = Plugin::$plugin->links->reports->getOverviewStats($siteId, $settings->reportCacheDuration);
         $trends = Plugin::$plugin->links->trends->getRecentSnapshots($siteId, 30);
@@ -70,7 +70,7 @@ class LinksController extends \craft\web\Controller
      */
     public function actionOrphans(): Response
     {
-        $siteId = Craft::$app->getSites()->getCurrentSite()->id;
+        $siteId = $this->resolveSite()->id;
         $sectionHandle = Http::request()->getQueryParam('section');
         $orphans = Plugin::$plugin->links->reports->getOrphanPages($siteId, $sectionHandle);
 
@@ -91,7 +91,7 @@ class LinksController extends \craft\web\Controller
      */
     public function actionLinkMap(): Response
     {
-        $siteId = Craft::$app->getSites()->getCurrentSite()->id;
+        $siteId = $this->resolveSite()->id;
         $sectionHandle = Http::request()->getQueryParam('section');
         $linkMap = Plugin::$plugin->links->reports->getLinkMap($siteId, $sectionHandle);
 
@@ -115,7 +115,7 @@ class LinksController extends \craft\web\Controller
     public function actionLinkDetail(): Response
     {
         $entryId = (int) Http::request()->getRequiredQueryParam('entryId');
-        $siteId = Craft::$app->getSites()->getCurrentSite()->id;
+        $siteId = $this->resolveSite()->id;
         /** @var Entry|null $entry */
         $entry = Entry::find()->id($entryId)->siteId($siteId)->status(null)->one();
         if ($entry === null) {
@@ -230,7 +230,7 @@ class LinksController extends \craft\web\Controller
      */
     public function actionClickDepth(): Response
     {
-        $siteId = Craft::$app->getSites()->getCurrentSite()->id;
+        $siteId = $this->resolveSite()->id;
         $result = Plugin::$plugin->links->depth->calculateDepths($siteId);
 
         $depths = $result['depths'];
@@ -306,7 +306,7 @@ class LinksController extends \craft\web\Controller
      */
     public function actionBrokenLinks(): Response
     {
-        $siteId = Craft::$app->getSites()->getCurrentSite()->id;
+        $siteId = $this->resolveSite()->id;
         $broken = Plugin::$plugin->links->brokenLinks->findBroken($siteId);
 
         $enriched = [];
@@ -342,7 +342,7 @@ class LinksController extends \craft\web\Controller
      */
     public function actionAnchorText(): Response
     {
-        $siteId = Craft::$app->getSites()->getCurrentSite()->id;
+        $siteId = $this->resolveSite()->id;
         $settings = Plugin::$plugin->links->getSettings();
         $generic = Plugin::$plugin->links->anchorText->findGenericAnchors($siteId, $settings->genericAnchorPatterns);
 
@@ -388,7 +388,7 @@ class LinksController extends \craft\web\Controller
      */
     public function actionExternalLinks(): Response
     {
-        $siteId = Craft::$app->getSites()->getCurrentSite()->id;
+        $siteId = $this->resolveSite()->id;
         $records = LinkRecord::find()->where(['sourceSiteId' => $siteId, 'isExternal' => true])->all();
 
         $enriched = [];
