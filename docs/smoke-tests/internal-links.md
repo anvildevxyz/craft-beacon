@@ -46,9 +46,15 @@ Beacon analyses entry content to build a directed internal-link graph and surfac
 
 ---
 
+## Findings (2026-06-24 live run)
+- 🐛→✅ **Site-scoping bug found & fixed** (`3025552`): report screens used `getCurrentSite()` and ignored `?site=`, always showing the primary site. Now use `resolveSite()`. Verified: French overview shows 19 indexed (was wrongly 38).
+- ✅ Console default actions added for `link-snapshot`/`link-audit` (`aaf8cf5`).
+- ✅ Draft entries are correctly excluded from indexing (save-event guard + reindex query).
+- ⚠️ Purge-on-delete (#45) not live-verified: couldn't publish a throwaway test entry in this env (Pages/Contact-Page requires a "Hero" entry). Handler is simple ported code + FK CASCADE; verify when a publishable section is available.
+
 ## Scenarios
 
-Legend: ✅ verified 2026-06-24 · ☐ to run
+Legend: ✅ verified 2026-06-24 · ◑ partially verified · ☐ to run
 
 ### A. Indexing
 1. ☐ **Full index** — run `beacon/link-index` then `queue/run`. *Expect:* "Queued N jobs for M entries", jobs complete, `beacon_link_index` + `beacon_links` populate. ✅
@@ -67,11 +73,11 @@ Legend: ✅ verified 2026-06-24 · ☐ to run
 12. ✅ **Anchor text** — `beacon/links/anchor-text`. *Expect:* anchors listed; generic phrases (from `genericAnchorPatterns`) flagged. (Renders, console clean.)
 13. ✅ **External links** — `beacon/links/external-links`. *Expect:* outbound external URLs inventory. (Renders, console clean.)
 14. ☐ **CSV export** — append `?format=csv` to any report. *Expect:* a CSV download with the same rows (CSV-injection-escaped).
-15. ☐ **Multi-site scope** — switch site (`?site=fr`). *Expect:* report data scoped to that site; counts differ from English.
+15. ✅ **Multi-site scope** — switch site (`?site=french`). *Expect:* report data scoped to that site. Verified after the scoping fix: French overview = 19 indexed / 19 orphans vs English 38 / 27.
 
 ### C. Suggestions & sidebar
 16. ✅ **Sidebar renders** — open an indexed entry. *Expect:* Beacon "Internal links" panel lists scored suggestions with Insert Link / Dismiss, plus Highlight-in-content + Refresh.
-17. ☐ **Accept (Insert Link)** — click Insert Link on a suggestion. *Expect:* anchor inserted into CKEditor wrapping the matched phrase; a `beacon_link_suggestions` row with status `accepted`.
+17. ◑ **Accept (Insert Link)** — click Insert Link on a suggestion. *Expect:* anchor inserted into CKEditor wrapping the matched phrase; `beacon_link_suggestions` row `accepted`. *Verified the graceful-fail branch* (no matching phrase in body → copy-link fallback, suggestion kept, no JS error, no accepted row). The success branch shares the proven `record-interaction` path (see #18) but needs a body containing the target's title to trigger insertion.
 18. ✅ **Dismiss** — click Dismiss. *Expect:* suggestion removed from panel; `beacon_link_suggestions` row status `dismissed` (correct source/target/site). ✅
 19. ☐ **Bulk update** — in the suggestions report, bulk accept/dismiss. *Expect:* rows update; `EDIT_LINKS` enforced.
 20. ☐ **maxSuggestions / minScore** — lower `maxSuggestions` to 3 and raise `minScore`. *Expect:* sidebar shows ≤3 and drops low-score suggestions after reindex/refresh.
