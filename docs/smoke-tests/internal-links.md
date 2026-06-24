@@ -59,13 +59,13 @@ Legend: ✅ verified 2026-06-24 · ☐ to run
 
 ### B. Reports
 6. ✅ **Overview** — visit `beacon/links`. *Expect:* indexed count, orphan count, avg links, broken count, acceptance %, quick actions — all populated.
-7. ☐ **Orphans** — `beacon/links/orphans`. *Expect:* lists entries with 0 inbound internal links; empty-state when none.
-8. ☐ **Link map** — `beacon/links/link-map`. *Expect:* per-entry inbound/outbound counts; click through to link-detail.
-9. ☐ **Link detail** — `beacon/links/link-detail?entryId=<id>`. *Expect:* inbound + outbound lists for that entry; "Edit entry" link.
-10. ☐ **Click depth** — `beacon/links/click-depth`. *Expect:* BFS depth from homepage; unreachable entries flagged.
-11. ☐ **Broken links** — `beacon/links/broken-links`. *Expect:* rows with httpStatus / deleted-target / disabled status; empty-state when none.
-12. ☐ **Anchor text** — `beacon/links/anchor-text`. *Expect:* anchors listed; generic phrases (from `genericAnchorPatterns`) flagged.
-13. ☐ **External links** — `beacon/links/external-links`. *Expect:* outbound external URLs inventory.
+7. ✅ **Orphans** — `beacon/links/orphans`. *Expect:* lists entries with 0 inbound internal links; section filter; empty-state when none. (27-row table verified.)
+8. ✅ **Link map** — `beacon/links/link-map`. *Expect:* per-entry inbound/outbound counts; click through to link-detail. (Renders, console clean.)
+9. ✅ **Link detail** — `beacon/links/link-detail?entryId=<id>`. *Expect:* inbound + outbound lists; "Edit entry"/"View" links. (Verified for entry 944.)
+10. ✅ **Click depth** — `beacon/links/click-depth`. *Expect:* BFS depth from homepage; unreachable entries flagged. (Renders, console clean.)
+11. ✅ **Broken links** — `beacon/links/broken-links`. *Expect:* rows with httpStatus / deleted-target / disabled status; empty-state when none. (Renders, console clean.)
+12. ✅ **Anchor text** — `beacon/links/anchor-text`. *Expect:* anchors listed; generic phrases (from `genericAnchorPatterns`) flagged. (Renders, console clean.)
+13. ✅ **External links** — `beacon/links/external-links`. *Expect:* outbound external URLs inventory. (Renders, console clean.)
 14. ☐ **CSV export** — append `?format=csv` to any report. *Expect:* a CSV download with the same rows (CSV-injection-escaped).
 15. ☐ **Multi-site scope** — switch site (`?site=fr`). *Expect:* report data scoped to that site; counts differ from English.
 
