@@ -83,4 +83,32 @@ class CitationDetectorTest extends TestCase
         );
         $this->assertSame(['https://acme.com/page'], $result['matchedUrls']);
     }
+
+    /** @dataProvider superstringProvider */
+    public function testDomainSuperstringsAreNotMentions(string $answer): void
+    {
+        $result = (new CitationDetector())->detect($answer, ['acme.com'], ['rival.com']);
+        $this->assertFalse($result['domainMentioned'], "Expected '$answer' not to count as a mention");
+        $this->assertSame([], $result['competitorMentions']);
+    }
+
+    /** @return array<string, array{string}> */
+    public static function superstringProvider(): array
+    {
+        return [
+            'longer TLD' => ['Try the acme.computer app instead.'],
+            'community suffix' => ['Join the myacme.community forum.'],
+            'prefixed label' => ['Beware notacme.com, the lookalike.'],
+        ];
+    }
+
+    public function testSubdomainStillCountsAsMention(): void
+    {
+        $result = (new CitationDetector())->detect(
+            'The docs live at docs.acme.com without a link.',
+            ['acme.com'],
+            [],
+        );
+        $this->assertTrue($result['domainMentioned']);
+    }
 }
