@@ -68,15 +68,27 @@ class ReportService extends Component
             $sectionEntryIdSet = array_fill_keys($sectionEntryIds, true);
 
             $totalEntries = count($sectionEntryIds);
-            $outboundCounts = LinkRecord::find()
-                ->select([new Expression('COUNT(*) as cnt')])
-                ->where(['sourceSiteId' => $siteId])
-                ->groupBy('sourceElementId')
-                ->column();
-            $averageLinks = $this->calculateAverage($outboundCounts);
             $allIndexedIds = LinkIndexRecord::find()->where(['siteId' => $siteId])->select('elementId')->column();
             // Filter to only section entries
-            $allIndexedIds = array_filter($allIndexedIds, fn($id) => isset($sectionEntryIdSet[$id]));
+            $allIndexedIds = array_values(array_filter($allIndexedIds, fn($id) => isset($sectionEntryIdSet[$id])));
+
+            // Average outbound links over the same indexed section-entry
+            // population the orphan/no-outbound tiles use, so all three KPIs
+            // share one denominator (entries with no outbound links count as 0).
+            $outboundByEntry = LinkRecord::find()
+                ->select(['sourceElementId', new Expression('COUNT(*) as cnt')])
+                ->where(['sourceSiteId' => $siteId, 'sourceElementId' => $allIndexedIds])
+                ->groupBy('sourceElementId')
+                ->asArray()
+                ->all();
+            $countMap = [];
+            foreach ($outboundByEntry as $row) {
+                $countMap[(int) $row['sourceElementId']] = (int) $row['cnt'];
+            }
+            $averageLinks = $this->calculateAverage(
+                array_map(static fn($id) => $countMap[$id] ?? 0, $allIndexedIds),
+            );
+
             $hasInboundIds = LinkRecord::find()->where(['targetSiteId' => $siteId])->select('targetElementId')->distinct()->column();
             $orphanCount = count(array_diff($allIndexedIds, $hasInboundIds));
             $hasOutboundIds = LinkRecord::find()->where(['sourceSiteId' => $siteId])->select('sourceElementId')->distinct()->column();
