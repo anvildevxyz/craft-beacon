@@ -2,11 +2,14 @@
 
 namespace anvildev\beacon\jobs\traits;
 
+use anvildev\beacon\helpers\links\KeywordExtractor;
 use anvildev\beacon\helpers\links\VolumeUrlResolver;
+use anvildev\beacon\Plugin;
 use anvildev\beacon\services\Links;
 use Craft;
 use craft\elements\Asset;
 use craft\elements\Entry;
+use craft\helpers\App;
 
 /**
  * @property int $siteId
@@ -15,6 +18,107 @@ trait IndexesEntries
 {
     /** @var array<string, int>|null */
     private ?array $volumePrefixMap = null;
+
+    /**
+     * Run the full index pipeline for a single root entry: scan and persist its
+     * link records, then (re)build its keyword index and embedding when the
+     * content has changed.
+     *
+     * Link records are always refreshed. Returns true only when the keyword
+     * index was actually rewritten (content changed), and false when the entry
+     * was skipped — disabled section, links-only/empty body, or unchanged
+     * content. Nested-entry handling and queue progress are the caller's
+     * concern; $entry is assumed to be a root (non-nested) entry.
+     *
+     * @param callable(float, string): void|null $progress optional progress reporter
+     */
+    protected function indexRootEntry(Entry $entry, int $entryId, ?callable $progress = null): bool
+    {
+        $progress ??= static function(float $pct, string $message): void {
+        };
+
+        $links = Plugin::getInstance()?->links;
+        if ($links === null) {
+            Craft::warning('Beacon: Plugin instance unavailable, skipping index.', 'beacon');
+            return false;
+        }
+        $settings = $links->getSettings();
+
+        $section = $entry->getSection();
+        if ($settings->enabledSections !== [] && ($section === null || !in_array($section->uid, $settings->enabledSections, true))) {
+            return false;
+        }
+
+        $progress(0.1, 'Extracting content...');
+
+        // Collect content from this entry AND all its nested entries
+        $allFieldContent = $this->collectAllFieldContent($entry, $links);
+        $structured = $links->index->extractStructuredContent($entry->title ?? '', $allFieldContent);
+
+        $progress(0.5, 'Scanning links...');
+
+        // Always scan links — even entries with no text content may contain
+        // internal links needed for click-depth calculations (e.g. the homepage).
+        $siteUrl = Craft::$app->getSites()->getSiteById($this->siteId)?->getBaseUrl() ?? '';
+        $extractedLinks = $links->linkScan->extractLinksFromFields($allFieldContent, $siteUrl);
+        $resolvedLinks = $this->resolveLinks($extractedLinks, $entryId, $siteUrl);
+
+        // Also capture entry relations (Entries fields, Hyper link fields) — these
+        // represent navigable links even though they aren't <a> tags in HTML.
+        $relationLinks = $this->collectEntryRelations($entry);
+        foreach ($relationLinks as $rel) {
+            // Skip self-links and duplicates
+            if ($rel['targetElementId'] === $entryId) {
+                continue;
+            }
+            $resolvedLinks[] = $rel;
+        }
+
+        $links->linkScan->saveLinks($entryId, $this->siteId, $resolvedLinks);
+
+        if ($structured['body'] === '' && $structured['title'] === '') {
+            $progress(1.0, 'Done (links only).');
+            return false;
+        }
+
+        $progress(0.3, 'Extracting keywords...');
+
+        $extractor = new KeywordExtractor(
+            maxKeywords: $settings->maxKeywordsPerEntry,
+            minLength: $settings->minKeywordLength,
+            language: $settings->stopWordsLanguage,
+        );
+        $keywords = $extractor->extractStructured($structured);
+
+        $existingHash = $links->index->getExistingHash($entryId, $this->siteId);
+        if (!$links->index->shouldReindex($keywords, $existingHash)) {
+            $progress(1.0, 'No changes detected.');
+            return false;
+        }
+
+        $links->index->saveIndex($entryId, $this->siteId, $keywords);
+
+        $progress(0.7, 'Processing embeddings...');
+
+        $apiKey = App::parseEnv($settings->embeddingsApiKey);
+        if ($settings->embeddingsEnabled && $apiKey !== '' && $apiKey !== false) {
+            $baseUrl = App::parseEnv($settings->embeddingsBaseUrl);
+            $text = $links->index->extractTextFromFields($allFieldContent);
+            $embedding = $links->embedding->fetchEmbedding(
+                $text,
+                $settings->embeddingsModel,
+                (string) $apiKey,
+                is_string($baseUrl) ? $baseUrl : null,
+            );
+            if ($embedding !== null) {
+                $links->embedding->saveEmbedding($entryId, $this->siteId, $embedding, $settings->embeddingsModel);
+            }
+        }
+
+        $links->suggestions->invalidateCache($entryId, $this->siteId);
+
+        return true;
+    }
 
     /** @return array<string, int> */
     private function getVolumePrefixMap(): array
