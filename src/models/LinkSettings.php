@@ -20,6 +20,9 @@ use craft\base\Model;
  */
 class LinkSettings extends Model
 {
+    /** Master switch — when false, indexing, sidebar, reports, and Twig helpers are off. */
+    public bool $enabled = true;
+
     /** @var list<string> Section handles eligible for indexing. Empty = all. */
     public array $enabledSections = [];
     public int $maxKeywordsPerEntry = 50;
@@ -78,7 +81,7 @@ class LinkSettings extends Model
             [['maxKeywordsPerEntry'], 'integer', 'min' => 1],
             [['stopWordsLanguage'], 'in', 'range' => ['en', 'de', 'es', 'fr', 'it', 'ja', 'nl', 'pt']],
             [['minKeywordLength'], 'integer', 'min' => 1],
-            [['indexOnSave', 'showSidebarSuggestions', 'excludeSameSection', 'embeddingsEnabled'], 'boolean'],
+            [['enabled', 'indexOnSave', 'showSidebarSuggestions', 'excludeSameSection', 'embeddingsEnabled'], 'boolean'],
             [['maxSuggestions'], 'integer', 'min' => 1],
             [['minScore'], 'number', 'min' => 0],
             [['maxDocumentFrequencyRatio'], 'number', 'min' => 0.1, 'max' => 1.0],

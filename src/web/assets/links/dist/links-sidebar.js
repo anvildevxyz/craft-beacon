@@ -4,10 +4,13 @@
     const BeaconLinksSidebar = {
         suggestions: [],
         highlightsActive: false,
+        highlightedTargetId: null,
+        labels: {},
 
-        init: function(entryId, siteId) {
+        init: function(entryId, siteId, labels) {
             this.entryId = entryId;
             this.siteId = siteId;
+            this.labels = labels || {};
             this.panel = document.getElementById('beacon-links-panel');
             this.container = document.getElementById('beacon-links-suggestions');
             if (!this.panel || !this.container) return;
@@ -34,39 +37,87 @@
                     this.loadSuggestions();
                 } else if (action === 'toggle-highlights') {
                     this.toggleHighlights(btn);
+                } else if (action === 'highlight-one') {
+                    this.toggleHighlightOne(targetId, btn);
                 }
             });
         },
 
-        toggleHighlights: function(btn) {
-            if (this.highlightsActive) {
-                // Turn off
-                BeaconLinksHighlights.disable();
-                this.highlightsActive = false;
-                btn.textContent = 'Show in Content';
+        label: function(key, fallback) {
+            return this.labels[key] || fallback;
+        },
+
+        clearHighlightUi: function() {
+            BeaconLinksHighlights.disable();
+            this.highlightsActive = false;
+            this.highlightedTargetId = null;
+
+            const globalBtn = this.panel.querySelector('[data-beacon-links-action="toggle-highlights"]');
+            if (globalBtn) {
+                globalBtn.textContent = this.label('showAllInContent', 'Highlight in content');
+                globalBtn.classList.remove('active');
+            }
+
+            this.container.querySelectorAll('[data-beacon-links-action="highlight-one"]').forEach(btn => {
+                btn.textContent = this.label('highlightOne', 'Highlight');
                 btn.classList.remove('active');
-                // Remove match badges
-                this.container.querySelectorAll('.beacon-links-match-count').forEach(el => el.remove());
+            });
+            this.container.querySelectorAll('.beacon-links-match-count').forEach(el => el.remove());
+        },
+
+        toggleHighlights: function(btn) {
+            if (this.highlightsActive && this.highlightedTargetId === null) {
+                this.clearHighlightUi();
             } else {
-                // Turn on
                 if (this.suggestions.length === 0) {
-                    Craft.cp.displayNotice('No suggestions to highlight.');
+                    Craft.cp.displayNotice(this.label('noSuggestions', 'No suggestions to highlight.'));
                     return;
                 }
+                this.clearHighlightUi();
+
                 const matchCounts = BeaconLinksHighlights.enable(
                     this.suggestions,
                     (suggestion) => this.onHighlightLinked(suggestion)
                 );
                 this.highlightsActive = true;
-                btn.textContent = 'Hide Highlights';
+                btn.textContent = this.label('hideAllInContent', 'Hide highlights');
                 btn.classList.add('active');
-                // Show match count badges on sidebar items
                 this.updateMatchBadges(matchCounts);
 
                 const totalMatches = Object.values(matchCounts).reduce((a, b) => a + b, 0);
                 if (totalMatches === 0) {
-                    Craft.cp.displayNotice('No matching phrases found in content. Add links manually where the topics overlap.');
+                    Craft.cp.displayNotice(this.label('noMatchesAll', 'No matching phrases found in content.'));
                 }
+            }
+        },
+
+        toggleHighlightOne: function(targetId, btn) {
+            if (this.highlightedTargetId === targetId) {
+                this.clearHighlightUi();
+                return;
+            }
+
+            const suggestion = this.suggestions.find(s => s.elementId === targetId);
+            if (!suggestion) {
+                return;
+            }
+
+            this.clearHighlightUi();
+
+            const matchCount = BeaconLinksHighlights.enableOne(
+                suggestion,
+                (s) => this.onHighlightLinked(s)
+            );
+
+            this.highlightsActive = true;
+            this.highlightedTargetId = targetId;
+            btn.textContent = this.label('hideHighlightOne', 'Hide');
+            btn.classList.add('active');
+
+            if (matchCount > 0) {
+                this.updateMatchBadges({ [targetId]: matchCount });
+            } else {
+                Craft.cp.displayNotice(this.label('noMatchesOne', 'No matching phrase found in content for this suggestion.'));
             }
         },
 
@@ -85,6 +136,8 @@
 
             // Remove from local suggestions
             this.suggestions = this.suggestions.filter(s => s.elementId !== suggestion.elementId);
+
+            this.clearHighlightUi();
 
             // Check if list is empty
             const remaining = this.container.querySelectorAll('.beacon-links-suggestion');
@@ -128,13 +181,7 @@
 
             // If highlights are active, turn them off during reload
             if (this.highlightsActive) {
-                BeaconLinksHighlights.disable();
-                this.highlightsActive = false;
-                const toggleBtn = this.panel.querySelector('[data-beacon-links-action="toggle-highlights"]');
-                if (toggleBtn) {
-                    toggleBtn.textContent = 'Show in Content';
-                    toggleBtn.classList.remove('active');
-                }
+                this.clearHighlightUi();
             }
 
             fetch(Craft.getActionUrl('beacon/link-suggestions/get', {
@@ -182,6 +229,11 @@
                     '<div class="beacon-links-score-fill" style="width: ' + scorePercent + '%"></div>' +
                 '</div>' +
                 '<div class="beacon-links-actions">' +
+                    '<button type="button" class="btn small" ' +
+                        'data-beacon-links-action="highlight-one" ' +
+                        'data-target-id="' + s.elementId + '" ' +
+                        'data-score="' + s.score + '"' +
+                    '>' + this.escapeHtml(this.label('highlightOne', 'Highlight')) + '</button>' +
                     '<button type="button" class="btn small submit" ' +
                         'data-beacon-links-action="use-link" ' +
                         'data-url="' + this.escapeAttr(url) + '" ' +

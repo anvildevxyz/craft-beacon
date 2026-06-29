@@ -19,6 +19,8 @@ use yii\console\ExitCode;
  */
 class LinkSnapshotController extends Controller
 {
+    use RequiresLinksEnabledConsoleTrait;
+
     /** @var string The only action; lets bare `beacon/link-snapshot` run it. */
     public $defaultAction = 'run';
 
@@ -31,6 +33,10 @@ class LinkSnapshotController extends Controller
      */
     public function actionRun(): int
     {
+        if (($exit = $this->exitIfLinksDisabled()) !== null) {
+            return $exit;
+        }
+
         $links = Plugin::$plugin->links;
         $sites = Craft::$app->getSites()->getAllSites();
 

@@ -155,6 +155,8 @@ return [
     // the embeddings keys are the usual reason to use a config file (keep the
     // API key out of the database). Any LinkSettings property is overridable.
     // 'links' => [
+    //     // Master switch — disables indexing, sidebar, reports, and craft.beacon.links.*
+    //     'enabled' => false,
     //     // Use AI embeddings for semantic suggestion scoring (in addition to
     //     // keyword matching). Embeddings route through Beacon's AiClient.
     //     'embeddingsEnabled' => true,

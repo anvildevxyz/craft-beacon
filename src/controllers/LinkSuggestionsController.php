@@ -34,6 +34,7 @@ class LinkSuggestionsController extends Controller
     // =========================================================================
 
     use BeaconCpPermissionTrait;
+    use RequiresLinksEnabledTrait;
 
     // =========================================================================
     // Const Properties
@@ -60,6 +61,9 @@ class LinkSuggestionsController extends Controller
     public function beforeAction($action): bool
     {
         if (!parent::beforeAction($action)) {
+            return false;
+        }
+        if (!$this->requireLinksFeatureEnabled()) {
             return false;
         }
         if (!$this->checkRateLimit()) {

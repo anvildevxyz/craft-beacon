@@ -73,6 +73,22 @@
         },
 
         /**
+         * Highlight matches for a single suggestion only (clears any existing markers).
+         *
+         * @param {Object} suggestion
+         * @param {Function} onLinkInserted
+         * @returns {number} match count for this suggestion
+         */
+        enableOne: function(suggestion, onLinkInserted) {
+            this.removeAllMarkers();
+            this.suggestions = [suggestion];
+            this.onLinkInserted = onLinkInserted;
+            this.active = true;
+            const matchCounts = this.scan();
+            return matchCounts[suggestion.elementId] || 0;
+        },
+
+        /**
          * Disable all highlights and remove all markers.
          */
         disable: function() {

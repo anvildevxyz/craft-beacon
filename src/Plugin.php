@@ -226,7 +226,7 @@ class Plugin extends BasePlugin
 
     public bool $hasCpSettings = false;
     public bool $hasCpSection = true;
-    public string $schemaVersion = '1.1.1';
+    public string $schemaVersion = '1.2.0';
     public $controllerNamespace = 'anvildev\\beacon\\controllers';
 
     /**
@@ -721,7 +721,7 @@ class Plugin extends BasePlugin
                 if (!$entry instanceof Entry || !$entry->id || $entry->getIsDraft() || $entry->getIsRevision() || $entry->propagating) {
                     return;
                 }
-                if (!self::$plugin->links->getSettings()->indexOnSave) {
+                if (!self::$plugin->links->isEnabled() || !self::$plugin->links->getSettings()->indexOnSave) {
                     return;
                 }
                 $cacheKey = "beacon:linkIndexPending:{$entry->id}:{$entry->siteId}";
@@ -757,7 +757,7 @@ class Plugin extends BasePlugin
             Entry::class,
             Entry::EVENT_DEFINE_SIDEBAR_HTML,
             static function(DefineHtmlEvent $event): void {
-                if (!self::$plugin->links->getSettings()->showSidebarSuggestions) {
+                if (!self::$plugin->links->isEnabled() || !self::$plugin->links->getSettings()->showSidebarSuggestions) {
                     return;
                 }
                 $entry = $event->sender;

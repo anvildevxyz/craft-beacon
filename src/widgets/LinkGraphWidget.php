@@ -45,6 +45,10 @@ final class LinkGraphWidget extends Widget
 
     public function getBodyHtml(): ?string
     {
+        if (!Plugin::$plugin->links->isEnabled()) {
+            return '<p class="light">' . Craft::t('beacon', 'links.disabled.widget') . '</p>';
+        }
+
         $this->registerBeaconCpAsset();
         $siteId = Craft::$app->getSites()->getCurrentSite()->id;
 

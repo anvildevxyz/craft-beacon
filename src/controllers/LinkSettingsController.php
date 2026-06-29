@@ -62,6 +62,7 @@ class LinkSettingsController extends Controller
         $links = Plugin::$plugin->links;
         $settings = $links->getSettings();
 
+        $settings->enabled = (bool) $request->getBodyParam('enabled', true);
         $enabledSections = $request->getBodyParam('enabledSections', []);
         $settings->enabledSections = is_array($enabledSections) ? array_values(array_filter($enabledSections, 'is_string')) : [];
         $settings->maxKeywordsPerEntry = (int) $request->getBodyParam('maxKeywordsPerEntry', 50);

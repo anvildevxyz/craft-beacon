@@ -19,6 +19,8 @@ use yii\console\ExitCode;
  */
 class LinkIndexController extends Controller
 {
+    use RequiresLinksEnabledConsoleTrait;
+
     // =========================================================================
     // Const Properties
     // =========================================================================
@@ -58,6 +60,10 @@ class LinkIndexController extends Controller
      */
     public function actionIndex(): int
     {
+        if (($exit = $this->exitIfLinksDisabled()) !== null) {
+            return $exit;
+        }
+
         $settings = Plugin::$plugin->links->getSettings();
         $sites = Craft::$app->getSites()->getAllSites();
         $totalQueued = 0;

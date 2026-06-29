@@ -18,6 +18,8 @@ use yii\console\ExitCode;
  */
 class LinkAuditController extends Controller
 {
+    use RequiresLinksEnabledConsoleTrait;
+
     /** @var string The only action; lets bare `beacon/link-audit` run it. */
     public $defaultAction = 'broken';
 
@@ -59,6 +61,10 @@ class LinkAuditController extends Controller
      */
     public function actionBroken(): int
     {
+        if (($exit = $this->exitIfLinksDisabled()) !== null) {
+            return $exit;
+        }
+
         // Only external links need an HTTP round trip. Internal links resolve
         // via Craft's element tables; running them through Guzzle just trips the
         // SSRF blocker and leaves httpStatus=0, which surfaces as a false

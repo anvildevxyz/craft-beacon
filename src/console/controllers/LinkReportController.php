@@ -22,6 +22,7 @@ class LinkReportController extends Controller
     // =========================================================================
 
     use SiteHandleResolverTrait;
+    use RequiresLinksEnabledConsoleTrait;
 
     // =========================================================================
     // Public Properties
@@ -53,6 +54,10 @@ class LinkReportController extends Controller
      */
     public function actionOrphans(): int
     {
+        if (($exit = $this->exitIfLinksDisabled()) !== null) {
+            return $exit;
+        }
+
         $siteId = $this->resolveSiteIdOrPrimary();
         if ($siteId === null) {
             return ExitCode::CONFIG;
@@ -84,6 +89,10 @@ class LinkReportController extends Controller
      */
     public function actionStats(): int
     {
+        if (($exit = $this->exitIfLinksDisabled()) !== null) {
+            return $exit;
+        }
+
         $siteId = $this->resolveSiteIdOrPrimary();
         if ($siteId === null) {
             return ExitCode::CONFIG;

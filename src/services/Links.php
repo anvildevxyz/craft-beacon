@@ -108,6 +108,16 @@ class Links extends Component
     }
 
     /**
+     * Whether the internal-link graph feature is active (indexing, sidebar,
+     * reports, Twig helpers). Controlled via Links → Settings or
+     * `config/beacon.php` `links.enabled`.
+     */
+    public function isEnabled(): bool
+    {
+        return $this->getSettings()->enabled;
+    }
+
+    /**
      * Returns the feature settings, memoized for the request. Layering:
      * `config/beacon.php` (`links` sub-array) > DB row > model defaults.
      */
@@ -121,6 +131,7 @@ class Links extends Component
         $record = LinkSettingsRecord::findOne(1);
         if ($record !== null) {
             $settings->setAttributes([
+                'enabled' => (bool) $record->enabled,
                 'enabledSections' => Json::decodeStringList(is_string($record->enabledSections) ? $record->enabledSections : null),
                 'maxKeywordsPerEntry' => (int) $record->maxKeywordsPerEntry,
                 'stopWordsLanguage' => (string) $record->stopWordsLanguage,
@@ -159,6 +170,7 @@ class Links extends Component
 
         $record = LinkSettingsRecord::findOne(1) ?? new LinkSettingsRecord(['id' => 1]);
         $record->setAttributes([
+            'enabled' => $settings->enabled,
             'enabledSections' => Json::encode($settings->enabledSections),
             'maxKeywordsPerEntry' => $settings->maxKeywordsPerEntry,
             'stopWordsLanguage' => $settings->stopWordsLanguage,

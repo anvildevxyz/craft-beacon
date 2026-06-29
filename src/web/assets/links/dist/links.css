@@ -466,6 +466,7 @@
 
 .beacon-links-actions {
     display: flex;
+    flex-wrap: wrap;
     gap: 6px;
     margin-top: 8px;
 }
@@ -496,7 +497,8 @@
     gap: 4px;
 }
 
-[data-beacon-links-action="toggle-highlights"].active {
+[data-beacon-links-action="toggle-highlights"].active,
+[data-beacon-links-action="highlight-one"].active {
     background: #3b82f6;
     color: #fff;
     border-color: #3b82f6;

@@ -4,7 +4,7 @@
     <h3>
         {{ 'links.sidebar.title'|t('beacon') }}
         <span class="beacon-links-header-actions">
-            <button type="button" class="btn small" data-beacon-links-action="toggle-highlights" title="{{ 'links.sidebar.highlight.title'|t('beacon') }}">{{ 'links.sidebar.show.in.content'|t('beacon') }}</button>
+            <button type="button" class="btn small" data-beacon-links-action="toggle-highlights" title="{{ 'links.sidebar.highlight.all.title'|t('beacon') }}">{{ 'links.sidebar.show.in.content'|t('beacon') }}</button>
             <button type="button" class="btn small" data-beacon-links-action="refresh">{{ 'links.sidebar.refresh'|t('beacon') }}</button>
         </span>
     </h3>
@@ -17,5 +17,13 @@
 </div>
 
 {% js %}
-    BeaconLinksSidebar.init({{ entryId }}, {{ siteId }});
+    BeaconLinksSidebar.init({{ entryId }}, {{ siteId }}, {
+        showAllInContent: {{ 'links.sidebar.show.in.content'|t('beacon')|json_encode|raw }},
+        hideAllInContent: {{ 'links.sidebar.hide.all.in.content'|t('beacon')|json_encode|raw }},
+        highlightOne: {{ 'links.sidebar.highlight.one'|t('beacon')|json_encode|raw }},
+        hideHighlightOne: {{ 'links.sidebar.highlight.one.hide'|t('beacon')|json_encode|raw }},
+        noSuggestions: {{ 'links.sidebar.highlight.no.suggestions'|t('beacon')|json_encode|raw }},
+        noMatchesAll: {{ 'links.sidebar.highlight.no.matches.all'|t('beacon')|json_encode|raw }},
+        noMatchesOne: {{ 'links.sidebar.highlight.no.matches.one'|t('beacon')|json_encode|raw }},
+    });
 {% endjs %}

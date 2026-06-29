@@ -84,6 +84,7 @@ class m260624_000001_links extends Migration
 
         $this->createTable('{{%beacon_link_settings}}', [
             'id' => $this->primaryKey(),
+            'enabled' => $this->boolean()->notNull()->defaultValue(true),
             'enabledSections' => $this->text()->null(),
             'maxKeywordsPerEntry' => $this->integer()->notNull()->defaultValue(50),
             'stopWordsLanguage' => $this->string(8)->notNull()->defaultValue('en'),

@@ -8,6 +8,7 @@ use craft\db\ActiveRecord;
  * Single-row store (id = 1) for the Links feature settings.
  *
  * @property int $id
+ * @property bool $enabled
  * @property string|null $enabledSections JSON list of section handles
  * @property int $maxKeywordsPerEntry
  * @property string $stopWordsLanguage

@@ -33,6 +33,7 @@ class LinksController extends \craft\web\Controller
     // =========================================================================
 
     use BeaconCpPermissionTrait;
+    use RequiresLinksEnabledTrait;
     use SiteScopedCpControllerTrait;
 
     // =========================================================================
@@ -44,6 +45,22 @@ class LinksController extends \craft\web\Controller
     // =========================================================================
     // Public Methods
     // =========================================================================
+
+    /**
+     * @param \yii\base\Action $action
+     */
+    public function beforeAction($action): bool
+    {
+        if (!parent::beforeAction($action)) {
+            return false;
+        }
+        $perm = static::BEACON_PERMISSION;
+        if (is_string($perm) && $perm !== '') {
+            $this->requirePermission($perm);
+        }
+
+        return $this->requireLinksFeatureEnabled();
+    }
 
     /**
      * Renders the Links overview dashboard (KPIs, trend sparklines, quick

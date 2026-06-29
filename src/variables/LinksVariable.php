@@ -36,6 +36,10 @@ class LinksVariable
      */
     public function suggestionsFor(Entry|int $entry, ?int $siteId = null, bool $includeNonLive = false): array
     {
+        if (!$this->featureEnabled()) {
+            return [];
+        }
+
         $entryId = $entry instanceof Entry ? $entry->id : $entry;
         $siteId = $siteId ?? ($entry instanceof Entry ? $entry->siteId : Craft::$app->getSites()->getCurrentSite()->id);
         if ($entryId === null) {
@@ -106,6 +110,10 @@ class LinksVariable
      */
     public function inboundLinks(Entry|int $entry, ?int $siteId = null, bool $includeNonLive = false): array
     {
+        if (!$this->featureEnabled()) {
+            return [];
+        }
+
         $entryId = $entry instanceof Entry ? $entry->id : $entry;
         $siteId = $siteId ?? ($entry instanceof Entry ? $entry->siteId : Craft::$app->getSites()->getCurrentSite()->id);
         if ($entryId === null) {
@@ -152,6 +160,10 @@ class LinksVariable
      */
     public function outboundLinks(Entry|int $entry, ?int $siteId = null, bool $includeNonLive = false): array
     {
+        if (!$this->featureEnabled()) {
+            return [];
+        }
+
         $entryId = $entry instanceof Entry ? $entry->id : $entry;
         $siteId = $siteId ?? ($entry instanceof Entry ? $entry->siteId : Craft::$app->getSites()->getCurrentSite()->id);
         if ($entryId === null) {
@@ -213,6 +225,10 @@ class LinksVariable
      */
     public function outboundLinksByType(Entry|int $entry, string $elementType, ?int $siteId = null, bool $includeNonLive = false): array
     {
+        if (!$this->featureEnabled()) {
+            return [];
+        }
+
         $entryId = $entry instanceof Entry ? $entry->id : $entry;
         $siteId = $siteId ?? ($entry instanceof Entry ? $entry->siteId : Craft::$app->getSites()->getCurrentSite()->id);
         if ($entryId === null) {
@@ -255,6 +271,10 @@ class LinksVariable
      */
     public function interactionStatus(int $sourceId, int $targetId, ?int $siteId = null): ?string
     {
+        if (!$this->featureEnabled()) {
+            return null;
+        }
+
         $siteId = $siteId ?? Craft::$app->getSites()->getCurrentSite()->id;
         $record = LinkSuggestionRecord::findOne([
             'sourceElementId' => $sourceId,
@@ -262,5 +282,14 @@ class LinksVariable
             'siteId' => $siteId,
         ]);
         return $record?->status;
+    }
+
+    // =========================================================================
+    // Private Methods
+    // =========================================================================
+
+    private function featureEnabled(): bool
+    {
+        return Plugin::$plugin->links->isEnabled();
     }
 }

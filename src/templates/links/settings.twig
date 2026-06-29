@@ -13,6 +13,16 @@
     {{ actionInput('beacon/link-settings/save') }}
     {{ redirectInput('beacon/links/settings') }}
 
+    {{ forms.lightswitchField({
+        label: 'links.settings.enabled'|t('beacon'),
+        instructions: 'links.settings.enabled.instructions'|t('beacon'),
+        name: 'enabled',
+        on: settings.enabled,
+        toggle: '#links-settings-fields',
+    }) }}
+
+    <div id="links-settings-fields" class="{% if not settings.enabled %}hidden{% endif %}">
+
     <h2>{{ 'links.settings.scope'|t('beacon') }}</h2>
 
     {% set sectionOptions = [] %}
@@ -214,4 +224,5 @@
         value: settings.genericAnchorPatterns|join("\n"),
         rows: 6,
     }) }}
+    </div>
 {% endblock %}
