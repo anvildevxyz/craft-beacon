@@ -10,6 +10,8 @@ use anvildev\beacon\records\LinkSuggestionRecord;
 use anvildev\beacon\web\assets\links\LinksCpAsset;
 use Craft;
 use craft\elements\Entry;
+use craft\web\Controller;
+use yii\base\Action;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
@@ -26,7 +28,7 @@ use yii\web\Response;
  * @author Anvil
  * @since 1.0.0
  */
-class LinksController extends \craft\web\Controller
+class LinksController extends Controller
 {
     // =========================================================================
     // Traits
@@ -47,7 +49,7 @@ class LinksController extends \craft\web\Controller
     // =========================================================================
 
     /**
-     * @param \yii\base\Action $action
+     * @param Action<Controller> $action
      */
     public function beforeAction($action): bool
     {

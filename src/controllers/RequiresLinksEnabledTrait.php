@@ -3,6 +3,7 @@
 namespace anvildev\beacon\controllers;
 
 use anvildev\beacon\helpers\BeaconPermissions;
+use anvildev\beacon\helpers\Http;
 use anvildev\beacon\Plugin;
 use Craft;
 use yii\web\NotFoundHttpException;
@@ -26,7 +27,7 @@ trait RequiresLinksEnabledTrait
             return true;
         }
 
-        if (Craft::$app->getRequest()->getAcceptsJson()) {
+        if (Http::request()->getAcceptsJson()) {
             throw new NotFoundHttpException(Craft::t('beacon', 'links.disabled'));
         }
 
