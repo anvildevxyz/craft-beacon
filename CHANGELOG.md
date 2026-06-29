@@ -1,5 +1,11 @@
 # Changelog — Beacon
 
+## 1.2.1 — 2026-06-29
+
+### Fixed
+- PHPStan: use `Http::request()` for JSON detection in `RequiresLinksEnabledTrait`.
+- PHPStan: add `Action<Controller>` generic to `LinksController::beforeAction()`.
+
 ## 1.2.0 — 2026-06-29
 
 ### Added

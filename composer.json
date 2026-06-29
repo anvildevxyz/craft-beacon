@@ -1,7 +1,7 @@
 {
     "name": "anvildev/craft-beacon",
     "description": "SEO and GEO for Craft 5 — meta, schema, redirects, llms.txt, AI crawler controls. API-first, with PHPBench-enforced performance budgets.",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "type": "craft-plugin",
     "license": "proprietary",
     "keywords": ["craft", "cms", "craftcms", "seo", "geo", "schema", "llms.txt"],
