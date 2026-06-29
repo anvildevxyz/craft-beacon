@@ -1,5 +1,24 @@
 # Changelog — Beacon
 
+## 1.2.0 — 2026-06-29
+
+### Added
+- **Internal links** feature: TF-IDF keyword index, optional AI-embedding suggestions, CP reports (overview, orphans, link map, link detail, click depth, broken links, anchor text, external links), entry-editor sidebar, dashboard widget, `craft.beacon.links.*` Twig API, and console commands (`beacon/link-index`, `link-snapshot`, `link-report`, `link-audit`).
+- Master **Enable internal links** toggle on Links → Settings — disables indexing, sidebar, reports, Twig helpers, and console (except `link-index/clear`).
+- Per-suggestion **Highlight** buttons in the entry sidebar, mutually exclusive with highlight-all.
+
+### Fixed
+- SSRF guard for IPv6-only hosts in broken-link audit (#9).
+- Protocol-relative URL classification in link parser (#10).
+- AI content controller error handling (#11).
+- Rate limiter TTL reset for active editors (#12).
+- robots.txt cache invalidation after AI-usage policy changes (#13).
+- Citation/competitor substring false positives (#14).
+- Avg-links KPI denominator consistency (#15).
+- URI resolution when site URL substring repeats (#16).
+- Shared index pipeline via `IndexesEntries` trait (#17).
+- Atomic `Db::upsert` in suggestion `recordInteraction()` (#18).
+
 ## 1.1.0 — 2026-06-24
 
 ### Added

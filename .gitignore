@@ -1,5 +1,7 @@
 /vendor/
 /cpresources/
+/node_modules/
+/scripts/node_modules/
 /.phpunit.cache/
 /.phpunit.integration.cache/
 .phpunit.result.cache

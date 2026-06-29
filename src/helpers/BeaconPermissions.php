@@ -26,6 +26,8 @@ final class BeaconPermissions
     public const EDIT_GEO_SCORE = 'beacon:editGeoScore';
     public const USE_AI_GENERATION = 'beacon:useAiGeneration';
     public const EDIT_AI_VISIBILITY = 'beacon:editAiVisibility';
+    public const VIEW_LINKS = 'beacon:viewLinks';
+    public const EDIT_LINKS = 'beacon:editLinks';
 
     /**
      * Definitions registered with Craft. Keep order = display order.
@@ -48,6 +50,8 @@ final class BeaconPermissions
             self::EDIT_GEO_SCORE => ['label' => $t('Manually recompute GEO scores (drill-down recompute button)')],
             self::USE_AI_GENERATION => ['label' => $t('Use AI content generation (Generate buttons in the SEO field)')],
             self::EDIT_AI_VISIBILITY => ['label' => $t('Manage AI visibility tracking (benchmark prompts, runs)')],
+            self::VIEW_LINKS => ['label' => $t('View internal-link reports, suggestions, and the link map')],
+            self::EDIT_LINKS => ['label' => $t('Manage internal links (accept/dismiss suggestions, run indexing, edit Links settings)')],
         ];
     }
 
