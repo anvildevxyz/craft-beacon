@@ -5,13 +5,74 @@ namespace anvildev\beacon\services;
 use anvildev\beacon\helpers\Db;
 use anvildev\beacon\helpers\ShortLinkSlug;
 use anvildev\beacon\models\ShortLink;
+use anvildev\beacon\records\ShortLinkRecord;
 use Craft;
 use craft\db\Query;
 use yii\base\Component;
+use yii\caching\TagDependency;
 use yii\db\Expression;
 
 class ShortLinkService extends Component
 {
+    private const ANY_EXIST_CACHE_KEY = 'beacon.shortLinks.any';
+
+    /**
+     * How long a cached "this site has no short links" answer may live.
+     * See {@see self::anyExist()} for why the negative case is time-boxed and
+     * the positive one isn't.
+     */
+    private const ANY_EXIST_NEGATIVE_DURATION = 300;
+
+    /**
+     * Whether any short link exists at all, on any site.
+     *
+     * Every 404 that reaches Beacon's response handler would otherwise pay for
+     * a rate-limiter round-trip plus a slug lookup, purely to discover that the
+     * site does not use short links. Most installs never create one, so this
+     * gate turns that whole branch into a single cached boolean.
+     *
+     * Deliberately conservative and deliberately not per-site: it reports true
+     * whenever a data row exists, including for links that are disabled,
+     * expired or soft-deleted. Over-reporting only costs the lookup we would
+     * have done anyway; under-reporting would silently break resolution. The
+     * cache is tagged, and {@see \anvildev\beacon\records\ShortLinkRecord}
+     * invalidates it on every write — including the first one, which is the
+     * transition that has to be picked up immediately.
+     */
+    public function anyExist(): bool
+    {
+        $cache = Craft::$app->getCache();
+
+        // Stored as 0/1, not as a bool: Yii's cache reports a miss by returning
+        // `false`, so a `false` payload can never be cached — it would re-query
+        // on every 404 for precisely the sites this gate exists to spare.
+        $flag = $cache->get(self::ANY_EXIST_CACHE_KEY);
+        if ($flag !== false) {
+            return (int) $flag === 1;
+        }
+
+        $exists = (new Query())
+            ->from(['sl' => '{{%beacon_short_links}}'])
+            ->exists();
+
+        // A cached "no short links here" is a kill switch for the whole
+        // feature, so it never outlives a few minutes: the tag can be bumped by
+        // a node whose cache this isn't (Craft's default cache is a per-server
+        // `FileCache`), or from inside the still-open transaction of the very
+        // first short link's save, and either way this read would otherwise be
+        // stuck at 0 until someone edited a short link again. A cached "yes"
+        // carries no such risk — it only costs the lookup we'd have done anyway
+        // — so it keeps the full duration.
+        $cache->set(
+            self::ANY_EXIST_CACHE_KEY,
+            $exists ? 1 : 0,
+            $exists ? null : self::ANY_EXIST_NEGATIVE_DURATION,
+            new TagDependency(['tags' => [ShortLinkRecord::CACHE_TAG]]),
+        );
+
+        return $exists;
+    }
+
     /**
      * Resolves a slug to a live short link for the given site. Returns null when
      * no element matches, it isn't enabled (globally or on this site), it's

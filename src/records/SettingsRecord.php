@@ -53,6 +53,10 @@ use craft\db\ActiveRecord;
  */
 class SettingsRecord extends ActiveRecord
 {
+    use InvalidatesCacheTagTrait;
+
+    public const CACHE_TAG = 'beacon_settings';
+
     public static function tableName(): string
     {
         return '{{%beacon_settings}}';

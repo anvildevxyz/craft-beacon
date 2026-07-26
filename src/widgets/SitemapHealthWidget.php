@@ -67,7 +67,11 @@ final class SitemapHealthWidget extends Widget
         $hasIndex = false;
         $partCount = 0;
         foreach ($rows as $row) {
-            $key = $row['contentKey'] === null ? '(single)' : (string) $row['contentKey'];
+            // The master document's key is stored as '' (it was NULL before
+            // the column was made NOT NULL; rows written by older versions can
+            // still be either).
+            $rawKey = $row['contentKey'];
+            $key = ($rawKey === null || $rawKey === '') ? '(single)' : (string) $rawKey;
             $content = (string) $row['content'];
             $urls = substr_count($content, '<url>');
             // Index row aggregates child URL counts in its `<sitemap>` entries

@@ -285,6 +285,7 @@ https://orcid.org/0000-0002-1825-0097',
     'import.redirects.target.exceeds.500.characters' => 'Target exceeds 500 characters.',
     'jobs.geoMarkdown.generating.geo.markdown.element' => 'Generating GEO Markdown for element {id}',
     'jobs.geoScore.recomputing.geo.score.element' => 'Recomputing GEO score for element {id}',
+    'jobs.geoScore.recomputing.geo.scores' => 'Recomputing GEO scores for {count} elements',
     'jobs.indexNow.indexnow.ping' => 'IndexNow ping for {url}{more}',
     'jobs.aiVisibility.run' => 'Checking AI answer-engine visibility',
     // AI visibility tracking

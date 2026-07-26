@@ -12,6 +12,10 @@ use craft\db\ActiveRecord;
  */
 class HumansSettingsRecord extends ActiveRecord
 {
+    use InvalidatesCacheTagTrait;
+
+    public const CACHE_TAG = 'beacon_site_settings';
+
     public static function tableName(): string
     {
         return '{{%beacon_humans_settings}}';

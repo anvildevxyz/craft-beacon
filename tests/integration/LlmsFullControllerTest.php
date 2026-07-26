@@ -41,12 +41,19 @@ class LlmsFullControllerTest extends TestCase
     }
 
     /**
-     * SiteSettingsService memoises per (kind, site) for the request, and the app
-     * (and its service singletons) outlive each transaction-isolated test. Reset
-     * the memo so getLlms() reads the row this test just wrote/cleared.
+     * Site settings are cached at two levels, and both outlive a test.
+     *
+     * `SiteSettingsService` memoises per (kind, site) for the request, and the
+     * app and its service singletons survive each transaction-isolated test.
+     * Behind that sits the tag-invalidated cross-request cache, which is not
+     * transactional — a row written by one test and then rolled back leaves its
+     * cached value behind for the next one. Clear both so `getLlms()` reads the
+     * row this test actually wrote or cleared.
      */
     private function clearSiteSettingsCache(): void
     {
+        Craft::$app->getCache()->flush();
+
         $service = Plugin::getInstance()->siteSettings;
         $property = (new ReflectionObject($service))->getProperty('cache');
         $property->setAccessible(true);

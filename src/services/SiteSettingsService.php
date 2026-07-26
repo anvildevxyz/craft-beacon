@@ -4,6 +4,7 @@ namespace anvildev\beacon\services;
 
 use anvildev\beacon\helpers\Db;
 use anvildev\beacon\helpers\Json;
+use anvildev\beacon\helpers\RecordCache;
 use anvildev\beacon\helpers\Strings;
 use anvildev\beacon\models\AdsSettings;
 use anvildev\beacon\models\BreadcrumbSettings;
@@ -48,37 +49,72 @@ class SiteSettingsService extends Component
     }
 
     /**
+     * Per-request memo backed by a cross-request cache.
+     *
+     * Used only by the kinds read on ordinary content pages (`sitemap` feeds
+     * the canonical/indexability logic, `llms` the AI-policy tags), where the
+     * query recurs on every request. The remaining kinds are each read once, on
+     * their own dedicated endpoint — humans.txt, ads.txt, robots.txt, webmaster
+     * verification — and those responses are already served from
+     * {@see RenderCacheService}, so a second cache layer would buy nothing.
+     * `breadcrumbs` is excluded for a different reason: it derives from
+     * `config/beacon.php` and the live home-entry title, neither of which a
+     * record write would invalidate.
+     *
+     * @template T of AdsSettings|BreadcrumbSettings|HumansSettings|LlmsSettings|RobotsSettings|SitemapSettings|WebmasterSettings
+     * @param callable():T $build
+     * @return T
+     */
+    private function remember(string $kind, int $siteId, callable $build): mixed
+    {
+        $key = $this->cacheKey($kind, $siteId);
+
+        if (isset($this->cache[$key])) {
+            /** @var T $memo */
+            $memo = $this->cache[$key];
+            return $memo;
+        }
+
+        /** @var T $value */
+        $value = RecordCache::remember(
+            'siteSettings.' . $kind . '.' . $siteId,
+            [SitemapSettingsRecord::CACHE_TAG],
+            $build,
+        );
+
+        $this->cache[$key] = $value;
+
+        return $value;
+    }
+
+    /**
      * Returns the site's sitemap settings, seeding a default DB row on first access.
      */
     public function getSitemap(int $siteId): SitemapSettings
     {
-        $key = $this->cacheKey('sitemap', $siteId);
-        if (isset($this->cache[$key])) {
-            $cached = $this->cache[$key];
-            assert($cached instanceof SitemapSettings);
-            return $cached;
-        }
-        $record = SitemapSettingsRecord::findOne(['siteId' => $siteId])
-            ?? $this->seedSitemap($siteId);
+        return $this->remember('sitemap', $siteId, function() use ($siteId): SitemapSettings {
+            $record = SitemapSettingsRecord::findOne(['siteId' => $siteId])
+                ?? $this->seedSitemap($siteId);
 
-        $sectionJson = (is_string($record->sectionSitemap) && $record->sectionSitemap !== '') ? $record->sectionSitemap : '{}';
-        $frontMatterJson = (is_string($record->geoMarkdownFrontMatter) && $record->geoMarkdownFrontMatter !== '') ? $record->geoMarkdownFrontMatter : '{}';
-        $newsSectionsJson = match (true) {
-            is_string($record->newsSections) => $record->newsSections,
-            is_array($record->newsSections) => Json::encode($record->newsSections),
-            default => '',
-        };
+            $sectionJson = (is_string($record->sectionSitemap) && $record->sectionSitemap !== '') ? $record->sectionSitemap : '{}';
+            $frontMatterJson = (is_string($record->geoMarkdownFrontMatter) && $record->geoMarkdownFrontMatter !== '') ? $record->geoMarkdownFrontMatter : '{}';
+            $newsSectionsJson = match (true) {
+                is_string($record->newsSections) => $record->newsSections,
+                is_array($record->newsSections) => Json::encode($record->newsSections),
+                default => '',
+            };
 
-        return $this->cache[$key] = new SitemapSettings(
-            siteId: $siteId,
-            sections: Json::decodeStringList($record->sections),
-            excludeSections: Json::decodeStringList($record->excludeSections),
-            priority: (float) $record->priority,
-            changefreq: (string) $record->changefreq,
-            newsSections: Json::decodeStringList($newsSectionsJson),
-            sectionSitemap: $this->decodeSectionSitemap($sectionJson),
-            geoMarkdownFrontMatter: $this->decodeGeoMarkdownFrontMatter($frontMatterJson),
-        );
+            return new SitemapSettings(
+                siteId: $siteId,
+                sections: Json::decodeStringList($record->sections),
+                excludeSections: Json::decodeStringList($record->excludeSections),
+                priority: (float) $record->priority,
+                changefreq: (string) $record->changefreq,
+                newsSections: Json::decodeStringList($newsSectionsJson),
+                sectionSitemap: $this->decodeSectionSitemap($sectionJson),
+                geoMarkdownFrontMatter: $this->decodeGeoMarkdownFrontMatter($frontMatterJson),
+            );
+        });
     }
 
     /**
@@ -86,28 +122,24 @@ class SiteSettingsService extends Component
      */
     public function getLlms(int $siteId): LlmsSettings
     {
-        $key = $this->cacheKey('llms', $siteId);
-        if (isset($this->cache[$key])) {
-            $cached = $this->cache[$key];
-            assert($cached instanceof LlmsSettings);
-            return $cached;
-        }
-        $record = LlmsSettingsRecord::findOne(['siteId' => $siteId])
-            ?? $this->seedLlms($siteId);
+        return $this->remember('llms', $siteId, function() use ($siteId): LlmsSettings {
+            $record = LlmsSettingsRecord::findOne(['siteId' => $siteId])
+                ?? $this->seedLlms($siteId);
 
-        return $this->cache[$key] = new LlmsSettings(
-            siteId: $siteId,
-            enabled: (bool) $record->enabled,
-            summary: $record->summary,
-            siteNameOverride: $record->siteNameOverride,
-            sections: Json::decodeStringList($record->sections),
-            policyUrl: Strings::trimToNull($record->policyUrl),
-            licenseUrl: Strings::trimToNull($record->licenseUrl),
-            contactEmail: Strings::trimToNull($record->contactEmail),
-            preferredAttribution: Strings::trimToNull($record->preferredAttribution),
-            fullBody: Strings::trimToNull($record->fullBody),
-            llmsFullTokenBudget: $record->llmsFullTokenBudget !== null ? (int) $record->llmsFullTokenBudget : null,
-        );
+            return new LlmsSettings(
+                siteId: $siteId,
+                enabled: (bool) $record->enabled,
+                summary: $record->summary,
+                siteNameOverride: $record->siteNameOverride,
+                sections: Json::decodeStringList($record->sections),
+                policyUrl: Strings::trimToNull($record->policyUrl),
+                licenseUrl: Strings::trimToNull($record->licenseUrl),
+                contactEmail: Strings::trimToNull($record->contactEmail),
+                preferredAttribution: Strings::trimToNull($record->preferredAttribution),
+                fullBody: Strings::trimToNull($record->fullBody),
+                llmsFullTokenBudget: $record->llmsFullTokenBudget !== null ? (int) $record->llmsFullTokenBudget : null,
+            );
+        });
     }
 
     /**

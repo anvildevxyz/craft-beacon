@@ -27,7 +27,6 @@ use anvildev\beacon\helpers\GeoScoreScope;
 use anvildev\beacon\helpers\Http;
 use anvildev\beacon\integrations\CommerceIntegration;
 use anvildev\beacon\jobs\LinkIndexEntryJob;
-use anvildev\beacon\jobs\RecomputeGeoScoreJob;
 use anvildev\beacon\schemas\SchemaTemplate;
 use anvildev\beacon\services\AiBotsService;
 use anvildev\beacon\services\AiClient;
@@ -226,7 +225,7 @@ class Plugin extends BasePlugin
 
     public bool $hasCpSettings = false;
     public bool $hasCpSection = true;
-    public string $schemaVersion = '1.2.0';
+    public string $schemaVersion = '1.3.0';
     public $controllerNamespace = 'anvildev\\beacon\\controllers';
 
     /**
@@ -823,10 +822,11 @@ class Plugin extends BasePlugin
                 if (!GeoScoreScope::sectionInScope($entry->getSection()?->handle, $settings->geoScoreSectionAllowlist)) {
                     return;
                 }
-                Craft::$app->getQueue()->push(new RecomputeGeoScoreJob([
-                    'siteId' => (int) $entry->siteId,
-                    'elementId' => (int) $entry->id,
-                ]));
+                // Buffered, not pushed: a single request that saves the same
+                // entry more than once (propagation, bulk actions, resaves)
+                // should cost one recompute, and bulk edits should not push a
+                // job per element. Drained on EVENT_AFTER_REQUEST below.
+                self::$plugin->geoScore->queueRecompute((int) $entry->id, (int) $entry->siteId);
             }
         );
 
@@ -901,7 +901,20 @@ class Plugin extends BasePlugin
 
         Craft::$app->on(\yii\base\Application::EVENT_AFTER_REQUEST, static function(): void {
             self::$plugin->redirects->flushSortResync();
+            self::$plugin->geoScore->flushPendingRecomputes();
         });
+
+        // A `queue/listen` worker runs for days, so the after-request event is
+        // no use to a job that saves entries: the buffered rescoring targets
+        // would sit in memory until the worker was restarted. Drain after every
+        // job instead.
+        Event::on(
+            \yii\queue\Queue::class,
+            \yii\queue\Queue::EVENT_AFTER_EXEC,
+            static function(): void {
+                self::$plugin->geoScore->flushPendingRecomputes();
+            }
+        );
 
         Event::on(
             \craft\web\Response::class,
@@ -939,8 +952,13 @@ class Plugin extends BasePlugin
                         $response->stream = null;
                         return;
                     }
+                    // The `anyExist()` gate short-circuits before the throttle
+                    // rather than after it: on a site with no short links there
+                    // is no slug space to enumerate, so there is nothing for the
+                    // rate limiter to protect and its mutex round-trips are pure
+                    // overhead on every 404.
                     $slug = ltrim($request->getPathInfo(), '/');
-                    if ($slug !== '') {
+                    if ($slug !== '' && self::$plugin->shortLinks->anyExist()) {
                         try {
                             self::$plugin->geoExportThrottle->enforce('short_link_resolve', 120);
                         } catch (\yii\web\TooManyRequestsHttpException) {

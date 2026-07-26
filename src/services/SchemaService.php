@@ -86,6 +86,11 @@ class SchemaService extends Component
                 SchemaRecord::updateAll(['sortOrder' => $i], ['id' => $id]);
             }
         });
+
+        // `updateAll()` writes straight to the table, so no record lifecycle
+        // hook fires to drop the cached schema registry. Ordering is part of
+        // that cached payload, so invalidate explicitly.
+        SchemaRecord::invalidateCacheTag();
     }
 
     public function setEnabled(int $id, bool $enabled): bool

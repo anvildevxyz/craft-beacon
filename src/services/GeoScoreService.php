@@ -4,7 +4,9 @@ namespace anvildev\beacon\services;
 
 use anvildev\beacon\enums\GeoScorePillar;
 use anvildev\beacon\events\RegisterGeoScorePillarsEvent;
+use anvildev\beacon\helpers\AfterCommit;
 use anvildev\beacon\helpers\GeoScoreLookup;
+use anvildev\beacon\jobs\RecomputeGeoScoreJob;
 use anvildev\beacon\models\GeoPillarScore;
 use anvildev\beacon\models\GeoScore;
 use anvildev\beacon\Plugin;
@@ -65,6 +67,111 @@ class GeoScoreService extends Component
 
     /** @var list<PillarComputerInterface>|null */
     private ?array $pillars = null;
+
+    /**
+     * Pending recompute targets, keyed "elementId:siteId" so a key can only be
+     * present once.
+     *
+     * @var array<string, array{int, int}>
+     */
+    private array $pendingRecomputes = [];
+
+    /**
+     * Whether the shutdown backstop that drains {@see self::$pendingRecomputes}
+     * has been registered. See {@see self::queueRecompute()}.
+     */
+    private bool $shutdownFlushRegistered = false;
+
+    /**
+     * How many pending targets may accumulate before they are flushed mid-request.
+     *
+     * Bounds memory for long-running processes — a console resave or a
+     * migration touching six figures of elements would otherwise buffer the
+     * whole set until the request ends.
+     */
+    private const RECOMPUTE_FLUSH_THRESHOLD = 500;
+
+    /**
+     * How many (element, site) pairs one queue job processes.
+     *
+     * One job per element made bulk edits pathological: saving 2,000 entries
+     * across two sites pushed 4,000 jobs, each with its own push/reserve/release
+     * round-trips, which saturated the worker for minutes. The scoring work is
+     * unchanged — only the per-job overhead is amortised.
+     */
+    private const RECOMPUTE_CHUNK_SIZE = 100;
+
+    /**
+     * Registers an (element, site) pair for asynchronous rescoring.
+     *
+     * Buffered rather than pushed immediately so that a single request which
+     * saves the same element repeatedly — propagation, bulk element actions,
+     * `resaveElements()` — enqueues it once. Call
+     * {@see self::flushPendingRecomputes()} to drain; Beacon wires that to the
+     * application's after-request event.
+     */
+    public function queueRecompute(int $elementId, int $siteId): void
+    {
+        if ($elementId <= 0 || $siteId <= 0) {
+            return;
+        }
+
+        $this->pendingRecomputes[$elementId . ':' . $siteId] = [$elementId, $siteId];
+
+        // Buffering trades durability for fewer queue writes, so the buffer
+        // needs a drain that survives paths the after-request event never
+        // reaches: an uncaught exception (Yii's error handler ends in `exit`),
+        // a memory-limit abort part-way through a long resave, a console
+        // command that dies. Before this branch the job row was already
+        // committed by the time the save returned, and a lost target means an
+        // entry keeps a stale GEO score until someone saves it again.
+        if (!$this->shutdownFlushRegistered) {
+            $this->shutdownFlushRegistered = true;
+            register_shutdown_function(function(): void {
+                try {
+                    $this->flushPendingRecomputes();
+                } catch (\Throwable $e) {
+                    Craft::warning('GEO score shutdown flush: ' . $e->getMessage(), 'beacon');
+                }
+            });
+        }
+
+        if (count($this->pendingRecomputes) >= self::RECOMPUTE_FLUSH_THRESHOLD) {
+            $this->flushPendingRecomputes();
+        }
+    }
+
+    /**
+     * Pushes buffered rescoring targets to the queue in chunks.
+     *
+     * Deferred past any open transaction: this is called from
+     * `Element::EVENT_AFTER_SAVE`, which Craft runs inside the element's own
+     * transaction, and the buffer spans many elements. Pushing there would put
+     * jobs covering hundreds of already-committed saves inside one element's
+     * transaction, where that element failing takes all of them down with it.
+     */
+    public function flushPendingRecomputes(): void
+    {
+        if ($this->pendingRecomputes === []) {
+            return;
+        }
+
+        if (Craft::$app->getDb()->getTransaction() !== null) {
+            AfterCommit::run('beacon.geoScore.flush', function(): void {
+                $this->flushPendingRecomputes();
+            });
+            return;
+        }
+
+        $pending = array_values($this->pendingRecomputes);
+        $this->pendingRecomputes = [];
+
+        $queue = Craft::$app->getQueue();
+
+        foreach (array_chunk($pending, self::RECOMPUTE_CHUNK_SIZE) as $chunk) {
+            $queue->push(new RecomputeGeoScoreJob(['pairs' => $chunk]));
+        }
+    }
 
     /**
      * Compute (or return the cached) GEO score for an (element, site).
