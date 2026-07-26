@@ -12,6 +12,10 @@ use craft\db\ActiveRecord;
  */
 class RobotsSettingsRecord extends ActiveRecord
 {
+    use InvalidatesCacheTagTrait;
+
+    public const CACHE_TAG = 'beacon_site_settings';
+
     public static function tableName(): string
     {
         return '{{%beacon_robots_settings}}';

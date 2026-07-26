@@ -4,6 +4,7 @@ namespace anvildev\beacon\services;
 
 use anvildev\beacon\helpers\Db;
 use anvildev\beacon\helpers\Json;
+use anvildev\beacon\helpers\RecordCache;
 use anvildev\beacon\models\Settings;
 use anvildev\beacon\records\SettingsRecord;
 use yii\base\Component;
@@ -63,12 +64,33 @@ class SettingsService extends Component
             return $this->cached;
         }
 
+        // Only the database-derived settings are cached. `config/beacon.php`
+        // can change without any DB write, so overrides are layered on at read
+        // time rather than baked into the cached value — otherwise a config
+        // edit would not take effect until some unrelated settings save
+        // happened to invalidate the tag. The clone protects the cached
+        // instance from `applyConfigFileOverrides()`, which mutates.
+        $fromDb = RecordCache::remember(
+            'settings.record',
+            [SettingsRecord::CACHE_TAG],
+            fn(): Settings => $this->buildFromRecord(),
+        );
+
+        return $this->cached = $this->applyConfigFileOverrides(clone $fromDb);
+    }
+
+    /**
+     * Hydrates the settings model from its database row, before any
+     * config-file overrides are applied.
+     */
+    private function buildFromRecord(): Settings
+    {
         $record = SettingsRecord::findOne(1);
         if ($record === null) {
-            return $this->cached = $this->applyConfigFileOverrides(new Settings());
+            return new Settings();
         }
 
-        $settings = new Settings(
+        return new Settings(
             titleTemplate: (string) $record->titleTemplate,
             descriptionTemplate: is_string($record->descriptionTemplate) ? $record->descriptionTemplate : '',
             organizationName: $record->organizationName,
@@ -118,8 +140,6 @@ class SettingsService extends Component
             aiUsagePolicyUrl: ($record->aiUsagePolicyUrl !== null && $record->aiUsagePolicyUrl !== '') ? (string) $record->aiUsagePolicyUrl : null,
             mcpEnabled: (bool) ($record->mcpEnabled ?? false),
         );
-
-        return $this->cached = $this->applyConfigFileOverrides($settings);
     }
 
     /**

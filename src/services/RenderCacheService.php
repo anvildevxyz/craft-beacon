@@ -9,6 +9,7 @@ use anvildev\beacon\records\LlmsSettingsRecord;
 use anvildev\beacon\records\RenderCacheRecord;
 use anvildev\beacon\records\SitemapSettingsRecord;
 use Craft;
+use craft\helpers\StringHelper;
 use DateTime;
 use yii\base\Component;
 
@@ -20,12 +21,23 @@ class RenderCacheService extends Component
     /** @var array<string,list<RenderCacheInvalidationTarget>>|null */
     private ?array $invalidationMap = null;
 
+    /**
+     * The master document of a cache type is stored with an empty `contentKey`
+     * rather than NULL, so the unique index on (siteId, type, contentKey)
+     * actually covers it — a unique index treats NULLs as distinct. Callers
+     * still pass `null` for "the primary document"; normalisation is internal.
+     */
+    private function contentKey(?string $contentKey): string
+    {
+        return $contentKey ?? '';
+    }
+
     public function get(int $siteId, RenderCacheType $type, ?string $contentKey = null): ?RenderedOutput
     {
         $record = RenderCacheRecord::findOne([
             'siteId' => $siteId,
             'type' => $type->value,
-            'contentKey' => $contentKey,
+            'contentKey' => $this->contentKey($contentKey),
         ]);
 
         if (!$record) {
@@ -47,6 +59,14 @@ class RenderCacheService extends Component
     /**
      * Stores (or replaces) the rendered content for a (site, type, contentKey).
      *
+     * A single upsert rather than a read-then-write: the read was a third query
+     * against a row `getOrRebuild()` has already looked up twice, and the
+     * read-then-write raced. Two writers could both miss and both insert,
+     * because `mutexedRebuild()` intentionally proceeds without the lock when
+     * the mutex backend is unresponsive. The unique index on
+     * (siteId, type, contentKey) now covers every row, so the upsert collapses
+     * that race into an update.
+     *
      * A transient DB failure here (deadlock, dropped connection during a
      * sitemap/llms rebuild) must not bubble up as a 500 to the visitor — the
      * cache write is best-effort, so we log and move on. The freshly rendered
@@ -54,21 +74,27 @@ class RenderCacheService extends Component
      */
     public function set(int $siteId, RenderCacheType $type, ?string $contentKey, string $content, ?int $ttlSeconds = null): void
     {
-        $record = RenderCacheRecord::findOne([
-            'siteId' => $siteId,
-            'type' => $type->value,
-            'contentKey' => $contentKey,
-        ]) ?? new RenderCacheRecord();
-
-        $record->siteId = $siteId;
-        $record->type = $type->value;
-        $record->contentKey = $contentKey;
-        $record->content = $content;
-        $record->generatedAt = Db::now();
-        $record->validUntil = $ttlSeconds !== null ? Db::future($ttlSeconds) : null;
+        $now = Db::now();
 
         try {
-            $record->save(false);
+            Craft::$app->getDb()->createCommand()
+                ->upsert(RenderCacheRecord::tableName(), [
+                    'siteId' => $siteId,
+                    'type' => $type->value,
+                    'contentKey' => $this->contentKey($contentKey),
+                    'content' => $content,
+                    'generatedAt' => $now,
+                    'validUntil' => $ttlSeconds !== null ? Db::future($ttlSeconds) : null,
+                    'dateCreated' => $now,
+                    'dateUpdated' => $now,
+                    'uid' => StringHelper::UUID(),
+                ], [
+                    'content' => $content,
+                    'generatedAt' => $now,
+                    'validUntil' => $ttlSeconds !== null ? Db::future($ttlSeconds) : null,
+                    'dateUpdated' => $now,
+                ])
+                ->execute();
         } catch (\yii\db\Exception $e) {
             Craft::warning('Beacon: render cache write failed: ' . $e->getMessage(), 'beacon');
         }
@@ -82,7 +108,7 @@ class RenderCacheService extends Component
         RenderCacheRecord::deleteAll([
             'siteId' => $siteId,
             'type' => $type->value,
-            'contentKey' => $contentKey,
+            'contentKey' => $this->contentKey($contentKey),
         ]);
     }
 

@@ -4,6 +4,7 @@ namespace anvildev\beacon\services;
 
 use anvildev\beacon\enums\AiBotSource;
 use anvildev\beacon\helpers\Db;
+use anvildev\beacon\helpers\RecordCache;
 use anvildev\beacon\helpers\SafeRegex;
 use anvildev\beacon\models\AiBot;
 use anvildev\beacon\models\BotDefinition;
@@ -62,18 +63,33 @@ class AiBotsService extends Component
         return $this->allMemo = array_map(fn(AiBotRecord $r) => $this->toModel($r), $records);
     }
 
-    /** @return list<AiBot> */
+    /**
+     * @return list<AiBot>
+     */
     public function getEnabledBots(): array
     {
         if ($this->enabledMemo !== null) {
             return $this->enabledMemo;
         }
-        /** @var list<AiBotRecord> $records */
-        $records = AiBotRecord::find()
-            ->where(['enabled' => true])
-            ->orderBy(['sortOrder' => SORT_ASC])
-            ->all();
-        return $this->enabledMemo = array_map(fn(AiBotRecord $r) => $this->toModel($r), $records);
+
+        // Cached across requests, not just memoised within one: this is the
+        // single query Beacon runs on literally every front-end request, and
+        // the bot list changes about as often as the plugin is configured.
+        /** @var list<AiBot> $bots */
+        $bots = RecordCache::remember(
+            'aiBots.enabled',
+            [AiBotRecord::CACHE_TAG],
+            function(): array {
+                /** @var list<AiBotRecord> $records */
+                $records = AiBotRecord::find()
+                    ->where(['enabled' => true])
+                    ->orderBy(['sortOrder' => SORT_ASC])
+                    ->all();
+                return array_map(fn(AiBotRecord $r) => $this->toModel($r), $records);
+            },
+        );
+
+        return $this->enabledMemo = $bots;
     }
 
     private function invalidateMemo(): void

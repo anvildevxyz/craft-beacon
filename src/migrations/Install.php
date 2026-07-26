@@ -270,7 +270,10 @@ class Install extends Migration
             'id' => $this->primaryKey(),
             'siteId' => $this->integer()->notNull(),
             'type' => $this->string(16)->notNull(),
-            'contentKey' => $this->string(64),
+            // NOT NULL so the unique index on (siteId, type, contentKey) covers
+            // every row: NULLs compare as distinct, which would leave the master
+            // sitemap/llms.txt documents unprotected against duplicate inserts.
+            'contentKey' => $this->string(64)->notNull()->defaultValue(''),
             'content' => $this->longText()->notNull(),
             'generatedAt' => $this->dateTime()->notNull(),
             'validUntil' => $this->dateTime(),

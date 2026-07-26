@@ -14,6 +14,10 @@ use craft\db\ActiveRecord;
  */
 class AiBotRecord extends ActiveRecord
 {
+    use InvalidatesCacheTagTrait;
+
+    public const CACHE_TAG = 'beacon_ai_bots';
+
     public static function tableName(): string
     {
         return '{{%beacon_ai_bots}}';

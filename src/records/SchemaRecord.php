@@ -14,6 +14,10 @@ use craft\db\ActiveRecord;
  */
 class SchemaRecord extends ActiveRecord
 {
+    use InvalidatesCacheTagTrait;
+
+    public const CACHE_TAG = 'beacon_schemas';
+
     public static function tableName(): string
     {
         return '{{%beacon_schemas}}';

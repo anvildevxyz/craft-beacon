@@ -5,6 +5,7 @@ namespace anvildev\beacon\services;
 use anvildev\beacon\enums\GeoScorePillar;
 use anvildev\beacon\events\RegisterGeoScorePillarsEvent;
 use anvildev\beacon\helpers\GeoScoreLookup;
+use anvildev\beacon\jobs\RecomputeGeoScoreJob;
 use anvildev\beacon\models\GeoPillarScore;
 use anvildev\beacon\models\GeoScore;
 use anvildev\beacon\Plugin;
@@ -76,6 +77,74 @@ class GeoScoreService extends Component
      * a write there would roll back with the render. The persisted row still
      * arrives via the queue job enqueued on the same save.
      */
+    /**
+     * Pending recompute targets, keyed "elementId:siteId" so a key can only be
+     * present once.
+     *
+     * @var array<string, array{int, int}>
+     */
+    private array $pendingRecomputes = [];
+
+    /**
+     * How many pending targets may accumulate before they are flushed mid-request.
+     *
+     * Bounds memory for long-running processes — a console resave or a
+     * migration touching six figures of elements would otherwise buffer the
+     * whole set until the request ends.
+     */
+    private const RECOMPUTE_FLUSH_THRESHOLD = 500;
+
+    /**
+     * How many (element, site) pairs one queue job processes.
+     *
+     * One job per element made bulk edits pathological: saving 2,000 entries
+     * across two sites pushed 4,000 jobs, each with its own push/reserve/release
+     * round-trips, which saturated the worker for minutes. The scoring work is
+     * unchanged — only the per-job overhead is amortised.
+     */
+    private const RECOMPUTE_CHUNK_SIZE = 100;
+
+    /**
+     * Registers an (element, site) pair for asynchronous rescoring.
+     *
+     * Buffered rather than pushed immediately so that a single request which
+     * saves the same element repeatedly — propagation, bulk element actions,
+     * `resaveElements()` — enqueues it once. Call
+     * {@see self::flushPendingRecomputes()} to drain; Beacon wires that to the
+     * application's after-request event.
+     */
+    public function queueRecompute(int $elementId, int $siteId): void
+    {
+        if ($elementId <= 0 || $siteId <= 0) {
+            return;
+        }
+
+        $this->pendingRecomputes[$elementId . ':' . $siteId] = [$elementId, $siteId];
+
+        if (count($this->pendingRecomputes) >= self::RECOMPUTE_FLUSH_THRESHOLD) {
+            $this->flushPendingRecomputes();
+        }
+    }
+
+    /**
+     * Pushes buffered rescoring targets to the queue in chunks.
+     */
+    public function flushPendingRecomputes(): void
+    {
+        if ($this->pendingRecomputes === []) {
+            return;
+        }
+
+        $pending = array_values($this->pendingRecomputes);
+        $this->pendingRecomputes = [];
+
+        $queue = Craft::$app->getQueue();
+
+        foreach (array_chunk($pending, self::RECOMPUTE_CHUNK_SIZE) as $chunk) {
+            $queue->push(new RecomputeGeoScoreJob(['pairs' => $chunk]));
+        }
+    }
+
     public function compute(ElementInterface $element, int $siteId, bool $persist = true): GeoScore
     {
         $sourceHash = $this->sourceHashFor($element, $siteId);
