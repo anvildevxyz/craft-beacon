@@ -827,6 +827,18 @@ class Plugin extends BasePlugin
             self::$plugin->geoScore->flushPendingRecomputes();
         });
 
+        // A `queue/listen` worker runs for days, so the after-request event is
+        // no use to a job that saves entries: the buffered rescoring targets
+        // would sit in memory until the worker was restarted. Drain after every
+        // job instead.
+        Event::on(
+            \yii\queue\Queue::class,
+            \yii\queue\Queue::EVENT_AFTER_EXEC,
+            static function(): void {
+                self::$plugin->geoScore->flushPendingRecomputes();
+            }
+        );
+
         Event::on(
             \craft\web\Response::class,
             \craft\web\Response::EVENT_BEFORE_SEND,

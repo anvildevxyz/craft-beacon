@@ -4,6 +4,7 @@ namespace anvildev\beacon\services;
 
 use anvildev\beacon\enums\GeoScorePillar;
 use anvildev\beacon\events\RegisterGeoScorePillarsEvent;
+use anvildev\beacon\helpers\AfterCommit;
 use anvildev\beacon\helpers\GeoScoreLookup;
 use anvildev\beacon\jobs\RecomputeGeoScoreJob;
 use anvildev\beacon\models\GeoPillarScore;
@@ -68,22 +69,18 @@ class GeoScoreService extends Component
     private ?array $pillars = null;
 
     /**
-     * Compute (or return the cached) GEO score for an (element, site).
-     *
-     * `$persist` controls whether a fresh compute is written to the score
-     * table. The async {@see RecomputeGeoScoreJob} persists (the default);
-     * the SEO-field chip computes with `$persist = false` for instant display
-     * because Craft renders fields inside the provisional-draft transaction —
-     * a write there would roll back with the render. The persisted row still
-     * arrives via the queue job enqueued on the same save.
-     */
-    /**
      * Pending recompute targets, keyed "elementId:siteId" so a key can only be
      * present once.
      *
      * @var array<string, array{int, int}>
      */
     private array $pendingRecomputes = [];
+
+    /**
+     * Whether the shutdown backstop that drains {@see self::$pendingRecomputes}
+     * has been registered. See {@see self::queueRecompute()}.
+     */
+    private bool $shutdownFlushRegistered = false;
 
     /**
      * How many pending targets may accumulate before they are flushed mid-request.
@@ -121,6 +118,24 @@ class GeoScoreService extends Component
 
         $this->pendingRecomputes[$elementId . ':' . $siteId] = [$elementId, $siteId];
 
+        // Buffering trades durability for fewer queue writes, so the buffer
+        // needs a drain that survives paths the after-request event never
+        // reaches: an uncaught exception (Yii's error handler ends in `exit`),
+        // a memory-limit abort part-way through a long resave, a console
+        // command that dies. Before this branch the job row was already
+        // committed by the time the save returned, and a lost target means an
+        // entry keeps a stale GEO score until someone saves it again.
+        if (!$this->shutdownFlushRegistered) {
+            $this->shutdownFlushRegistered = true;
+            register_shutdown_function(function(): void {
+                try {
+                    $this->flushPendingRecomputes();
+                } catch (\Throwable $e) {
+                    Craft::warning('GEO score shutdown flush: ' . $e->getMessage(), 'beacon');
+                }
+            });
+        }
+
         if (count($this->pendingRecomputes) >= self::RECOMPUTE_FLUSH_THRESHOLD) {
             $this->flushPendingRecomputes();
         }
@@ -128,10 +143,23 @@ class GeoScoreService extends Component
 
     /**
      * Pushes buffered rescoring targets to the queue in chunks.
+     *
+     * Deferred past any open transaction: this is called from
+     * `Element::EVENT_AFTER_SAVE`, which Craft runs inside the element's own
+     * transaction, and the buffer spans many elements. Pushing there would put
+     * jobs covering hundreds of already-committed saves inside one element's
+     * transaction, where that element failing takes all of them down with it.
      */
     public function flushPendingRecomputes(): void
     {
         if ($this->pendingRecomputes === []) {
+            return;
+        }
+
+        if (Craft::$app->getDb()->getTransaction() !== null) {
+            AfterCommit::run('beacon.geoScore.flush', function(): void {
+                $this->flushPendingRecomputes();
+            });
             return;
         }
 
@@ -145,6 +173,16 @@ class GeoScoreService extends Component
         }
     }
 
+    /**
+     * Compute (or return the cached) GEO score for an (element, site).
+     *
+     * `$persist` controls whether a fresh compute is written to the score
+     * table. The async {@see RecomputeGeoScoreJob} persists (the default);
+     * the SEO-field chip computes with `$persist = false` for instant display
+     * because Craft renders fields inside the provisional-draft transaction —
+     * a write there would roll back with the render. The persisted row still
+     * arrives via the queue job enqueued on the same save.
+     */
     public function compute(ElementInterface $element, int $siteId, bool $persist = true): GeoScore
     {
         $sourceHash = $this->sourceHashFor($element, $siteId);

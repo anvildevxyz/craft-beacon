@@ -2,6 +2,7 @@
 
 namespace anvildev\beacon\records;
 
+use anvildev\beacon\helpers\AfterCommit;
 use Craft;
 use yii\caching\TagDependency;
 
@@ -36,9 +37,21 @@ trait InvalidatesCacheTagTrait
     /**
      * Invalidates this record's cache tag. Public so callers that write around
      * the record lifecycle can keep the cache honest.
+     *
+     * Fires twice when a transaction is open: once now, so nothing in this
+     * request keeps reading the pre-write value, and once after the commit.
+     * The second pass is what closes the window in which a concurrent request
+     * cannot yet see the new row, re-runs the query, and re-caches the old
+     * answer against the tag version this call just bumped.
      */
     public static function invalidateCacheTag(): void
     {
-        TagDependency::invalidate(Craft::$app->getCache(), static::CACHE_TAG);
+        $tag = static::CACHE_TAG;
+
+        TagDependency::invalidate(Craft::$app->getCache(), $tag);
+
+        AfterCommit::run('invalidate:' . $tag, static function() use ($tag): void {
+            TagDependency::invalidate(Craft::$app->getCache(), $tag);
+        });
     }
 }

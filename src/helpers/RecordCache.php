@@ -15,12 +15,25 @@ use yii\caching\TagDependency;
  * with it. Caching the hydrated model instead of the row means the record class
  * is never touched on a hit, so the table introspection goes away too.
  *
- * Entries never expire on time; they are dropped by tag when the underlying
- * record is written. Each record class owns a `CACHE_TAG` and invalidates it
- * from `afterSave()`/`afterDelete()`.
+ * Entries are dropped by tag when the underlying record is written — each
+ * record class owns a `CACHE_TAG` and invalidates it from
+ * `afterSave()`/`afterDelete()` — and expire on time as a backstop.
  */
 final class RecordCache
 {
+    /**
+     * Ceiling on how long a cached payload may survive without its tag being
+     * invalidated.
+     *
+     * Tag invalidation reaches one cache instance, and Craft's default cache is
+     * a per-server `FileCache`. On a multi-node deployment the node that
+     * handles a CP save is the only one that hears about it, so without a TTL
+     * the other nodes would serve the pre-save settings until their next
+     * deploy. Five minutes bounds that divergence while still absorbing
+     * essentially every front-end read.
+     */
+    private const DURATION = 300;
+
     /**
      * Returns the cached value for $key, building and storing it on a miss.
      *
@@ -31,13 +44,35 @@ final class RecordCache
      */
     public static function remember(string $key, array $tags, callable $build): mixed
     {
+        $cache = Craft::$app->getCache();
+        $key = self::key($key);
+
+        $cached = $cache->get($key);
+        if ($cached !== false) {
+            /** @var T $cached */
+            return $cached;
+        }
+
+        // The tag versions are snapshotted *before* the build, not after it as
+        // `getOrSet()` would: a write that lands while a cold rebuild is in
+        // flight bumps the tag, and stamping the just-built (now stale) value
+        // with the post-write version would mark it fresh and leave it that way
+        // until some unrelated write happened to invalidate the tag again.
+        $before = new TagDependency(['tags' => $tags]);
+        $before->evaluateDependency($cache);
+
         /** @var T $value */
-        $value = Craft::$app->getCache()->getOrSet(
-            self::key($key),
-            $build,
-            null,
-            new TagDependency(['tags' => $tags]),
-        );
+        $value = $build();
+
+        $after = new TagDependency(['tags' => $tags]);
+        $after->evaluateDependency($cache);
+
+        // Raced with a write — serve what we built, but don't cache it.
+        if ($after->data !== $before->data) {
+            return $value;
+        }
+
+        $cache->set($key, $value, self::DURATION, $after);
 
         return $value;
     }

@@ -14,6 +14,15 @@ use yii\db\Expression;
 
 class ShortLinkService extends Component
 {
+    private const ANY_EXIST_CACHE_KEY = 'beacon.shortLinks.any';
+
+    /**
+     * How long a cached "this site has no short links" answer may live.
+     * See {@see self::anyExist()} for why the negative case is time-boxed and
+     * the positive one isn't.
+     */
+    private const ANY_EXIST_NEGATIVE_DURATION = 300;
+
     /**
      * Whether any short link exists at all, on any site.
      *
@@ -32,20 +41,36 @@ class ShortLinkService extends Component
      */
     public function anyExist(): bool
     {
+        $cache = Craft::$app->getCache();
+
         // Stored as 0/1, not as a bool: Yii's cache reports a miss by returning
-        // `false`, so `getOrSet()` can never cache a `false` payload — it would
-        // re-query on every 404 for precisely the sites this gate exists to
-        // spare.
-        $flag = Craft::$app->getCache()->getOrSet(
-            'beacon.shortLinks.any',
-            static fn(): int => (new Query())
-                ->from(['sl' => '{{%beacon_short_links}}'])
-                ->exists() ? 1 : 0,
-            null,
+        // `false`, so a `false` payload can never be cached — it would re-query
+        // on every 404 for precisely the sites this gate exists to spare.
+        $flag = $cache->get(self::ANY_EXIST_CACHE_KEY);
+        if ($flag !== false) {
+            return (int) $flag === 1;
+        }
+
+        $exists = (new Query())
+            ->from(['sl' => '{{%beacon_short_links}}'])
+            ->exists();
+
+        // A cached "no short links here" is a kill switch for the whole
+        // feature, so it never outlives a few minutes: the tag can be bumped by
+        // a node whose cache this isn't (Craft's default cache is a per-server
+        // `FileCache`), or from inside the still-open transaction of the very
+        // first short link's save, and either way this read would otherwise be
+        // stuck at 0 until someone edited a short link again. A cached "yes"
+        // carries no such risk — it only costs the lookup we'd have done anyway
+        // — so it keeps the full duration.
+        $cache->set(
+            self::ANY_EXIST_CACHE_KEY,
+            $exists ? 1 : 0,
+            $exists ? null : self::ANY_EXIST_NEGATIVE_DURATION,
             new TagDependency(['tags' => [ShortLinkRecord::CACHE_TAG]]),
         );
 
-        return (int) $flag === 1;
+        return $exists;
     }
 
     /**

@@ -7,6 +7,7 @@ use anvildev\beacon\helpers\Json;
 use anvildev\beacon\helpers\RecordCache;
 use anvildev\beacon\models\Settings;
 use anvildev\beacon\records\SettingsRecord;
+use Craft;
 use yii\base\Component;
 
 class SettingsService extends Component
@@ -73,10 +74,86 @@ class SettingsService extends Component
         $fromDb = RecordCache::remember(
             'settings.record',
             [SettingsRecord::CACHE_TAG],
-            fn(): Settings => $this->buildFromRecord(),
+            fn(): Settings => $this->buildForCache(),
         );
 
-        return $this->cached = $this->applyConfigFileOverrides(clone $fromDb);
+        $settings = clone $fromDb;
+        $settings->aiApiKey = $this->decryptApiKey($settings->aiApiKey);
+
+        return $this->cached = $this->applyConfigFileOverrides($settings);
+    }
+
+    /**
+     * Hydrates the settings model for storage in the cross-request cache.
+     *
+     * The cache is Craft's default `FileCache`, i.e. `storage/runtime/cache` on
+     * disk — a directory that ends up in support bundles, dev-to-local syncs
+     * and image snapshots. The AI provider key has no business being written
+     * there in the clear, so it is encrypted with the app's security key (which
+     * lives in `.env`, not in `storage/`) and decrypted on read.
+     */
+    private function buildForCache(): Settings
+    {
+        $settings = $this->buildFromRecord();
+        $settings->aiApiKey = $this->encryptApiKey($settings->aiApiKey);
+
+        return $settings;
+    }
+
+    /**
+     * Stands in for the key in the cached payload when it could not be
+     * encrypted — an install with no `securityKey` configured. Reading it back
+     * costs a query, which is the right trade for never writing the key out in
+     * the clear.
+     */
+    private const API_KEY_WITHHELD = "\0beacon:withheld";
+
+    private function encryptApiKey(?string $key): ?string
+    {
+        if ($key === null || $key === '') {
+            return null;
+        }
+
+        try {
+            return base64_encode(Craft::$app->getSecurity()->encryptByKey($key));
+        } catch (\Throwable) {
+            return self::API_KEY_WITHHELD;
+        }
+    }
+
+    private function decryptApiKey(?string $key): ?string
+    {
+        if ($key === null || $key === '') {
+            return null;
+        }
+
+        if ($key === self::API_KEY_WITHHELD) {
+            return $this->readApiKeyFromDb();
+        }
+
+        $raw = base64_decode($key, true);
+        if ($raw === false) {
+            return null;
+        }
+
+        try {
+            $decrypted = Craft::$app->getSecurity()->decryptByKey($raw);
+        } catch (\Throwable) {
+            // Rotated security key, or a payload cached by an older version.
+            return null;
+        }
+
+        return $decrypted !== false && $decrypted !== '' ? $decrypted : null;
+    }
+
+    private function readApiKeyFromDb(): ?string
+    {
+        $key = SettingsRecord::find()
+            ->select(['aiApiKey'])
+            ->where(['id' => 1])
+            ->scalar();
+
+        return is_string($key) && $key !== '' ? $key : null;
     }
 
     /**

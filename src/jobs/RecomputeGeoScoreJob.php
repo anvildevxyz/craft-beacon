@@ -34,6 +34,14 @@ class RecomputeGeoScoreJob extends BaseJob
     public array $pairs = [];
 
     /**
+     * How many pairs are processed between progress updates.
+     *
+     * `setProgress()` is a write to the queue table, and the whole point of
+     * batching was to stop paying per-element queue round-trips.
+     */
+    private const PROGRESS_INTERVAL = 10;
+
+    /**
      * @param \craft\queue\QueueInterface $queue
      */
     public function execute($queue): void
@@ -42,8 +50,27 @@ class RecomputeGeoScoreJob extends BaseJob
         $total = count($pairs);
 
         foreach ($pairs as $i => [$elementId, $siteId]) {
-            $this->setProgress($queue, $total > 0 ? ($i + 1) / $total : 1);
-            $this->recompute($elementId, $siteId);
+            if ($total > 1 && ($i % self::PROGRESS_INTERVAL === 0 || $i === $total - 1)) {
+                $this->setProgress($queue, ($i + 1) / $total);
+            }
+
+            // One bad element must not cost the rest of the batch its scores.
+            // Before batching each pair had its own job, so a failure was
+            // isolated by construction; now a throw here would abandon every
+            // pair after it with nothing in the CP to say they were skipped.
+            try {
+                $this->recompute($elementId, $siteId);
+            } catch (\Throwable $e) {
+                Craft::warning(
+                    sprintf(
+                        'GEO score recompute failed for element %d on site %d: %s',
+                        $elementId,
+                        $siteId,
+                        $e->getMessage(),
+                    ),
+                    'beacon',
+                );
+            }
         }
     }
 
@@ -63,7 +90,11 @@ class RecomputeGeoScoreJob extends BaseJob
         return [];
     }
 
-    private function recompute(int $elementId, int $siteId): void
+    /**
+     * Rescores one pair. Protected so the batch's failure isolation can be
+     * exercised without a database.
+     */
+    protected function recompute(int $elementId, int $siteId): void
     {
         if ($elementId <= 0 || $siteId <= 0) {
             return;
