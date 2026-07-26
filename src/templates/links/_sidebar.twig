@@ -1,0 +1,29 @@
+{% do view.registerAssetBundle('anvildev\\beacon\\web\\assets\\links\\LinksCpAsset') %}
+
+<div class="beacon-links-panel" id="beacon-links-panel">
+    <h3>
+        {{ 'links.sidebar.title'|t('beacon') }}
+        <span class="beacon-links-header-actions">
+            <button type="button" class="btn small" data-beacon-links-action="toggle-highlights" title="{{ 'links.sidebar.highlight.all.title'|t('beacon') }}">{{ 'links.sidebar.show.in.content'|t('beacon') }}</button>
+            <button type="button" class="btn small" data-beacon-links-action="refresh">{{ 'links.sidebar.refresh'|t('beacon') }}</button>
+        </span>
+    </h3>
+
+    <div id="beacon-links-suggestions">
+        <div class="beacon-links-loading">{{ 'links.sidebar.loading'|t('beacon') }}</div>
+        <div class="beacon-links-list" style="display: none;"></div>
+        <div class="beacon-links-empty" style="display: none;">{{ 'links.sidebar.empty'|t('beacon') }}</div>
+    </div>
+</div>
+
+{% js %}
+    BeaconLinksSidebar.init({{ entryId }}, {{ siteId }}, {
+        showAllInContent: {{ 'links.sidebar.show.in.content'|t('beacon')|json_encode|raw }},
+        hideAllInContent: {{ 'links.sidebar.hide.all.in.content'|t('beacon')|json_encode|raw }},
+        highlightOne: {{ 'links.sidebar.highlight.one'|t('beacon')|json_encode|raw }},
+        hideHighlightOne: {{ 'links.sidebar.highlight.one.hide'|t('beacon')|json_encode|raw }},
+        noSuggestions: {{ 'links.sidebar.highlight.no.suggestions'|t('beacon')|json_encode|raw }},
+        noMatchesAll: {{ 'links.sidebar.highlight.no.matches.all'|t('beacon')|json_encode|raw }},
+        noMatchesOne: {{ 'links.sidebar.highlight.no.matches.one'|t('beacon')|json_encode|raw }},
+    });
+{% endjs %}

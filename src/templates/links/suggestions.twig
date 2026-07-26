@@ -1,0 +1,67 @@
+{% extends "_layouts/cp" %}
+
+{% set title = 'links.nav.suggestions'|t('beacon') %}
+{% set selectedSubnavItem = 'links' %}
+{% set crumbs = [
+    { label: 'nav.beacon'|t('beacon'), url: cpUrl('beacon') },
+    { label: 'links.nav.overview'|t('beacon'), url: cpUrl('beacon/links') },
+] %}
+
+{% do view.registerAssetBundle('anvildev\\beacon\\web\\assets\\links\\LinksCpAsset') %}
+
+{% block content %}
+    <div class="beacon-links-toolbar">
+        <a href="{{ url(craft.app.request.url, { format: 'csv' }) }}" class="btn">{{ 'links.report.export.csv'|t('beacon') }}</a>
+    </div>
+
+    <div class="beacon-links-grid-3 beacon-links-mb-24">
+        <div class="beacon-links-kpi-card">
+            <div class="beacon-links-kpi-label">{{ 'links.suggestions.total.accepted'|t('beacon') }}</div>
+            <div class="beacon-links-kpi-value beacon-links-color-success">{{ accepted }}</div>
+        </div>
+        <div class="beacon-links-kpi-card">
+            <div class="beacon-links-kpi-label">{{ 'links.suggestions.total.dismissed'|t('beacon') }}</div>
+            <div class="beacon-links-kpi-value">{{ dismissed }}</div>
+        </div>
+        <div class="beacon-links-kpi-card">
+            <div class="beacon-links-kpi-label">{{ 'links.suggestions.acceptance.rate'|t('beacon') }}</div>
+            <div class="beacon-links-kpi-value">{{ (rate * 100)|round }}%</div>
+            <div class="beacon-links-progress-bar">
+                <div class="beacon-links-progress-fill color-primary" style="width: {{ (rate * 100)|round }}%;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="beacon-links-widget-card">
+        <div class="beacon-links-widget-header">
+            <h3 class="beacon-links-widget-title">{{ 'links.suggestions.recent.accepted'|t('beacon') }}</h3>
+        </div>
+        {% if recent|length %}
+            <table class="data fullwidth">
+                <thead>
+                    <tr>
+                        <th>{{ 'links.report.from'|t('beacon') }}</th>
+                        <th>{{ 'links.report.to'|t('beacon') }}</th>
+                        <th>{{ 'links.report.score'|t('beacon') }}</th>
+                        <th>{{ 'links.report.date'|t('beacon') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for row in recent %}
+                        <tr>
+                            <td><a href="{{ row.sourceCpUrl }}">{{ row.sourceTitle }}</a></td>
+                            <td><a href="{{ row.targetCpUrl }}">{{ row.targetTitle }}</a></td>
+                            <td>{{ (row.score * 100)|round }}%</td>
+                            <td>{{ row.date }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <div class="beacon-links-empty-state">
+                <p class="beacon-links-empty-title">{{ 'links.suggestions.none.title'|t('beacon') }}</p>
+                <p class="beacon-links-empty-text">{{ 'links.suggestions.none.text'|t('beacon') }}</p>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

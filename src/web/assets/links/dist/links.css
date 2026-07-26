@@ -1,0 +1,539 @@
+/**
+ * Beacon Links — Control Panel Styles
+ *
+ * Card-based design language shared with the rest of Beacon's CP:
+ *   - 12px radius cards, #e5e7eb borders, white backgrounds
+ *   - Tailwind-aligned color palette
+ *   - Consistent spacing, typography, and component patterns
+ */
+
+/* ==========================================================================
+   UTILITY CLASSES
+   ========================================================================== */
+
+/* Grid Layouts */
+.beacon-links-grid-2,
+.beacon-links-grid-3,
+.beacon-links-grid-4 {
+    display: grid;
+    gap: 20px;
+}
+
+.beacon-links-grid-2 { grid-template-columns: repeat(2, 1fr); }
+.beacon-links-grid-3 { grid-template-columns: repeat(3, 1fr); }
+.beacon-links-grid-4 { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+
+/* Flex */
+.beacon-links-flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Spacing */
+.beacon-links-mb-24 { margin-bottom: 24px; }
+
+/* Text */
+.beacon-links-text-muted { color: #6b7280; }
+
+/* Color utilities */
+.beacon-links-color-success { color: #10b981; }
+.beacon-links-color-warning { color: #f59e0b; }
+.beacon-links-color-danger { color: #ef4444; }
+.beacon-links-color-error { color: #ef4444; }
+.beacon-links-color-primary { color: #3b82f6; }
+
+/* ==========================================================================
+   CARD COMPONENTS
+   ========================================================================== */
+
+.beacon-links-card,
+.beacon-links-kpi-card,
+.beacon-links-widget-card {
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.beacon-links-card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e5e7eb;
+}
+.beacon-links-card-header h2 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #111827;
+}
+
+/* ==========================================================================
+   KPI CARDS (Dashboard stat cards with sparklines)
+   ========================================================================== */
+
+.beacon-links-kpi-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 140px;
+    overflow: hidden;
+}
+
+.beacon-links-kpi-header {
+    margin-bottom: 8px;
+}
+
+.beacon-links-kpi-label {
+    color: #6b7280;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.beacon-links-kpi-main {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.beacon-links-kpi-value {
+    font-size: 36px;
+    font-weight: 600;
+    line-height: 1;
+    color: #111827;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-variant-numeric: tabular-nums;
+}
+
+.beacon-links-kpi-sparkline {
+    flex-grow: 1;
+    display: flex;
+    align-items: flex-end;
+    min-height: 32px;
+}
+
+.beacon-links-kpi-sparkline svg {
+    width: 100%;
+    height: 32px;
+}
+
+.beacon-links-kpi-footer {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid #f3f4f6;
+}
+
+.beacon-links-kpi-footer a {
+    color: #3b82f6;
+    font-size: 13px;
+    font-weight: 500;
+    text-decoration: none;
+}
+
+.beacon-links-kpi-footer a:hover {
+    text-decoration: underline;
+}
+
+/* ==========================================================================
+   TREND BADGES
+   ========================================================================== */
+
+.beacon-links-trend {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.beacon-links-trend.trend-up {
+    color: #059669;
+    background: #d1fae5;
+}
+
+.beacon-links-trend.trend-down {
+    color: #dc2626;
+    background: #fee2e2;
+}
+
+.beacon-links-trend.trend-neutral {
+    color: #6b7280;
+    background: #f3f4f6;
+}
+
+.beacon-links-trend-arrow {
+    font-size: 10px;
+}
+
+/* ==========================================================================
+   WIDGET CARDS
+   ========================================================================== */
+
+.beacon-links-widget-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.beacon-links-widget-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #111827;
+}
+
+/* ==========================================================================
+   PROGRESS BARS
+   ========================================================================== */
+
+.beacon-links-progress-bar {
+    height: 8px;
+    background: #e5e7eb;
+    border-radius: 4px;
+    margin-top: 8px;
+    overflow: hidden;
+}
+
+.beacon-links-progress-bar.size-sm {
+    height: 6px;
+}
+
+.beacon-links-progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+    background: #3b82f6;
+}
+
+.beacon-links-progress-fill.color-success { background: #10b981; }
+.beacon-links-progress-fill.color-warning { background: #f59e0b; }
+.beacon-links-progress-fill.color-danger { background: #ef4444; }
+.beacon-links-progress-fill.color-primary { background: #3b82f6; }
+
+/* ==========================================================================
+   BADGES
+   ========================================================================== */
+
+.beacon-links-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    border-radius: 4px;
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.beacon-links-badge--warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.beacon-links-badge--danger,
+.beacon-links-badge--error {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.beacon-links-badge--success {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+/* ==========================================================================
+   ALERT BOXES
+   ========================================================================== */
+
+.beacon-links-alert {
+    padding: 16px;
+    border-radius: 12px;
+    border-left: 4px solid;
+}
+
+.beacon-links-alert-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.beacon-links-alert-text {
+    font-size: 14px;
+}
+
+.beacon-links-alert.alert-info {
+    background: #f0f9ff;
+    border-color: #3b82f6;
+}
+.beacon-links-alert.alert-info .beacon-links-alert-title { color: #1e40af; }
+.beacon-links-alert.alert-info .beacon-links-alert-text { color: #1e3a8a; }
+
+.beacon-links-alert.alert-warning {
+    background: #fef3c7;
+    border-color: #f59e0b;
+}
+.beacon-links-alert.alert-warning .beacon-links-alert-title { color: #92400e; }
+.beacon-links-alert.alert-warning .beacon-links-alert-text { color: #78350f; }
+
+/* ==========================================================================
+   QUICK ACTIONS
+   ========================================================================== */
+
+.beacon-links-quick-actions-title {
+    font-size: 13px;
+    color: #6b7280;
+    margin-bottom: 12px;
+    font-weight: 500;
+}
+
+.beacon-links-quick-actions-grid {
+    display: flex;
+    gap: 8px;
+}
+
+.beacon-links-quick-actions-grid .btn {
+    flex: 1;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* ==========================================================================
+   TOOLBAR
+   ========================================================================== */
+
+.beacon-links-toolbar {
+    margin-bottom: 20px;
+}
+
+/* ==========================================================================
+   EMPTY STATE
+   ========================================================================== */
+
+.beacon-links-empty-state {
+    text-align: center;
+    color: #9ca3af;
+    padding: 48px 24px;
+}
+
+.beacon-links-empty-state-lg {
+    padding: 60px 24px;
+}
+
+.beacon-links-empty-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: #374151;
+    margin: 0 0 8px;
+}
+
+.beacon-links-empty-text {
+    font-size: 14px;
+    color: #6b7280;
+    margin: 0;
+}
+
+.beacon-links-empty-state code {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 6px 12px;
+    background: #f3f4f6;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+/* ==========================================================================
+   TABLE ENHANCEMENTS
+   ========================================================================== */
+
+.beacon-links-card .data { margin: 0; }
+.beacon-links-card .data td,
+.beacon-links-card .data th {
+    padding: 10px 16px;
+}
+
+/* ==========================================================================
+   LIST ITEMS (shared with widget cards)
+   ========================================================================== */
+
+.beacon-links-list-item {
+    padding: 12px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.beacon-links-list-item:last-child {
+    border-bottom: none;
+}
+
+/* ==========================================================================
+   SCROLLABLE CONTAINERS
+   ========================================================================== */
+
+.beacon-links-scrollable {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* ==========================================================================
+   SIDEBAR PANEL
+   ========================================================================== */
+
+.beacon-links-panel {
+    margin-top: 14px;
+}
+
+.beacon-links-panel h3 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.beacon-links-loading {
+    padding: 14px 0;
+    color: #6b7280;
+    text-align: center;
+}
+
+.beacon-links-empty {
+    padding: 14px 0;
+    color: #6b7280;
+    text-align: center;
+    font-style: italic;
+}
+
+/* ==========================================================================
+   SUGGESTION CARD (sidebar)
+   ========================================================================== */
+
+.beacon-links-suggestion {
+    padding: 10px 0;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.beacon-links-suggestion:last-child {
+    border-bottom: none;
+}
+
+.beacon-links-suggestion-header {
+    margin-bottom: 6px;
+}
+
+.beacon-links-title {
+    font-weight: 600;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.beacon-links-section {
+    font-size: 11px;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ==========================================================================
+   SCORE BAR (sidebar)
+   ========================================================================== */
+
+.beacon-links-score-bar {
+    position: relative;
+    height: 6px;
+    background: #e5e7eb;
+    border-radius: 3px;
+    margin: 6px 0;
+    overflow: visible;
+}
+
+.beacon-links-score-fill {
+    height: 100%;
+    background: #3b82f6;
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.beacon-links-score-label {
+    position: absolute;
+    right: 0;
+    top: -16px;
+    font-size: 11px;
+    color: #6b7280;
+}
+
+/* ==========================================================================
+   ACTION BUTTONS (sidebar)
+   ========================================================================== */
+
+.beacon-links-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.beacon-links-actions .btn {
+    font-size: 12px;
+    padding: 3px 8px;
+}
+
+/* ==========================================================================
+   CKEDITOR HIGHLIGHT MARKERS
+   ========================================================================== */
+
+.ck-editor__editable .beacon-links-highlight {
+    border-bottom: 2px dashed #3b82f6;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+    border-radius: 2px;
+}
+
+.ck-editor__editable .beacon-links-highlight:hover {
+    background-color: rgba(59, 130, 246, 0.12);
+}
+
+/* Toggle button active state */
+.beacon-links-header-actions {
+    display: flex;
+    gap: 4px;
+}
+
+[data-beacon-links-action="toggle-highlights"].active,
+[data-beacon-links-action="highlight-one"].active {
+    background: #3b82f6;
+    color: #fff;
+    border-color: #3b82f6;
+}
+
+/* ==========================================================================
+   REPORT PAGE UTILITIES
+   ========================================================================== */
+
+.beacon-links-depth-warning { color: var(--error-color); font-weight: bold; }
+
+.beacon-links-bulk-toolbar { display: flex; gap: 8px; margin-bottom: 16px; }
+.beacon-links-bulk-toolbar .btn { opacity: 0.5; pointer-events: none; }
+.beacon-links-bulk-toolbar .btn.active { opacity: 1; pointer-events: auto; }
+
+.beacon-links-status-deleted { color: var(--error-color); }
+.beacon-links-status-disabled { color: var(--warning-color); }
+.beacon-links-status-http_error { color: var(--error-color); }
+.beacon-links-status-ok { color: var(--success-color); }
+
+.beacon-links-generic-anchor {
+    background: var(--warning-bg-color, #fef3c7);
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+
+/* Match count badge */
+.beacon-links-match-count {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 8px;
+    background: #3b82f6;
+    color: #fff;
+    margin-left: 6px;
+    vertical-align: middle;
+}

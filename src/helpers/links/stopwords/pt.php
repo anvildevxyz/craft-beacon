@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'a', 'ao', 'aos', 'aquela', 'aquelas', 'aquele', 'aqueles', 'aquilo',
+    'as', 'até', 'com', 'como', 'da', 'das', 'de', 'dela', 'delas', 'dele',
+    'deles', 'depois', 'do', 'dos', 'e', 'ela', 'elas', 'ele', 'eles', 'em',
+    'entre', 'era', 'eram', 'essa', 'essas', 'esse', 'esses', 'esta', 'estas',
+    'este', 'estes', 'eu', 'foi', 'foram', 'há', 'isso', 'isto', 'já', 'lhe',
+    'lhes', 'lo', 'mais', 'mas', 'me', 'mesmo', 'minha', 'meu', 'muito',
+    'muitos', 'na', 'não', 'nas', 'nem', 'no', 'nos', 'nossa', 'nossas',
+    'nosso', 'nossos', 'num', 'numa', 'o', 'os', 'ou', 'para', 'pela',
+    'pelas', 'pelo', 'pelos', 'por', 'qual', 'quando', 'que', 'quem',
+    'se', 'seja', 'sem', 'ser', 'seu', 'seus', 'si', 'so', 'sob', 'sua',
+    'suas', 'também', 'te', 'tem', 'têm', 'ter', 'teu', 'teus', 'tua',
+    'tuas', 'tudo', 'um', 'uma', 'umas', 'uns', 'você', 'vocês', 'vos',
+    'ainda', 'além', 'ambos', 'antes', 'apenas', 'bastante', 'bem', 'cada',
+    'caso', 'certo', 'certamente', 'certeza', 'como', 'contra', 'contudo',
+    'desde', 'embora', 'então', 'enquanto', 'entretanto', 'estamos', 'estar',
+    'estão', 'este', 'estes', 'havia', 'hoje', 'isso', 'junto', 'logo',
+    'muito', 'neste', 'nisto', 'nada', 'ninguém', 'nós', 'nunca', 'outra',
+    'outros', 'pode', 'podem', 'poderão', 'porém', 'portanto', 'pois',
+    'quase', 'quatro', 'sempre', 'seria', 'sendo', 'sobre', 'somente',
+    'tal', 'talvez', 'tanto', 'tenho', 'todo', 'todos', 'toda', 'todas',
+    'vai', 'vem', 'vezes',
+];

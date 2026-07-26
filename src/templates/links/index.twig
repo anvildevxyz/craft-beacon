@@ -1,0 +1,182 @@
+{% extends "_layouts/cp" %}
+
+{% set title = 'links.nav.overview'|t('beacon') %}
+{% set selectedSubnavItem = 'links' %}
+{% set crumbs = [{ label: 'nav.beacon'|t('beacon'), url: cpUrl('beacon') }] %}
+
+{% do view.registerAssetBundle('anvildev\\beacon\\web\\assets\\links\\LinksCpAsset') %}
+
+{% macro sparkline(data, colorClass) %}
+    {% if data|length > 1 %}
+        {% set maxVal = max(data) > 0 ? max(data) : 1 %}
+        {% set width = 100 %}
+        {% set height = 32 %}
+        {% set points = [] %}
+        {% for i, val in data %}
+            {% set x = (i / (data|length - 1)) * width %}
+            {% set y = height - ((val / maxVal) * (height - 4)) - 2 %}
+            {% set points = points|merge([x ~ ',' ~ y]) %}
+        {% endfor %}
+        <svg viewBox="0 0 {{ width }} {{ height }}" preserveAspectRatio="none">
+            <defs>
+                <linearGradient id="beacon-links-spark-{{ colorClass }}" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" style="stop-color:currentColor;stop-opacity:0.3" />
+                    <stop offset="100%" style="stop-color:currentColor;stop-opacity:0.05" />
+                </linearGradient>
+            </defs>
+            <polygon
+                points="0,{{ height }} {{ points|join(' ') }} {{ width }},{{ height }}"
+                fill="url(#beacon-links-spark-{{ colorClass }})"
+            />
+            <polyline
+                points="{{ points|join(' ') }}"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+            />
+        </svg>
+    {% elseif data|length == 1 %}
+        <svg viewBox="0 0 100 32" preserveAspectRatio="none">
+            <line x1="0" y1="16" x2="100" y2="16" stroke="currentColor" stroke-width="2" stroke-dasharray="4,4" />
+        </svg>
+    {% endif %}
+{% endmacro %}
+
+{% macro trend(current, previous, invertColor) %}
+    {% if previous > 0 %}
+        {% set change = ((current - previous) / previous * 100)|round %}
+        {% if change > 0 %}
+            <span class="beacon-links-trend {{ invertColor|default(false) ? 'trend-down' : 'trend-up' }}">
+                <span class="beacon-links-trend-arrow">&#9650;</span>
+                {{ change }}%
+            </span>
+        {% elseif change < 0 %}
+            <span class="beacon-links-trend {{ invertColor|default(false) ? 'trend-up' : 'trend-down' }}">
+                <span class="beacon-links-trend-arrow">&#9660;</span>
+                {{ change|abs }}%
+            </span>
+        {% else %}
+            <span class="beacon-links-trend trend-neutral">&mdash; 0%</span>
+        {% endif %}
+    {% endif %}
+{% endmacro %}
+
+{% block content %}
+    {% if stats.totalIndexed == 0 %}
+        <div class="beacon-links-card">
+            <div class="beacon-links-empty-state-lg">
+                <p class="beacon-links-empty-title">{{ 'links.overview.no.entries.indexed'|t('beacon') }}</p>
+                <p class="beacon-links-empty-text">{{ 'links.overview.run.indexer.to.start'|t('beacon') }}</p>
+                <code>php craft beacon/link-index</code>
+            </div>
+        </div>
+    {% else %}
+        {# Prepare trend data from snapshots #}
+        {% set reversedTrends = trends|reverse %}
+        {% set orphanData = reversedTrends|map(s => s.orphanCount) %}
+        {% set linksData = reversedTrends|map(s => s.totalInternalLinks) %}
+        {% set brokenData = reversedTrends|map(s => s.brokenLinkCount) %}
+
+        {# Previous values for trend comparison (oldest snapshot vs current) #}
+        {% set prevOrphan = reversedTrends|length > 1 ? reversedTrends|first.orphanCount : 0 %}
+        {% set prevBroken = reversedTrends|length > 1 ? reversedTrends|first.brokenLinkCount : 0 %}
+
+        <div class="beacon-links-grid-4 beacon-links-mb-24">
+            <div class="beacon-links-kpi-card">
+                <div class="beacon-links-kpi-header">
+                    <div class="beacon-links-kpi-label">{{ 'links.overview.entries.indexed'|t('beacon') }}</div>
+                </div>
+                <div class="beacon-links-kpi-main">
+                    <div class="beacon-links-kpi-value">{{ stats.totalIndexed }}</div>
+                </div>
+                <div class="beacon-links-progress-bar size-sm">
+                    <div class="beacon-links-progress-fill color-primary" style="width: {{ stats.totalEntries > 0 ? ((stats.totalIndexed / stats.totalEntries) * 100)|round : 0 }}%;"></div>
+                </div>
+                <div class="beacon-links-kpi-footer">
+                    {{ 'links.overview.of.total.entries'|t('beacon', { count: stats.totalEntries }) }}
+                </div>
+            </div>
+
+            <div class="beacon-links-kpi-card">
+                <div class="beacon-links-kpi-header">
+                    <div class="beacon-links-kpi-label">{{ 'links.overview.orphan.pages'|t('beacon') }}</div>
+                </div>
+                <div class="beacon-links-kpi-main">
+                    <div class="beacon-links-kpi-value beacon-links-color-warning">{{ stats.orphanCount }}</div>
+                    {{ _self.trend(stats.orphanCount, prevOrphan, true) }}
+                </div>
+                {% if orphanData|length > 1 %}
+                    <div class="beacon-links-kpi-sparkline" style="color: #f59e0b;">
+                        {{ _self.sparkline(orphanData, 'orphan') }}
+                    </div>
+                {% endif %}
+                <div class="beacon-links-kpi-footer">
+                    <a href="{{ cpUrl('beacon/links/orphans') }}">{{ 'links.overview.view.report'|t('beacon') }} &rarr;</a>
+                </div>
+            </div>
+
+            <div class="beacon-links-kpi-card">
+                <div class="beacon-links-kpi-header">
+                    <div class="beacon-links-kpi-label">{{ 'links.overview.avg.links.per.entry'|t('beacon') }}</div>
+                </div>
+                <div class="beacon-links-kpi-main">
+                    <div class="beacon-links-kpi-value">{{ stats.averageLinks|number_format(1) }}</div>
+                </div>
+                {% if linksData|length > 1 %}
+                    <div class="beacon-links-kpi-sparkline" style="color: #3b82f6;">
+                        {{ _self.sparkline(linksData, 'links') }}
+                    </div>
+                {% endif %}
+                <div class="beacon-links-kpi-footer">
+                    {{ 'links.overview.no.outbound.count'|t('beacon', { count: stats.noOutboundCount }) }}
+                </div>
+            </div>
+
+            <div class="beacon-links-kpi-card">
+                <div class="beacon-links-kpi-header">
+                    <div class="beacon-links-kpi-label">{{ 'links.overview.broken.links'|t('beacon') }}</div>
+                </div>
+                <div class="beacon-links-kpi-main">
+                    <div class="beacon-links-kpi-value {{ brokenCount > 0 ? 'beacon-links-color-danger' }}">{{ brokenCount }}</div>
+                    {{ _self.trend(brokenCount, prevBroken, true) }}
+                </div>
+                {% if brokenData|length > 1 %}
+                    <div class="beacon-links-kpi-sparkline" style="color: #ef4444;">
+                        {{ _self.sparkline(brokenData, 'broken') }}
+                    </div>
+                {% endif %}
+                <div class="beacon-links-kpi-footer">
+                    <a href="{{ cpUrl('beacon/links/broken-links') }}">{{ 'links.overview.view.report'|t('beacon') }} &rarr;</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="beacon-links-grid-2">
+            <div class="beacon-links-widget-card">
+                <div class="beacon-links-widget-header">
+                    <h3 class="beacon-links-widget-title">{{ 'links.overview.suggestion.acceptance'|t('beacon') }}</h3>
+                    <a href="{{ cpUrl('beacon/links/suggestions') }}" class="btn small">{{ 'links.overview.view.history'|t('beacon') }}</a>
+                </div>
+
+                <div class="beacon-links-kpi-main">
+                    <div class="beacon-links-kpi-value beacon-links-color-primary">{{ (stats.acceptanceRate * 100)|round }}%</div>
+                </div>
+                <div class="beacon-links-progress-bar">
+                    <div class="beacon-links-progress-fill color-primary" style="width: {{ (stats.acceptanceRate * 100)|round }}%;"></div>
+                </div>
+            </div>
+
+            <div class="beacon-links-widget-card">
+                <div class="beacon-links-quick-actions-title">{{ 'links.overview.quick.actions'|t('beacon') }}</div>
+                <div class="beacon-links-quick-actions-grid">
+                    <a href="{{ cpUrl('beacon/links/orphans') }}" class="btn">{{ 'links.nav.orphans'|t('beacon') }}</a>
+                    <a href="{{ cpUrl('beacon/links/click-depth') }}" class="btn">{{ 'links.nav.click.depth'|t('beacon') }}</a>
+                    <a href="{{ cpUrl('beacon/links/broken-links') }}" class="btn">{{ 'links.nav.broken.links'|t('beacon') }}</a>
+                    <a href="{{ cpUrl('beacon/links/link-map') }}" class="btn">{{ 'links.nav.link.map'|t('beacon') }}</a>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

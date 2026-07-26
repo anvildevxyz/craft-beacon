@@ -1,0 +1,54 @@
+{% extends "_layouts/cp" %}
+
+{% set title = 'links.nav.anchor.text'|t('beacon') %}
+{% set selectedSubnavItem = 'links' %}
+{% set crumbs = [
+    { label: 'nav.beacon'|t('beacon'), url: cpUrl('beacon') },
+    { label: 'links.nav.overview'|t('beacon'), url: cpUrl('beacon/links') },
+] %}
+
+{% do view.registerAssetBundle('anvildev\\beacon\\web\\assets\\links\\LinksCpAsset') %}
+
+{% block content %}
+    <div class="beacon-links-toolbar">
+        <a href="{{ url(craft.app.request.url, { format: 'csv' }) }}" class="btn">{{ 'links.report.export.csv'|t('beacon') }}</a>
+    </div>
+
+    {% if links|length %}
+        <div class="beacon-links-card">
+            <table class="data fullwidth">
+                <thead>
+                    <tr>
+                        <th>{{ 'links.report.source'|t('beacon') }}</th>
+                        <th>{{ 'links.report.target'|t('beacon') }}</th>
+                        <th>{{ 'links.report.anchor.text'|t('beacon') }}</th>
+                        <th>{{ 'links.report.field'|t('beacon') }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for link in links %}
+                        <tr>
+                            <td><a href="{{ link.sourceCpEditUrl }}"><strong>{{ link.sourceTitle }}</strong></a></td>
+                            <td>
+                                {% if link.targetCpEditUrl %}
+                                    <a href="{{ link.targetCpEditUrl }}">{{ link.targetTitle }}</a>
+                                {% else %}
+                                    <em>{{ 'links.report.unknown'|t('beacon') }}</em>
+                                {% endif %}
+                            </td>
+                            <td><span class="beacon-links-badge beacon-links-badge--warning">{{ link.anchorText }}</span></td>
+                            <td><code>{{ link.fieldHandle }}</code></td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="beacon-links-card">
+            <div class="beacon-links-empty-state">
+                <p class="beacon-links-empty-title">{{ 'links.report.anchor.none.title'|t('beacon') }}</p>
+                <p class="beacon-links-empty-text">{{ 'links.report.anchor.none.text'|t('beacon') }}</p>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
