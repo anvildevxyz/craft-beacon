@@ -6,10 +6,13 @@ use anvildev\beacon\variables\BeaconVariable;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Regression: hreflang alternates must follow the canonical's page when
- * `setPagination({ canonicalMode: 'self' })` is in effect. Otherwise
- * canonical says page-N and each language alternate points at page-1 —
- * Google flags conflicting signals.
+ * The no-op edges of pagination-aware hreflang rewriting: page 1 and an empty
+ * alternate list, neither of which builds a URL.
+ *
+ * The cases that actually rewrite an href moved to
+ * {@see \anvildev\beacon\tests\integration\BeaconVariablePaginationTest},
+ * because `UrlHelper::urlWithParams()` needs a booted application as of
+ * Craft 5.10.
  */
 class BeaconVariablePaginationAlternatesTest extends TestCase
 {
@@ -22,27 +25,7 @@ class BeaconVariablePaginationAlternatesTest extends TestCase
         $this->assertSame($alternates, BeaconVariable::pageAlternates($alternates, 'page', 1));
     }
 
-    public function testPage2AppendsPageParam(): void
-    {
-        $alternates = [
-            ['hreflang' => 'en', 'href' => 'https://example.com/blog'],
-            ['hreflang' => 'de', 'href' => 'https://example.de/blog'],
-        ];
-        $rewritten = BeaconVariable::pageAlternates($alternates, 'page', 2);
-        $this->assertSame('https://example.com/blog?page=2', $rewritten[0]['href']);
-        $this->assertSame('https://example.de/blog?page=2', $rewritten[1]['href']);
-        $this->assertSame('en', $rewritten[0]['hreflang']);
-        $this->assertSame('de', $rewritten[1]['hreflang']);
-    }
 
-    public function testCustomPageParam(): void
-    {
-        $alternates = [
-            ['hreflang' => 'en', 'href' => 'https://example.com/blog'],
-        ];
-        $rewritten = BeaconVariable::pageAlternates($alternates, 'p', 3);
-        $this->assertSame('https://example.com/blog?p=3', $rewritten[0]['href']);
-    }
 
     public function testEmptyAlternatesIsNoop(): void
     {

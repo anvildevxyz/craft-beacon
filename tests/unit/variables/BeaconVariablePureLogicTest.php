@@ -10,8 +10,13 @@ use ReflectionObject;
 
 /**
  * Exercises the pure, Craft-app-free logic on {@see BeaconVariable}: meta-tag
- * map building, override application, HTML rendering, tag counting, pagination
- * meta rewriting, and the static URL helpers. None of these touch Craft::$app.
+ * map building, override application, HTML rendering, tag counting, and the
+ * static URL helpers. None of these touch Craft::$app.
+ *
+ * The pagination cases that rewrite URLs live in
+ * {@see \anvildev\beacon\tests\integration\BeaconVariablePaginationTest} —
+ * `UrlHelper::urlWithParams()` reads the general config as of Craft 5.10, so
+ * they need a booted application.
  */
 class BeaconVariablePureLogicTest extends TestCase
 {
@@ -32,17 +37,6 @@ class BeaconVariablePureLogicTest extends TestCase
         $this->assertSame($alternates, BeaconVariable::pageAlternates($alternates, 'page', 0));
     }
 
-    public function testPageAlternatesRewritesHrefForLaterPages(): void
-    {
-        $alternates = [
-            ['hreflang' => 'en', 'href' => 'https://example.test/blog'],
-            ['hreflang' => 'de', 'href' => 'https://example.test/de/blog'],
-        ];
-        $result = BeaconVariable::pageAlternates($alternates, 'page', 3);
-        $this->assertSame('en', $result[0]['hreflang']);
-        $this->assertStringContainsString('page=3', $result[0]['href']);
-        $this->assertStringContainsString('page=3', $result[1]['href']);
-    }
 
     public function testSetTagPicksPropertyAttributeForOpenGraphAndArticle(): void
     {
@@ -164,43 +158,7 @@ class BeaconVariablePureLogicTest extends TestCase
         $this->assertSame('https://example.test/blog', $meta->canonical);
     }
 
-    public function testApplyPaginationToMetaBuildsPrevNextAndSelfCanonical(): void
-    {
-        $variable = new BeaconVariable();
-        $variable->setPagination([
-            'page' => 2,
-            'pageCount' => 4,
-            'baseUrl' => 'https://example.test/blog',
-            'canonicalMode' => 'self',
-        ]);
-        $meta = new SeoMeta();
 
-        $this->invoke($variable, 'applyPaginationToMeta', [$meta]);
-
-        $this->assertStringContainsString('page=2', (string) $meta->canonical);
-        $rels = array_column($meta->paginationLinkTags, 'rel');
-        $this->assertContains('prev', $rels);
-        $this->assertContains('next', $rels);
-    }
-
-    public function testApplyPaginationToMetaFirstPageCanonicalKeepsBaseUrl(): void
-    {
-        $variable = new BeaconVariable();
-        $variable->setPagination([
-            'page' => 3,
-            'pageCount' => 5,
-            'baseUrl' => 'https://example.test/blog',
-            'canonicalMode' => 'firstPageCanonical',
-        ]);
-        $meta = new SeoMeta();
-
-        $this->invoke($variable, 'applyPaginationToMeta', [$meta]);
-
-        $this->assertSame('https://example.test/blog', $meta->canonical);
-        $rels = array_column($meta->paginationLinkTags, 'rel');
-        $this->assertContains('prev', $rels);
-        $this->assertContains('next', $rels);
-    }
 
     /**
      * @param array<int,mixed> $args
