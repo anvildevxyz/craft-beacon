@@ -15,6 +15,7 @@ use anvildev\beacon\Plugin;
 use Craft;
 use craft\queue\jobs\UpdateElementSlugsAndUris;
 use craft\web\Controller;
+use yii\caching\TagDependency;
 use yii\web\Response;
 
 class SettingsController extends Controller
@@ -154,6 +155,12 @@ class SettingsController extends Controller
             || $before->authorPagesUriPrefix !== $patched->authorPagesUriPrefix;
 
         Plugin::$plugin->settings->save($patched);
+
+        // robots.txt embeds AI-usage Content-Signals (and robots directives)
+        // derived from these settings and is edge-cached behind the
+        // `beacon-robots` surrogate tag. Drop it on every settings save so
+        // crawlers don't keep reading the previous policy until max-age lapses.
+        TagDependency::invalidate(Craft::$app->getCache(), 'beacon-robots');
 
         // Author URIs are stamped at element-save time, so an enable/disable or
         // prefix change leaves every existing author at its old (or NULL) URI

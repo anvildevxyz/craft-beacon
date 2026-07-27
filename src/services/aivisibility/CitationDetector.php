@@ -36,7 +36,7 @@ final class CitationDetector
 
         $domainMentioned = false;
         foreach ($hosts as $host) {
-            if ($host !== '' && str_contains($haystack, $host)) {
+            if ($host !== '' && $this->mentionsHost($haystack, $host)) {
                 $domainMentioned = true;
                 break;
             }
@@ -44,7 +44,7 @@ final class CitationDetector
 
         $competitorMentions = [];
         foreach ($this->normalizeHosts($competitorDomains) as $domain) {
-            if ($domain !== '' && str_contains($haystack, $domain)) {
+            if ($domain !== '' && $this->mentionsHost($haystack, $domain)) {
                 $competitorMentions[] = $domain;
             }
         }
@@ -69,6 +69,20 @@ final class CitationDetector
         // Trim trailing punctuation that commonly clings to URLs in prose.
         $urls = array_map(static fn(string $u): string => rtrim($u, '.,;:!?'), $m[0]);
         return array_values(array_filter($urls, static fn(string $u): bool => $u !== ''));
+    }
+
+    /**
+     * True when $host appears in $haystack as a standalone domain token rather
+     * than as a substring of a longer label — so an owned `acme.com` matches
+     * `docs.acme.com` and a trailing `acme.com.` but not `acme.computer`,
+     * `notacme.com`, or `myacme.community`.
+     *
+     * Both arguments are expected to be pre-lowercased.
+     */
+    private function mentionsHost(string $haystack, string $host): bool
+    {
+        $pattern = '/(?<![a-z0-9-])' . preg_quote($host, '/') . '(?![a-z0-9-])/i';
+        return preg_match($pattern, $haystack) === 1;
     }
 
     private function hostOf(string $url): ?string

@@ -8,7 +8,7 @@ use craft\db\ActiveRecord;
  * @property int $id
  * @property int $siteId
  * @property string $type
- * @property string|null $contentKey
+ * @property string $contentKey Empty string for a cache type's master document
  * @property string $content
  * @property string $generatedAt
  * @property string|null $validUntil

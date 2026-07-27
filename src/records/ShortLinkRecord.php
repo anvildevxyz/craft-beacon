@@ -23,6 +23,10 @@ use craft\db\ActiveRecord;
  */
 class ShortLinkRecord extends ActiveRecord
 {
+    use InvalidatesCacheTagTrait;
+
+    public const CACHE_TAG = 'beacon_short_links';
+
     public static function tableName(): string
     {
         return '{{%beacon_short_links}}';
