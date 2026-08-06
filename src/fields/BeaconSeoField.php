@@ -2,10 +2,10 @@
 
 namespace anvildev\beacon\fields;
 
+use anvildev\beacon\gql\types\SeoFieldValueType;
 use anvildev\beacon\helpers\EntitySchema;
 use anvildev\beacon\helpers\GeoScoreScope;
 use anvildev\beacon\helpers\RobotsDirectives;
-use anvildev\beacon\gql\types\SeoFieldValueType;
 use anvildev\beacon\helpers\SeoFieldReader;
 use anvildev\beacon\models\AiMarkdownOverride;
 use anvildev\beacon\Plugin;

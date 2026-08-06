@@ -5,8 +5,11 @@ namespace anvildev\beacon\gql\queries;
 use anvildev\beacon\enums\RedirectType;
 use anvildev\beacon\gql\types\BeaconRedirect404Type;
 use anvildev\beacon\gql\types\BeaconRedirectType;
+use anvildev\beacon\gql\types\BeaconResolvedRedirectType;
 use anvildev\beacon\gql\types\BeaconShortLinkType;
 use anvildev\beacon\helpers\Redirect404LogQuery;
+use anvildev\beacon\models\Redirect;
+use anvildev\beacon\Plugin;
 use craft\db\Query;
 use craft\gql\base\Query as BaseQuery;
 use craft\gql\GqlEntityRegistry;
@@ -61,6 +64,19 @@ class BeaconRedirectQueries extends BaseQuery
                 ],
                 'resolve' => [self::class, 'resolveRedirect'],
             ];
+
+            $queries['beaconResolveRedirect'] = [
+                'type' => BeaconResolvedRedirectType::getType(),
+                'args' => [
+                    'siteId' => ['type' => Type::nonNull(Type::int())],
+                    'uri' => [
+                        'type' => Type::nonNull(Type::string()),
+                        'description' => 'Site-relative URI (path + optional query string), e.g. "/old-page?utm=x".',
+                    ],
+                ],
+                'description' => 'Resolves a URI through the full redirect matcher (exact / glob / regex / custom). Read-only — use the beaconTrack404 mutation to also record the hit.',
+                'resolve' => [self::class, 'resolveRedirectForUri'],
+            ];
         }
 
         if (!$checkToken || GqlHelper::canSchema('beaconShortLinks', 'read')) {
@@ -95,6 +111,7 @@ class BeaconRedirectQueries extends BaseQuery
         // introspection working.
         GqlEntityRegistry::getOrCreate(BeaconRedirectType::getName(), fn() => BeaconRedirectType::getType());
         GqlEntityRegistry::getOrCreate(BeaconRedirect404Type::getName(), fn() => BeaconRedirect404Type::getType());
+        GqlEntityRegistry::getOrCreate(BeaconResolvedRedirectType::getName(), fn() => BeaconResolvedRedirectType::getType());
         GqlEntityRegistry::getOrCreate(BeaconShortLinkType::getName(), fn() => BeaconShortLinkType::getType());
 
         return $queries;
@@ -215,6 +232,27 @@ class BeaconRedirectQueries extends BaseQuery
             ->from(['r' => '{{%beacon_redirects}}'])
             ->innerJoin(['e' => '{{%elements}}'], '[[e.id]] = [[r.id]]')
             ->where(['e.dateDeleted' => null]);
+    }
+
+    /**
+     * Resolves a request URI through {@see \anvildev\beacon\services\RedirectService::findRedirect()}
+     * — the same matcher the native 404 listener uses, so glob/regex rules
+     * and query-string modes behave identically for headless consumers.
+     * No side effects: hit counters are untouched.
+     *
+     * @param mixed $source
+     * @param array{siteId: int, uri: string} $args
+     */
+    public static function resolveRedirectForUri(mixed $source, array $args): ?Redirect
+    {
+        $uri = trim((string) $args['uri']);
+        if ($uri === '') {
+            return null;
+        }
+        if (!str_starts_with($uri, '/')) {
+            $uri = '/' . $uri;
+        }
+        return Plugin::$plugin->redirects->findRedirect((int) $args['siteId'], $uri);
     }
 
     /**

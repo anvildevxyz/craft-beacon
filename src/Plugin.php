@@ -7,12 +7,15 @@ use anvildev\beacon\elements\RedirectElement;
 use anvildev\beacon\elements\ShortLinkElement;
 use anvildev\beacon\enums\Environment;
 use anvildev\beacon\events\RegisterTrackingProvidersEvent;
+use anvildev\beacon\gql\mutations\BeaconRedirectMutations;
 use anvildev\beacon\gql\queries\BeaconRedirectQueries;
 use anvildev\beacon\gql\resolvers\EntryBeaconResolver;
 use anvildev\beacon\gql\types\AlternateLinkType;
 use anvildev\beacon\gql\types\BeaconRedirect404Type;
 use anvildev\beacon\gql\types\BeaconRedirectType;
+use anvildev\beacon\gql\types\BeaconResolvedRedirectType;
 use anvildev\beacon\gql\types\BeaconShortLinkType;
+use anvildev\beacon\gql\types\BeaconTrack404PayloadType;
 use anvildev\beacon\gql\types\BreadcrumbItemType;
 use anvildev\beacon\gql\types\OpenGraphType;
 use anvildev\beacon\gql\types\SchemaArticleType;
@@ -102,6 +105,7 @@ use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterCpAlertsEvent;
 use craft\events\RegisterElementSortOptionsEvent;
 use craft\events\RegisterElementTableAttributesEvent;
+use craft\events\RegisterGqlMutationsEvent;
 use craft\events\RegisterGqlQueriesEvent;
 use craft\events\RegisterGqlSchemaComponentsEvent;
 use craft\events\RegisterGqlTypesEvent;
@@ -622,6 +626,8 @@ class Plugin extends BasePlugin
                     SchemaListItemType::class,
                     BeaconRedirectType::class,
                     BeaconRedirect404Type::class,
+                    BeaconResolvedRedirectType::class,
+                    BeaconTrack404PayloadType::class,
                     BeaconShortLinkType::class,
                 );
             }
@@ -632,6 +638,14 @@ class Plugin extends BasePlugin
             Gql::EVENT_REGISTER_GQL_QUERIES,
             static function(RegisterGqlQueriesEvent $event): void {
                 $event->queries = array_merge($event->queries, BeaconRedirectQueries::getQueries());
+            },
+        );
+
+        Event::on(
+            Gql::class,
+            Gql::EVENT_REGISTER_GQL_MUTATIONS,
+            static function(RegisterGqlMutationsEvent $event): void {
+                $event->mutations = array_merge($event->mutations, BeaconRedirectMutations::getMutations());
             },
         );
 
@@ -650,6 +664,9 @@ class Plugin extends BasePlugin
                 ];
                 $event->queries[Craft::t('beacon', 'plugin.geo.score')] = [
                     'beaconGeoScore:read' => ['label' => Craft::t('beacon', 'plugin.read.geo.content.score')],
+                ];
+                $event->mutations[Craft::t('beacon', 'plugin.404.log')] = [
+                    'beaconRedirect404s:log' => ['label' => Craft::t('beacon', 'plugin.log.404.and.redirect.hits')],
                 ];
             },
         );
