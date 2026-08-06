@@ -654,17 +654,34 @@
 
   var t = window.__beacon.t;
 
+  function postName(wrap) {
+    // Craft namespaces the `name` attributes of server-rendered inputs
+    // (`fields[handle][]`) but leaves data-* attributes alone, so
+    // data-field-name carries the raw handle — inputs created with it POST
+    // outside `fields[]` and are silently dropped. Reuse the name of an
+    // already-namespaced sibling input (a row, or the empty marker), then
+    // Craft's data-base-input-name on the field wrapper, before falling back.
+    var existing = wrap.querySelector('input');
+    if (existing && existing.name) {
+      return existing.name;
+    }
+    var field = wrap.closest('[data-base-input-name]');
+    if (field) {
+      return field.getAttribute('data-base-input-name') + '[]';
+    }
+    return wrap.getAttribute('data-field-name') + '[]';
+  }
+
   function addRow(wrap) {
     var list = wrap.querySelector('.beacon-redirect-sources__list');
-    var fieldName = wrap.getAttribute('data-field-name');
-    if (!list || !fieldName) {
+    if (!list) {
       return;
     }
     var row = document.createElement('div');
     row.className = 'beacon-redirect-sources__row';
     var input = document.createElement('input');
     input.type = 'text';
-    input.name = fieldName + '[]';
+    input.name = postName(wrap);
     input.className = 'text fullwidth';
     input.placeholder = t('/old/path');
     input.autocomplete = 'off';
@@ -701,11 +718,13 @@
       }
       var list = row.parentNode;
       var sourcesWrap = list && list.closest('.beacon-redirect-sources');
+      var rowInput = row.querySelector('input');
+      var removedName = rowInput && rowInput.name;
       row.parentNode.removeChild(row);
       if (list && sourcesWrap && !list.querySelector('.beacon-redirect-sources__row')) {
         var marker = document.createElement('input');
         marker.type = 'hidden';
-        marker.name = sourcesWrap.getAttribute('data-field-name') + '[]';
+        marker.name = removedName || postName(sourcesWrap);
         marker.value = '';
         list.appendChild(marker);
       }

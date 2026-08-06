@@ -27,14 +27,8 @@ class HumansTxtController extends Controller
             RenderCacheType::Humans,
             'text/plain; charset=UTF-8',
             'beacon-humans',
-            function(Site $site): string {
-                $settings = Plugin::$plugin->siteSettings->getHumans($site->id);
-                $body = $settings->enabled && is_string($settings->body) ? trim($settings->body) : '';
-                if ($body === '') {
-                    throw new NotFoundHttpException();
-                }
-                return $body;
-            },
+            static fn(Site $site): string => Plugin::$plugin->publicFiles->humansTxt($site)
+                ?? throw new NotFoundHttpException(),
         );
     }
 }

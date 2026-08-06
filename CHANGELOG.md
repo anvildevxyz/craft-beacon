@@ -1,5 +1,16 @@
 # Changelog — Beacon
 
+## Unreleased
+
+### Added
+- The Beacon SEO field is now queryable in GraphQL with a subselection (`BeaconSeoFieldValue`): title/description/canonical overrides, granular robots directives (incl. `notranslate`, `maxSnippet`, `unavailableAfter`), `aiUsage`, `schemaAddons`, `authorIds`, `entities`, and the `aiMarkdown` override. Beacon redirect-sources fields resolve as `[String!]`. Previously both fields were typed as `String` and any query touching them failed with "String cannot represent value". ([#38](https://github.com/anvildevxyz/craft-beacon/issues/38))
+- `beaconFiles(siteId)` GraphQL query (schema component `beaconPublicFiles:read`) exposing the rendered bodies of robots.txt, sitemap.xml (+ `sitemapPart(part)` chunks), llms.txt, llms-full.txt, ads.txt, and humans.txt — headless sites can re-serve them from their own domain. Fields render lazily and share the render cache with the HTTP routes. ([#37](https://github.com/anvildevxyz/craft-beacon/issues/37))
+- `beaconResolveRedirect(siteId, uri)` GraphQL query: resolves a URI through the full redirect matcher (exact/glob/regex/custom + query-string modes) without touching hit counters. ([#39](https://github.com/anvildevxyz/craft-beacon/issues/39))
+- `beaconTrack404` GraphQL mutation (schema component `beaconRedirect404s:log`): runs the native 404 pipeline for headless frontends — bumps the matched redirect's hit counter and returns it, or records the URI in the 404 log (honouring the *Log 404s* setting and the AI-bot filter). ([#39](https://github.com/anvildevxyz/craft-beacon/issues/39))
+
+### Changed
+- Public-file rendering (robots.txt, sitemap.xml, llms.txt, llms-full.txt, ads.txt, humans.txt) moved from the controllers into the site-parameterized `PublicFilesService`; the HTTP routes are unchanged and keep serving the same cached bodies.
+
 ## 1.3.0 — 2026-07-26
 
 > Reconciles the two release lines. The 1.2.x releases were tagged off the

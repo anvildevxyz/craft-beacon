@@ -3,7 +3,6 @@
 namespace anvildev\beacon\controllers;
 
 use anvildev\beacon\enums\RenderCacheType;
-use anvildev\beacon\helpers\Assets;
 use anvildev\beacon\Plugin;
 use craft\models\Site;
 use craft\web\Controller;
@@ -28,20 +27,8 @@ class AdsTxtController extends Controller
             RenderCacheType::Ads,
             'text/plain; charset=UTF-8',
             'beacon-ads',
-            function(Site $site): string {
-                $settings = Plugin::$plugin->siteSettings->getAds($site->id);
-                if (!$settings->enabled) {
-                    throw new NotFoundHttpException();
-                }
-                $body = ($settings->assetId !== null
-                    ? Assets::findById((int) $settings->assetId)?->getContents() ?? ''
-                    : ''
-                ) ?: (is_string($settings->body) ? trim($settings->body) : '');
-                if ($body === '') {
-                    throw new NotFoundHttpException();
-                }
-                return $body;
-            },
+            static fn(Site $site): string => Plugin::$plugin->publicFiles->adsTxt($site)
+                ?? throw new NotFoundHttpException(),
         );
     }
 }

@@ -2,22 +2,20 @@
 
 namespace anvildev\beacon\controllers;
 
-use anvildev\beacon\enums\RenderCacheType;
 use anvildev\beacon\helpers\RawResponse;
-use anvildev\beacon\helpers\SeoFieldReader;
 use anvildev\beacon\Plugin;
-use anvildev\beacon\services\llms\MarkdownBudgetTrimmer;
 use Craft;
-use craft\elements\Entry;
-use craft\models\Site;
 use craft\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
+/**
+ * HTTP transport for llms.txt / llms-full.txt. Content building + render
+ * caching live in {@see \anvildev\beacon\services\PublicFilesService},
+ * shared with the `beaconFiles` GraphQL query.
+ */
 class LlmsTxtController extends Controller
 {
-    use CachedTextResponseTrait;
-
     public array|int|bool $allowAnonymous = true;
     public $enableCsrfValidation = false;
 
@@ -29,32 +27,17 @@ class LlmsTxtController extends Controller
     public function actionIndex(): Response
     {
         $site = Craft::$app->getSites()->getCurrentSite();
-        $settings = Plugin::$plugin->siteSettings->getLlms($site->id);
-        if (!$settings->enabled) {
+        $body = Plugin::$plugin->publicFiles->llmsTxt($site);
+        if ($body === null) {
             Craft::info("llms.txt disabled for siteId={$site->id}", 'beacon');
             throw new NotFoundHttpException();
         }
 
-        return $this->cachedTextResponse(
-            RenderCacheType::LlmsTxt,
+        return RawResponse::build(
             'text/markdown; charset=UTF-8',
-            'beacon-llms',
-            function(Site $site) use ($settings): string {
-                $trust = array_filter([
-                    'policyUrl' => $settings->policyUrl,
-                    'licenseUrl' => $settings->licenseUrl,
-                    'contactEmail' => $settings->contactEmail,
-                    'preferredAttribution' => $settings->preferredAttribution,
-                ], static fn($v) => $v !== null && $v !== '');
-
-                return Plugin::$plugin->llmsTxt->render(
-                    siteName: (string) ($settings->siteNameOverride ?? $site->name),
-                    summary: is_string($settings->summary) ? $settings->summary : null,
-                    sections: $this->collectSections($site->id, $settings->sections),
-                    trust: $trust,
-                );
-            },
+            $body,
             1800,
+            cacheTags: ['beacon-llms', "beacon-site-{$site->id}"],
         );
     }
 
@@ -66,17 +49,11 @@ class LlmsTxtController extends Controller
     public function actionFull(): Response
     {
         $site = Craft::$app->getSites()->getCurrentSite();
-        $settings = Plugin::$plugin->siteSettings->getLlms($site->id);
-        $fullBody = $settings->fullBody ?? '';
-        $body = $settings->enabled && trim($fullBody) !== '' ? $fullBody : null;
-
-        if ($body === null) {
+        $result = Plugin::$plugin->publicFiles->llmsFull($site);
+        if ($result === null) {
             Craft::info("llms-full.txt unavailable for siteId={$site->id}", 'beacon');
             throw new NotFoundHttpException();
         }
-
-        $result = (new MarkdownBudgetTrimmer(Plugin::$plugin->tokenEstimator))
-            ->trim($body, (int) ($settings->llmsFullTokenBudget ?? 0));
         $body = $result->markdown;
 
         Craft::info(sprintf(
@@ -94,44 +71,5 @@ class LlmsTxtController extends Controller
         );
         $response->headers->set('X-Token-Estimate', (string) $result->estimatedTokens);
         return $response;
-    }
-
-    /**
-     * @param list<string> $sectionHandles
-     * @return array<string, list<array{title:string, url:string, description:?string}>>
-     */
-    private function collectSections(int $siteId, array $sectionHandles): array
-    {
-        $result = [];
-        foreach ($sectionHandles as $handle) {
-            // Skip Commerce/integration placeholder handles (e.g. __products__) — they
-            // cause QueryAbortedException in Craft's ElementQuery.
-            if (str_starts_with($handle, '__') && str_ends_with($handle, '__')) {
-                continue;
-            }
-            $list = [];
-            $entries = Entry::find()
-                ->section($handle)
-                ->siteId($siteId)
-                ->status(Entry::STATUS_LIVE)
-                ->orderBy(['dateUpdated' => SORT_DESC])
-                ->limit(5000);
-            foreach ($entries->each(500) as $entry) {
-                assert($entry instanceof Entry);
-                $url = SeoFieldReader::indexableUrl($entry);
-                if ($url === null) {
-                    continue;
-                }
-                $list[] = [
-                    'title' => (string) $entry->title,
-                    'url' => $url,
-                    'description' => SeoFieldReader::readDescriptionFor($entry),
-                ];
-            }
-            if ($list !== []) {
-                $result[$handle] = $list;
-            }
-        }
-        return $result;
     }
 }

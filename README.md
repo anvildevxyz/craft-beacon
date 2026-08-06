@@ -146,14 +146,47 @@ Beacon registers a `beacon` field on Craft's `EntryInterface`:
 
 The resolver is **lazy** — entries that don't include `beacon` in the query never touch the plugin.
 
+### GraphQL: Beacon SEO field (raw per-entry value)
+
+The Beacon SEO field itself is queryable with a subselection — it returns the **raw stored value** (editor overrides, before site/section fallbacks are applied), typed as `BeaconSeoFieldValue`. Use it when your headless app needs the editor's input (e.g. granular robots flags, the AI-markdown override); use the resolved `beacon` field above for render-ready meta.
+
+```graphql
+{
+  entries(section: "blog", limit: 10) {
+    ... on blog_Entry {
+      mySeoField {          # your Beacon SEO field handle
+        title               # null = "no override, inheriting"
+        description
+        ogImageId
+        canonical
+        aiUsage
+        robots {
+          noindex nofollow noarchive nosnippet
+          noimageindex notranslate indexifembedded
+          maxSnippet maxImagePreview maxVideoPreview unavailableAfter
+        }
+        aiMarkdown { enabled customFrontMatter }
+        schemaAddons { type mapping }   # mapping is a JSON string
+        authorIds
+        entities { qid label description wikidataUrl wikipediaUrl officialUrl role }
+      }
+    }
+  }
+}
+```
+
+Fields of type **Beacon redirect sources** resolve as `[String!]` — the list of legacy URIs attached to the element.
+
 **Schema-graph scope:** GraphQL `beacon.schemas` and `beacon.schemaNodes` return the CP-configured schema bundles (Article / Product / Recipe / HowTo / FAQPage / Review) plus any per-entry `schemaAddons` from the Beacon SEO field. The auto-emitted nodes that appear in the HTML `<head>` (BreadcrumbList from the breadcrumb chain, the WebPage / WebSite identity pair, the Organization / Person node, the GEO-provenance citations node) are **HTML-only** in this release. Headless clients can rebuild them client-side from `beacon.breadcrumbs { name url }` plus a static Organization JSON-LD constant in their layout. Full parity (single schema-graph builder used by both HTML and GraphQL paths) is tracked for a future release.
 
 ### GraphQL: redirects & 404 log
 
-Two read-only top-level queries are exposed when the corresponding schema components are granted on a token:
+Read-only top-level queries are exposed when the corresponding schema components are granted on a token:
 
-- `beaconRedirects:read` enables `beaconRedirects(siteId, source, type, enabled, search, limit, offset)` and `beaconRedirect(id)`
+- `beaconRedirects:read` enables `beaconRedirects(siteId, source, type, enabled, search, limit, offset)`, `beaconRedirect(id)`, and `beaconResolveRedirect(siteId, uri)`
 - `beaconRedirect404s:read` enables `beaconRedirect404s(siteId, handled, limit)`
+
+`beaconResolveRedirect` runs a URI through the **full matcher** (exact / glob / regex / custom, honouring query-string modes) — the same code path the native 404 listener uses — and returns a `BeaconResolvedRedirect` (`resolvedTarget` has capture groups substituted and the query string applied) or `null`. It never touches hit counters; pair it with the `beaconTrack404` mutation below when the hit should count.
 
 ```graphql
 {
@@ -181,6 +214,29 @@ Two read-only top-level queries are exposed when the corresponding schema compon
 
 Both `BeaconRedirect` and `BeaconRedirect404` are queryable via `__type` introspection. The plural queries return non-null lists of non-null items — clients can skip null checks. The singular `beaconRedirect(id: …)` returns null when no row matches.
 
+### GraphQL: tracking 404s from a headless frontend
+
+The `beaconTrack404` **mutation** (gated by `beaconRedirect404s:log`) gives a headless frontend the same behaviour Beacon's native 404 listener applies on monolith sites, in one round trip:
+
+- a redirect matches → its hit counter + `lastHit` are bumped and the resolved redirect is returned — redirect the visitor to `resolvedTarget` with `statusCode`
+- nothing matches → the URI is recorded in the 404 log (respecting the *Log 404s* setting; pass the visitor's user agent so AI-bot traffic is filtered)
+
+```graphql
+mutation {
+  beaconTrack404(
+    siteId: 1
+    uri: "/old-page?utm=x"
+    userAgent: "Mozilla/5.0 …"        # optional; enables bot filtering
+    referer: "https://example.com/a"  # optional; stored with the log row
+  ) {
+    logged                             # true when the 404 was recorded
+    redirect { resolvedTarget statusCode }
+  }
+}
+```
+
+Call it from your frontend's 404 handler (server-side — e.g. a Next.js catch-all route), then either redirect or render your 404 page. The logged URIs appear in **Beacon → Redirects → 404s** exactly like origin-served 404s.
+
 ### GraphQL: short links
 
 `beaconShortLinks(siteId, enabled, search, limit)` exposes short links
@@ -188,6 +244,26 @@ read-only, gated by `beaconShortLinks:read`. Pass `siteId` to return only
 the links live on that site. Returns the `BeaconShortLink` type (id,
 propagationMethod, slug, destination, statusCode, enabled, clicks,
 lastClicked, expiresAt, …).
+
+### GraphQL: public files (robots.txt, sitemap.xml, llms.txt, …)
+
+Fully headless sites usually don't want to route `/robots.txt` or `/sitemap.xml` to the Craft origin. The `beaconFiles` query (gated by `beaconPublicFiles:read`) returns the rendered file bodies so the frontend can re-serve them from its own domain:
+
+```graphql
+{
+  beaconFiles(siteId: 1) {        # siteId optional — defaults to the primary site
+    robotsTxt                     # String!
+    sitemap                       # String! — urlset, or a sitemap index when chunked
+    sitemapPart(part: 2)          # String — chunk body (sitemap-2.xml), null when out of range
+    llmsTxt                       # String — null when llms.txt is disabled for the site
+    llmsFullTxt                   # String — null when disabled/empty
+    adsTxt                        # String — null when disabled/empty
+    humansTxt                     # String — null when disabled/empty
+  }
+}
+```
+
+Each field renders **lazily** (only selected files are built) and shares the render cache + rebuild mutex with the HTTP routes, so GraphQL and origin-served files always agree. URLs inside the documents (sitemap `<loc>`, the robots `Sitemap:` line) use the site's configured base URL — in a typical headless setup that already points at your frontend domain.
 
 ### GraphQL: GEO content score
 
@@ -224,7 +300,7 @@ A live smoke is in `bench/gql-geoscore.sh` (set `TOKEN`, `ENTRY_ID`, optional `A
 
 ### GraphQL writes (Beacon SEO field)
 
-Beacon does not register custom GraphQL mutations. For headless authoring, use Craft's built-in entry mutations and set your Beacon SEO field handle as an object input.
+Beyond `beaconTrack404` above, Beacon registers no custom GraphQL mutations. For headless authoring, use Craft's built-in entry mutations and set your Beacon SEO field handle as an object input.
 
 Example payload shape (assuming field handle `seo`):
 

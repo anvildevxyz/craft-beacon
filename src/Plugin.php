@@ -7,12 +7,17 @@ use anvildev\beacon\elements\RedirectElement;
 use anvildev\beacon\elements\ShortLinkElement;
 use anvildev\beacon\enums\Environment;
 use anvildev\beacon\events\RegisterTrackingProvidersEvent;
+use anvildev\beacon\gql\mutations\BeaconRedirectMutations;
+use anvildev\beacon\gql\queries\BeaconPublicFilesQueries;
 use anvildev\beacon\gql\queries\BeaconRedirectQueries;
 use anvildev\beacon\gql\resolvers\EntryBeaconResolver;
 use anvildev\beacon\gql\types\AlternateLinkType;
+use anvildev\beacon\gql\types\BeaconPublicFilesType;
 use anvildev\beacon\gql\types\BeaconRedirect404Type;
 use anvildev\beacon\gql\types\BeaconRedirectType;
+use anvildev\beacon\gql\types\BeaconResolvedRedirectType;
 use anvildev\beacon\gql\types\BeaconShortLinkType;
+use anvildev\beacon\gql\types\BeaconTrack404PayloadType;
 use anvildev\beacon\gql\types\BreadcrumbItemType;
 use anvildev\beacon\gql\types\OpenGraphType;
 use anvildev\beacon\gql\types\SchemaArticleType;
@@ -54,6 +59,7 @@ use anvildev\beacon\services\LlmsTxtService;
 use anvildev\beacon\services\McpService;
 use anvildev\beacon\services\McpTokenService;
 use anvildev\beacon\services\MetaResolverService;
+use anvildev\beacon\services\PublicFilesService;
 use anvildev\beacon\services\Redirect404LogService;
 use anvildev\beacon\services\RedirectImporter;
 use anvildev\beacon\services\RedirectMatcher;
@@ -102,6 +108,7 @@ use craft\events\RegisterComponentTypesEvent;
 use craft\events\RegisterCpAlertsEvent;
 use craft\events\RegisterElementSortOptionsEvent;
 use craft\events\RegisterElementTableAttributesEvent;
+use craft\events\RegisterGqlMutationsEvent;
 use craft\events\RegisterGqlQueriesEvent;
 use craft\events\RegisterGqlSchemaComponentsEvent;
 use craft\events\RegisterGqlTypesEvent;
@@ -138,6 +145,7 @@ use yii\base\Event;
  * @property-read SitemapService $sitemap
  * @property-read RobotsService $robots
  * @property-read LlmsTxtService $llmsTxt
+ * @property-read PublicFilesService $publicFiles
  * @property-read \anvildev\beacon\services\llms\TokenEstimatorInterface $tokenEstimator
  * @property-read BotLogService $botLog
  * @property-read RedirectMatcher $redirectMatcher
@@ -308,6 +316,7 @@ class Plugin extends BasePlugin
             'sitemap' => SitemapService::class,
             'robots' => RobotsService::class,
             'llmsTxt' => LlmsTxtService::class,
+            'publicFiles' => PublicFilesService::class,
             'botLog' => fn() => new BotLogService(self::$plugin->botRegistry),
             'redirectMatcher' => RedirectMatcher::class,
             'redirects' => fn() => new RedirectService(self::$plugin->redirectMatcher),
@@ -622,6 +631,9 @@ class Plugin extends BasePlugin
                     SchemaListItemType::class,
                     BeaconRedirectType::class,
                     BeaconRedirect404Type::class,
+                    BeaconResolvedRedirectType::class,
+                    BeaconTrack404PayloadType::class,
+                    BeaconPublicFilesType::class,
                     BeaconShortLinkType::class,
                 );
             }
@@ -631,7 +643,19 @@ class Plugin extends BasePlugin
             Gql::class,
             Gql::EVENT_REGISTER_GQL_QUERIES,
             static function(RegisterGqlQueriesEvent $event): void {
-                $event->queries = array_merge($event->queries, BeaconRedirectQueries::getQueries());
+                $event->queries = array_merge(
+                    $event->queries,
+                    BeaconRedirectQueries::getQueries(),
+                    BeaconPublicFilesQueries::getQueries(),
+                );
+            },
+        );
+
+        Event::on(
+            Gql::class,
+            Gql::EVENT_REGISTER_GQL_MUTATIONS,
+            static function(RegisterGqlMutationsEvent $event): void {
+                $event->mutations = array_merge($event->mutations, BeaconRedirectMutations::getMutations());
             },
         );
 
@@ -650,6 +674,12 @@ class Plugin extends BasePlugin
                 ];
                 $event->queries[Craft::t('beacon', 'plugin.geo.score')] = [
                     'beaconGeoScore:read' => ['label' => Craft::t('beacon', 'plugin.read.geo.content.score')],
+                ];
+                $event->queries[Craft::t('beacon', 'plugin.public.files')] = [
+                    'beaconPublicFiles:read' => ['label' => Craft::t('beacon', 'plugin.query.public.files')],
+                ];
+                $event->mutations[Craft::t('beacon', 'plugin.404.log')] = [
+                    'beaconRedirect404s:log' => ['label' => Craft::t('beacon', 'plugin.log.404.and.redirect.hits')],
                 ];
             },
         );
