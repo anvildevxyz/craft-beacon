@@ -1,6 +1,6 @@
 # Changelog — Beacon
 
-## Unreleased
+## 1.4.0 — 2026-08-06
 
 ### Added
 - The Beacon SEO field is now queryable in GraphQL with a subselection (`BeaconSeoFieldValue`): title/description/canonical overrides, granular robots directives (incl. `notranslate`, `maxSnippet`, `unavailableAfter`), `aiUsage`, `schemaAddons`, `authorIds`, `entities`, and the `aiMarkdown` override. Beacon redirect-sources fields resolve as `[String!]`. Previously both fields were typed as `String` and any query touching them failed with "String cannot represent value". ([#38](https://github.com/anvildevxyz/craft-beacon/issues/38))
