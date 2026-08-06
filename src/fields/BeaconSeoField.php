@@ -5,6 +5,7 @@ namespace anvildev\beacon\fields;
 use anvildev\beacon\helpers\EntitySchema;
 use anvildev\beacon\helpers\GeoScoreScope;
 use anvildev\beacon\helpers\RobotsDirectives;
+use anvildev\beacon\gql\types\SeoFieldValueType;
 use anvildev\beacon\helpers\SeoFieldReader;
 use anvildev\beacon\models\AiMarkdownOverride;
 use anvildev\beacon\Plugin;
@@ -18,6 +19,7 @@ use craft\base\Field;
 use craft\elements\Entry;
 use craft\helpers\Json;
 use craft\helpers\UrlHelper;
+use GraphQL\Type\Definition\Type;
 
 class BeaconSeoField extends Field implements SeoFieldInterface
 {
@@ -29,6 +31,16 @@ class BeaconSeoField extends Field implements SeoFieldInterface
     public function getContentColumnType(): string
     {
         return 'text';
+    }
+
+    /**
+     * The queryable GraphQL shape of the stored field value. Without this
+     * the base Field implementation types the value as `String`, and the
+     * normalized array value dies with "String cannot represent value".
+     */
+    public function getContentGqlType(): Type
+    {
+        return SeoFieldValueType::getType();
     }
 
     public function normalizeValue(mixed $value, ?ElementInterface $element = null): mixed

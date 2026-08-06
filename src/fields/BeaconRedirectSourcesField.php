@@ -9,6 +9,7 @@ use craft\base\ElementInterface;
 use craft\base\Field;
 use craft\helpers\Html;
 use craft\helpers\Json;
+use GraphQL\Type\Definition\Type;
 
 /**
  * Tag-input field that lets editors attach legacy URIs to an element. On
@@ -43,6 +44,16 @@ class BeaconRedirectSourcesField extends Field
         // The field owns rows in beacon_redirects, not the content column.
         // A 1-byte column satisfies Craft's "field has a value" expectation.
         return 'string(1)';
+    }
+
+    /**
+     * The normalized value is a list of source URIs; without this override
+     * the base Field types it as `String` and GraphQL queries touching the
+     * field die with "String cannot represent value: []".
+     */
+    public function getContentGqlType(): Type
+    {
+        return Type::listOf(Type::nonNull(Type::string()));
     }
 
     public function normalizeValue(mixed $value, ?ElementInterface $element = null): mixed
