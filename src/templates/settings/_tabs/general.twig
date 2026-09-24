@@ -20,6 +20,13 @@
     rows: 2,
 }) }}
 
+{{ forms.lightswitchField({
+    label: 'settings.general.autoCanonicalEnabled.label'|t('beacon'),
+    instructions: 'settings.general.autoCanonicalEnabled.instructions'|t('beacon'),
+    name: 'autoCanonicalEnabled',
+    on: settings.autoCanonicalEnabled,
+}) }}
+
 <hr>
 
 <h2 class="heading">{{ 'settings.general.default.social.image.heading'|t('beacon') }}</h2>

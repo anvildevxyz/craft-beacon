@@ -26,6 +26,7 @@ use craft\elements\Entry;
 use craft\helpers\Json;
 use craft\helpers\Template;
 use craft\helpers\UrlHelper;
+use craft\models\Section;
 use craft\web\Request as WebRequest;
 use Twig\Markup;
 use yii\base\Event;
@@ -1172,7 +1173,8 @@ class BeaconVariable
             return null;
         }
 
-        $sectionHandle = $entry->getSection()?->handle ?? 'content';
+        $section = $entry->getSection();
+        $sectionHandle = $section?->handle ?? 'content';
         $citations = [
             $canonical,
             $siteUrl . '/llms.txt',
@@ -1182,8 +1184,12 @@ class BeaconVariable
         if ($settings->geoMarkdownMdSuffixEnabled && is_string($entry->uri) && $entry->uri !== '') {
             $citations[] = $siteUrl . '/' . ltrim($entry->uri, '/') . '.md';
         }
-        $citations[] = $siteUrl . '/feed/' . $sectionHandle . '.json';
-        $citations[] = $siteUrl . '/feed/' . $sectionHandle . '.atom';
+        // A Single section has no feed (see FeedService::sectionExists()); citing
+        // one would point crawlers at a route that 404s.
+        if ($section !== null && $section->type !== Section::TYPE_SINGLE) {
+            $citations[] = $siteUrl . '/feed/' . $sectionHandle . '.json';
+            $citations[] = $siteUrl . '/feed/' . $sectionHandle . '.atom';
+        }
         $citations = array_values(array_unique(array_filter($citations, static fn(string $u): bool => trim($u) !== '')));
 
         $llms = Plugin::$plugin->siteSettings->getLlms((int) $site->id);

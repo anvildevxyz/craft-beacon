@@ -303,6 +303,50 @@ class MetaResolverServiceTest extends TestCase
         $this->assertSame('summary_large_image', $meta->twitter['card'] ?? null);
     }
 
+    public function testCanonicalStaysNullWhenAutoCanonicalDisabled(): void
+    {
+        $service = new MetaResolverService();
+        $meta = $service->resolve(
+            entryFieldValue: [],
+            entryTitle: 'Post',
+            siteName: 'Site',
+            geoDefaults: [],
+            entryUrl: 'https://example.test/blog/post?utm_source=x',
+        );
+
+        $this->assertNull($meta->canonical);
+    }
+
+    public function testAutoCanonicalUsesEntryUrlWhenFieldIsBlank(): void
+    {
+        $service = new MetaResolverService();
+        $meta = $service->resolve(
+            entryFieldValue: ['canonical' => ''],
+            entryTitle: 'Post',
+            siteName: 'Site',
+            geoDefaults: ['autoCanonicalEnabled' => true],
+            entryUrl: 'https://example.test/blog/post',
+        );
+
+        $this->assertSame('https://example.test/blog/post', $meta->canonical);
+        $this->assertSame('auto', $meta->sourceMap['canonical'] ?? null);
+    }
+
+    public function testExplicitCanonicalBeatsAutoCanonical(): void
+    {
+        $service = new MetaResolverService();
+        $meta = $service->resolve(
+            entryFieldValue: ['canonical' => 'https://example.test/override'],
+            entryTitle: 'Post',
+            siteName: 'Site',
+            geoDefaults: ['autoCanonicalEnabled' => true],
+            entryUrl: 'https://example.test/blog/post',
+        );
+
+        $this->assertSame('https://example.test/override', $meta->canonical);
+        $this->assertSame('entry', $meta->sourceMap['canonical'] ?? null);
+    }
+
     public function testSocialImageUsesAbsoluteUrlForOpenGraphAndTwitter(): void
     {
         $service = new MetaResolverService();

@@ -58,7 +58,13 @@ class FeedController extends Controller
             ),
             'beacon',
         );
-        return RawResponse::build($contentType, $body);
+        $response = RawResponse::build($contentType, $body);
+        // The feed itself is never the indexable representation of its entries —
+        // the entry pages are. Without this, search engines crawl the feed URL
+        // (discovered via the GEO provenance citation list) and flag it as
+        // "Crawled – currently not indexed" since it's structurally a duplicate.
+        $response->headers->set('X-Robots-Tag', 'noindex, nofollow');
+        return $response;
     }
 
     /**

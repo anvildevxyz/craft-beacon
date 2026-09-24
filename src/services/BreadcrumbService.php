@@ -63,7 +63,7 @@ class BreadcrumbService extends Component
 
         return [
             ...$items,
-            ...$this->resolveAncestorsAndSection($entry),
+            ...$this->resolveAncestorsAndSection($entry, $siteBaseUrl),
             ['name' => (string) ($entry->title ?? '')],
         ];
     }
@@ -94,7 +94,7 @@ class BreadcrumbService extends Component
     /**
      * @return array<int, BreadcrumbItem>
      */
-    private function resolveAncestorsAndSection(Entry $entry): array
+    private function resolveAncestorsAndSection(Entry $entry, string $siteBaseUrl): array
     {
         /** @var list<ElementInterface> $ancestors */
         $ancestors = $entry->getAncestors()->all();
@@ -112,7 +112,11 @@ class BreadcrumbService extends Component
         if ($section !== null) {
             $sectionPath = self::deriveSectionPath($section['uriFormat']);
             if ($sectionPath !== '') {
-                return [['name' => $section['name'], 'url' => $sectionPath]];
+                // deriveSectionPath() only returns a bare path (e.g. '/diensten');
+                // prepend the site's base URL so it's absolute and carries the
+                // site's language prefix, matching the ancestor branch above
+                // (Craft's element->url is already absolute).
+                return [['name' => $section['name'], 'url' => rtrim($siteBaseUrl, '/') . $sectionPath]];
             }
         }
 
