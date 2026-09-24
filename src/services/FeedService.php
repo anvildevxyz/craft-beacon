@@ -110,8 +110,13 @@ class FeedService extends Component
         return $xml;
     }
 
+    /**
+     * A Single section has exactly one entry, so a feed of it has no reader
+     * value; treat it as absent so the controller 404s.
+     */
     public function sectionExists(string $handle): bool
     {
-        return Craft::$app->getEntries()->getSectionByHandle($handle) instanceof Section;
+        $section = Craft::$app->getEntries()->getSectionByHandle($handle);
+        return $section instanceof Section && $section->type !== Section::TYPE_SINGLE;
     }
 }

@@ -169,6 +169,7 @@ class SettingsService extends Component
 
         return new Settings(
             titleTemplate: (string) $record->titleTemplate,
+            autoCanonicalEnabled: (bool) ($record->autoCanonicalEnabled ?? false),
             descriptionTemplate: is_string($record->descriptionTemplate) ? $record->descriptionTemplate : '',
             organizationName: $record->organizationName,
             organizationLogoAssetId: $record->organizationLogoAssetId !== null ? (int) $record->organizationLogoAssetId : null,
@@ -325,6 +326,7 @@ class SettingsService extends Component
     {
         $record = SettingsRecord::findOne(1) ?? new SettingsRecord(['id' => 1]);
         $record->titleTemplate = $settings->titleTemplate;
+        $record->autoCanonicalEnabled = $settings->autoCanonicalEnabled;
         $record->descriptionTemplate = $settings->descriptionTemplate;
         $record->organizationName = $settings->organizationName;
         $record->organizationLogoAssetId = $settings->organizationLogoAssetId;

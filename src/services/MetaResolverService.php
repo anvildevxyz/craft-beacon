@@ -88,11 +88,14 @@ class MetaResolverService extends Component
         }
 
         $rawCanonical = $entryFieldValue['canonical'] ?? null;
-        $meta->canonical = ($rawCanonical !== null && $rawCanonical !== '')
-            ? $this->normalizePublicUrl((string) $rawCanonical)
-            : null;
-        if ($meta->canonical !== null) {
+        if ($rawCanonical !== null && $rawCanonical !== '') {
+            $meta->canonical = $this->normalizePublicUrl((string) $rawCanonical);
             $meta->sourceMap['canonical'] = 'entry';
+        } elseif (!empty($geoDefaults['autoCanonicalEnabled']) && $entryUrl !== null) {
+            // Self-referencing canonical: the entry's own URL, already free of
+            // any query string, so filtered/tracked-parameter variants of the
+            // same page consolidate onto it instead of indexing separately.
+            $meta->canonical = $this->normalizePublicUrl($entryUrl);
         }
 
         $robotsFlags = is_array($entryFieldValue['robots'] ?? null) ? $entryFieldValue['robots'] : [];

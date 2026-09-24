@@ -99,6 +99,7 @@ class SettingsController extends Controller
         $trimNullable = static fn(string $k) => static fn(Settings $s, $v) => $s->$k = ((string) $v) !== '' ? (string) $v : null;
 
         $apply('titleTemplate', $trim('titleTemplate', '{title}'));
+        $apply('autoCanonicalEnabled', $bool('autoCanonicalEnabled'));
         $apply('descriptionTemplate', static fn(Settings $s, $v) => $s->descriptionTemplate = trim((string) $v));
         $apply('organizationName', $trimNullable('organizationName'));
         $apply('organizationLogoAssetId', fn(Settings $s, $v) => $s->organizationLogoAssetId = $this->viewableAssetIdFromSelector($v));

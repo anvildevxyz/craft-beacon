@@ -22,6 +22,7 @@ namespace anvildev\beacon\models;
  *     defaultTwitterSite: string|null,
  *     aiUsagePolicy: string,
  *     aiUsagePolicyUrl: string|null,
+ *     autoCanonicalEnabled: bool,
  * }
  */
 class Settings
@@ -44,6 +45,8 @@ class Settings
     public function __construct(
         public string $titleTemplate = '{title}',
         public string $descriptionTemplate = '',
+        /** When true, entries without an explicit SEO-field canonical get a self-referencing canonical (the entry's own URL, query string stripped) instead of no canonical tag at all. Off by default to preserve existing installs' behaviour. */
+        public bool $autoCanonicalEnabled = false,
         public ?string $organizationName = null,
         public ?int $organizationLogoAssetId = null,
         public ?int $organizationImageAssetId = null,
@@ -162,6 +165,7 @@ class Settings
             'defaultTwitterSite' => $this->twitterSiteHandle(),
             'aiUsagePolicy' => $this->aiUsagePolicy,
             'aiUsagePolicyUrl' => $this->aiUsagePolicyUrl,
+            'autoCanonicalEnabled' => $this->autoCanonicalEnabled,
         ];
     }
 

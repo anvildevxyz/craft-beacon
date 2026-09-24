@@ -1,5 +1,14 @@
 # Changelog — Beacon
 
+## 1.5.0 — 2026-09-24
+
+### Added
+- An opt-in **Auto self-canonical** setting (General tab): when an entry's SEO field leaves canonical blank, Beacon outputs the entry's own URL (query string stripped) as a self-referencing canonical instead of no canonical tag at all. Off by default. ([#44](https://github.com/anvildevxyz/craft-beacon/issues/44))
+
+### Fixed
+- Atom/JSON feed responses now carry `X-Robots-Tag: noindex, nofollow`, matching the Markdown surfaces. Feeds are linked from the GEO provenance JSON-LD citation list, so search engines were crawling and flagging them as "Crawled – currently not indexed". Single sections no longer get a feed route or a feed citation. ([#43](https://github.com/anvildevxyz/craft-beacon/issues/43))
+- The breadcrumb JSON-LD section item now uses an absolute URL. It previously used a bare path (e.g. `/diensten`), which also dropped the site's language prefix on multi-site installs — Google reported "Invalid URL in field 'id'". ([#44](https://github.com/anvildevxyz/craft-beacon/issues/44))
+
 ## 1.4.0 — 2026-08-06
 
 ### Added

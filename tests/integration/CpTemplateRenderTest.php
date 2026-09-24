@@ -47,6 +47,9 @@ class CpTemplateRenderTest extends TestCase
             'settings/_tabs/content' => [
                 static fn(): Response => (new SettingsController('settings', Plugin::getInstance()))->actionSection('content'),
             ],
+            'settings/_tabs/general' => [
+                static fn(): Response => (new SettingsController('settings', Plugin::getInstance()))->actionSection('general'),
+            ],
         ];
     }
 

@@ -7,6 +7,7 @@ use craft\db\ActiveRecord;
 /**
  * @property int $id
  * @property string $titleTemplate
+ * @property bool $autoCanonicalEnabled
  * @property string|null $descriptionTemplate
  * @property string|null $organizationName
  * @property int|null $organizationLogoAssetId

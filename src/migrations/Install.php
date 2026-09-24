@@ -290,6 +290,7 @@ class Install extends Migration
         $this->createTable('{{%beacon_settings}}', [
             'id' => $this->integer()->notNull()->defaultValue(1),
             'titleTemplate' => $this->string(500)->notNull()->defaultValue('{title}'),
+            'autoCanonicalEnabled' => $this->boolean()->notNull()->defaultValue(false),
             'descriptionTemplate' => $this->string(500),
             'organizationName' => $this->string(255),
             'organizationLogoAssetId' => $this->integer(),
