@@ -123,6 +123,7 @@ final class GeoMarkdownNegotiator
             $response,
             is_string($canonical) ? $canonical : null,
             includeUserAgentInVary: $trigger === 'bot',
+            siteId: $siteId,
         );
 
         $app->end(0, $response);

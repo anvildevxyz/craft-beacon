@@ -12,6 +12,8 @@ use anvildev\beacon\helpers\AiUsagePolicy;
 use anvildev\beacon\helpers\Assets;
 use anvildev\beacon\helpers\Http;
 use anvildev\beacon\helpers\Ids;
+use anvildev\beacon\helpers\LinkHeader;
+use anvildev\beacon\helpers\LlmsDiscovery;
 use anvildev\beacon\helpers\SeoFieldReader;
 use anvildev\beacon\helpers\SocialPlatforms;
 use anvildev\beacon\models\Schema;
@@ -115,8 +117,12 @@ class BeaconVariable
             $html .= sprintf('<link rel="canonical" href="%s">' . "\n", $h($meta->canonical));
         }
         $markdownAlternate = $this->resolveMarkdownAlternateUrl($meta);
+        $llmsDescribedByUrl = $markdownAlternate !== null ? $this->resolveLlmsDescribedByUrl() : null;
         if ($markdownAlternate !== null) {
             $html .= sprintf('<link rel="alternate" type="text/markdown" href="%s">' . "\n", $h($markdownAlternate));
+            if ($llmsDescribedByUrl !== null) {
+                $html .= sprintf('<link rel="describedby" href="%s">' . "\n", $h($llmsDescribedByUrl));
+            }
         }
         foreach ($meta->alternates as $alternate) {
             $html .= sprintf(
@@ -154,7 +160,7 @@ class BeaconVariable
 
         $html .= $this->renderBreadcrumbJsonLd();
 
-        $this->applySeoHeaders($meta);
+        $this->applySeoHeaders($meta, $markdownAlternate, $llmsDescribedByUrl);
         if ($debugTimings) {
             $this->emitServerTiming([
                 'resolve' => $tMeta - $tStart,
@@ -244,6 +250,18 @@ class BeaconVariable
         return $qPos === false
             ? $base . '.md'
             : substr($base, 0, $qPos) . '.md' . substr($base, $qPos);
+    }
+
+    /**
+     * `rel="describedby"` target for the current entry's site, or null when
+     * llms.txt is disabled for that site (see {@see LlmsDiscovery}).
+     */
+    private function resolveLlmsDescribedByUrl(): ?string
+    {
+        if (Craft::$app === null) {
+            return null;
+        }
+        return LlmsDiscovery::describedByUrl(Craft::$app->getSites()->getCurrentSite()->id);
     }
 
     /**
@@ -975,12 +993,13 @@ class BeaconVariable
         return $html;
     }
 
-    private function applySeoHeaders(SeoMeta $meta): void
+    private function applySeoHeaders(SeoMeta $meta, ?string $markdownAlternateUrl, ?string $llmsDescribedByUrl): void
     {
         if (Craft::$app === null || Plugin::$plugin === null) {
             return;
         }
-        $headers = Http::response()->getHeaders();
+        $response = Http::response();
+        $headers = $response->getHeaders();
         if (!empty($meta->robots)) {
             $headers->set('X-Robots-Tag', implode(', ', $meta->robots));
         }
@@ -988,13 +1007,21 @@ class BeaconVariable
         if ($contentUsage !== null) {
             $headers->set('Content-Usage', $contentUsage);
         }
+
+        // LinkHeader strips CR/LF/NUL from each URL, so a stray newline in the
+        // canonical or markdown-alternate (both editor-supplied) can't break
+        // the header or be abused for header injection.
+        $links = [];
         if (is_string($meta->canonical) && $meta->canonical !== '') {
-            // Strip CR/LF/NUL so a stray newline in the canonical can't break the
-            // header (PHP's header() rejects such values outright) or be abused
-            // for header injection. Defense-in-depth on editor-supplied input.
-            $canonical = str_replace(["\r", "\n", "\0"], '', $meta->canonical);
-            $headers->set('Link', '<' . $canonical . '>; rel="canonical"');
+            $links[] = ['url' => $meta->canonical, 'rel' => 'canonical'];
         }
+        if ($markdownAlternateUrl !== null) {
+            $links[] = ['url' => $markdownAlternateUrl, 'rel' => 'alternate', 'type' => 'text/markdown'];
+            if ($llmsDescribedByUrl !== null) {
+                $links[] = ['url' => $llmsDescribedByUrl, 'rel' => 'describedby'];
+            }
+        }
+        LinkHeader::apply($response, $links);
     }
 
     private function countRenderedTags(SeoMeta $meta): int
