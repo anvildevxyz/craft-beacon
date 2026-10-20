@@ -462,6 +462,7 @@ class Install extends Migration
             'userAgentPattern' => $this->string(255)->notNull(),
             'enabled' => $this->boolean()->notNull()->defaultValue(true),
             'source' => $this->string(16)->notNull()->defaultValue('custom'),
+            'purpose' => $this->string(16)->null(),
             'sortOrder' => $this->smallInteger()->unsigned()->notNull()->defaultValue(0),
             'dateCreated' => $this->dateTime()->notNull(),
             'dateUpdated' => $this->dateTime()->notNull(),

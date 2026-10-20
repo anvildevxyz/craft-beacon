@@ -60,6 +60,13 @@
 
 <hr>
 
+{% set purposeOptions = [
+    { label: 'aiCrawlers.purpose.training.text'|t('beacon'), value: 'training' },
+    { label: 'aiCrawlers.purpose.searchIndex.text'|t('beacon'), value: 'searchIndex' },
+    { label: 'aiCrawlers.purpose.userAgent.text'|t('beacon'), value: 'userAgent' },
+] %}
+{% set purposeLabels = { training: purposeOptions[0].label, searchIndex: purposeOptions[1].label, userAgent: purposeOptions[2].label } %}
+
 <h2>{{ 'aiCrawlers.bots.heading'|t('beacon') }}</h2>
 <p class="instructions">{{ 'aiCrawlers.known.ai.crawlers.defaults.custom.text'|t('beacon') }}</p>
 <div class="buttons">
@@ -71,6 +78,30 @@
     </form>
 </div>
 
+<div class="flex beacon-space-bottom">
+    <form method="get" action="{{ url('beacon/crawlers/ai-crawlers') }}">
+        {{ forms.select({
+            label: 'aiCrawlers.filter.purpose.label'|t('beacon'),
+            name: 'purpose',
+            value: purposeFilter,
+            options: [{ label: 'aiCrawlers.filter.all.purposes.text'|t('beacon'), value: '' }]|merge(purposeOptions),
+            inputAttributes: { onchange: 'this.form.submit()' },
+        }) }}
+    </form>
+
+    {% if purposeFilter %}
+        <form method="post" action="" data-confirm="{{ 'aiCrawlers.bulk.apply.policy.confirm.text'|t('beacon') }}">
+            {{ csrfInput() }}
+            <input type="hidden" name="action" value="beacon/ai-crawlers/bulk-apply-purpose-policy">
+            <input type="hidden" name="purpose" value="{{ purposeFilter }}">
+            <div class="buttons">
+                <button type="submit" name="policy" value="allow" class="btn submit">{{ 'aiCrawlers.bulk.allow.text'|t('beacon') }}</button>
+                <button type="submit" name="policy" value="disallow" class="btn">{{ 'aiCrawlers.bulk.disallow.text'|t('beacon') }}</button>
+            </div>
+        </form>
+    {% endif %}
+</div>
+
 <table class="data fullwidth">
     <thead>
         <tr>
@@ -78,6 +109,7 @@
             <th>{{ 'aiCrawlers.user.agent.pattern.text'|t('beacon') }}</th>
             <th class="thin">{{ 'field.enabled'|t('beacon') }}</th>
             <th>{{ 'aiCrawlers.source.text'|t('beacon') }}</th>
+            <th>{{ 'aiCrawlers.purpose.text'|t('beacon') }}</th>
             <th class="thin"></th>
         </tr>
     </thead>
@@ -105,6 +137,7 @@
                     <span class="status"></span> {{ 'aiCrawlers.custom.text'|t('beacon') }}
                 {% endif %}
             </td>
+            <td>{{ b.purpose ? purposeLabels[b.purpose.value] : 'common.emDash'|t('beacon') }}</td>
             <td class="thin">
                 <form method="post" action="" class="inline" data-confirm="{{ b.source == 'default' ? 'aiCrawlers.delete.default.bot.you.can.text'|t('beacon') : 'aiCrawlers.delete.bot.text'|t('beacon') }}">
                     {{ csrfInput() }}

@@ -10,6 +10,7 @@ use craft\db\ActiveRecord;
  * @property string $userAgentPattern
  * @property bool $enabled
  * @property string $source
+ * @property string|null $purpose
  * @property int $sortOrder
  */
 class AiBotRecord extends ActiveRecord

@@ -59,26 +59,28 @@ The rendered file at `/llms.txt` looks roughly:
 
 ## Phase 2 — AI crawler controls
 
-Beacon distinguishes **AI training crawlers** from **classic search crawlers** and gives you per-bot rules.
+Beacon distinguishes **AI training crawlers** from **classic search crawlers** and gives you per-bot rules — and, since every bot also carries a **purpose** (`training`, `search index`, or `user agent`), a policy you can apply to a whole purpose at once instead of bot-by-bot.
 
 1. Visit `/admin/beacon/crawlers/ai-crawlers`.
-2. Use the **Restore defaults** button if you want the curated bot list (GPTBot, ClaudeBot, Google-Extended, CCBot, etc.).
+2. Use the **Restore defaults** button if you want the curated bot list (GPTBot, ClaudeBot, Google-Extended, Bytespider, etc.), each already tagged with its purpose.
 3. For each bot, decide:
    - **Allow** — bot crawls normally
    - **Disallow** — listed in robots.txt with `Disallow: /`
    - **Disallow specific paths** — `Disallow: /private`, `/staging`, etc.
 4. Save. Beacon's `/robots.txt` immediately reflects the new rules.
 
-You can also write **custom bot definitions**. Each definition uses a user-agent regex; pathological patterns are rejected at save time and matched under a lowered backtrack limit.
+Instead of working bot-by-bot, filter the bot list by **Purpose** and use **Allow all** / **Disallow all** to apply a site-wide (no-path-restriction) policy to every bot of that purpose in one action — the fastest way to act on an editorial position like "no training, but let search and user-agent fetches through."
+
+You can also write **custom bot definitions**, each tagged with its own purpose. Each definition uses a user-agent regex; pathological patterns are rejected at save time and matched under a lowered backtrack limit.
 
 ### Operational guidance
 
 | Editorial position | Recommended config |
 |---|---|
-| "We want to be cited but not trained on" | Allow `OAI-SearchBot`, `Perplexity-User`; Disallow `GPTBot`, `ClaudeBot`, `CCBot`, `Google-Extended` |
-| "Open content, training OK" | Restore defaults, then Allow everything |
-| "Maximum protection" | Disallow all AI crawlers; keep classic crawlers (Googlebot, Bingbot) allowed |
-| "Public docs only" | Disallow all AI on `/private/*`; Allow on `/docs/*` via path lists |
+| "We want to be cited but not trained on" | Filter to **Search index** and **User agent**, Allow all; filter to **Training**, Disallow all |
+| "Open content, training OK" | Restore defaults, then Allow all for every purpose |
+| "Maximum protection" | Disallow all for every purpose; keep classic crawlers (Googlebot, Bingbot) allowed |
+| "Public docs only" | Disallow all AI on `/private/*`; Allow on `/docs/*` via per-bot path lists (the purpose bulk action doesn't scope by path) |
 
 ### Caveats
 

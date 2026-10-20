@@ -2,13 +2,16 @@
 
 namespace anvildev\beacon\controllers;
 
+use anvildev\beacon\enums\BotPurpose;
 use anvildev\beacon\helpers\BeaconPermissions;
 use anvildev\beacon\helpers\Http;
 use anvildev\beacon\helpers\SafeRegex;
 use anvildev\beacon\helpers\Strings;
+use anvildev\beacon\models\AiBot;
 use anvildev\beacon\Plugin;
 use Craft;
 use craft\web\Controller;
+use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
@@ -22,15 +25,23 @@ class AiCrawlersController extends Controller
     private const REDIRECT = 'beacon/crawlers/ai-crawlers';
 
     /**
-     * Lists the configured AI-crawler rules and bots on the crawlers screen.
+     * Lists the configured AI-crawler rules and bots on the crawlers screen,
+     * optionally filtered to one purpose via `?purpose=`.
      */
     public function actionIndex(): Response
     {
         $plugin = Plugin::$plugin;
+        $purposeFilter = BotPurpose::tryFrom((string) Http::request()->getQueryParam('purpose', ''));
+        $bots = $plugin->aiBots->getAllBots();
+        if ($purposeFilter !== null) {
+            $bots = array_values(array_filter($bots, static fn(AiBot $b): bool => $b->purpose === $purposeFilter));
+        }
+
         return $this->renderTemplate('beacon/crawlers/index', [
             'selectedCrawlerTab' => 'ai-crawlers',
             'rules' => $plugin->aiCrawlers->getAllRules(),
-            'bots' => $plugin->aiBots->getAllBots(),
+            'bots' => $bots,
+            'purposeFilter' => $purposeFilter?->value ?? '',
         ]);
     }
 
@@ -126,6 +137,7 @@ class AiCrawlersController extends Controller
             name: (string) $request->getBodyParam('name', ''),
             userAgentPattern: $userAgentPattern,
             enabled: (bool) $request->getBodyParam('enabled', true),
+            purpose: BotPurpose::tryFrom((string) $request->getBodyParam('purpose', '')),
         );
 
         Craft::$app->getSession()->setNotice(Craft::t('beacon', 'flash.aiCrawlers.bot.saved'));
@@ -143,6 +155,34 @@ class AiCrawlersController extends Controller
         Plugin::$plugin->aiBots->deleteBot((int) Http::request()->getBodyParam('botId'));
         Craft::$app->getSession()->setNotice(Craft::t('beacon', 'flash.aiCrawlers.bot.deleted'));
         return $this->redirect(self::REDIRECT);
+    }
+
+    /**
+     * Bulk-applies an allow/disallow crawler policy to every bot tagged with
+     * the posted `purpose`, then redirects to the crawlers screen filtered to
+     * that purpose.
+     *
+     * @throws \yii\web\BadRequestHttpException when the request is not a POST, or `purpose`/`policy` is invalid
+     */
+    public function actionBulkApplyPurposePolicy(): ?Response
+    {
+        $this->requirePostRequest();
+        $request = Http::request();
+        $purpose = BotPurpose::tryFrom((string) $request->getRequiredBodyParam('purpose'));
+        if ($purpose === null) {
+            throw new BadRequestHttpException('Invalid purpose.');
+        }
+        $policy = (string) $request->getRequiredBodyParam('policy');
+        if (!in_array($policy, ['allow', 'disallow'], true)) {
+            throw new BadRequestHttpException('Invalid policy.');
+        }
+
+        $plugin = Plugin::$plugin;
+        $names = $plugin->aiBots->namesForPurpose($purpose);
+        $count = $plugin->aiCrawlers->applyPolicyToBots($names, $policy === 'disallow');
+
+        Craft::$app->getSession()->setNotice(Craft::t('beacon', 'flash.aiCrawlers.bulk.policy.applied', ['count' => $count]));
+        return $this->redirect(self::REDIRECT . '?purpose=' . $purpose->value);
     }
 
     /**
