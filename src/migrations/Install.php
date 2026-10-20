@@ -2,6 +2,7 @@
 
 namespace anvildev\beacon\migrations;
 
+use anvildev\beacon\services\AiBotsService;
 use Craft;
 use craft\db\Migration;
 use craft\helpers\StringHelper;
@@ -686,26 +687,20 @@ class Install extends Migration
         $this->seedPerSiteRows($now);
     }
 
+    /**
+     * Seeds from {@see AiBotsService::DEFAULT_BOTS} — the single source for
+     * the curated bot list — rather than a second hardcoded copy here, so a
+     * fresh install and `resetDefaults()` on an existing one never drift
+     * apart (install migrations aren't replayed on upgrade: Craft marks them
+     * all as already-applied right after `install()` runs this method).
+     */
     private function seedDefaultBots(string $now): void
     {
-        $bots = [
-            ['name' => 'GPTBot',            'userAgentPattern' => 'GPTBot/.*'],
-            ['name' => 'OAI-SearchBot',     'userAgentPattern' => 'OAI-SearchBot/.*'],
-            ['name' => 'ChatGPT-User',      'userAgentPattern' => 'ChatGPT-User/.*'],
-            ['name' => 'ClaudeBot',         'userAgentPattern' => 'ClaudeBot/.*'],
-            ['name' => 'Claude-Web',        'userAgentPattern' => 'Claude-Web/.*'],
-            ['name' => 'PerplexityBot',     'userAgentPattern' => 'PerplexityBot/.*'],
-            ['name' => 'Google-Extended',   'userAgentPattern' => 'Google-Extended'],
-            ['name' => 'Bytespider',        'userAgentPattern' => 'Bytespider'],
-            ['name' => 'Amazonbot',         'userAgentPattern' => 'Amazonbot/.*'],
-            ['name' => 'Applebot-Extended', 'userAgentPattern' => 'Applebot-Extended'],
-            ['name' => 'Diffbot',           'userAgentPattern' => 'Diffbot'],
-            ['name' => 'cohere-ai',         'userAgentPattern' => 'cohere-ai'],
-        ];
-
-        foreach ($bots as $i => $bot) {
+        foreach (AiBotsService::DEFAULT_BOTS as $i => $bot) {
             $this->insert('{{%beacon_ai_bots}}', [
-                ...$bot,
+                'name' => $bot['name'],
+                'userAgentPattern' => $bot['userAgentPattern'],
+                'purpose' => $bot['purpose'],
                 'enabled' => true,
                 'source' => 'default',
                 'sortOrder' => $i,

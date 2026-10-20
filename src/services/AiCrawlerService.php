@@ -103,17 +103,28 @@ class AiCrawlerService extends Component
      */
     public function applyPolicyToBots(array $botNames, bool $disallow): int
     {
+        if ($botNames === []) {
+            return 0;
+        }
+
+        /** @var array<string, AiCrawlerRuleRecord> $existingByName */
+        $existingByName = AiCrawlerRuleRecord::find()
+            ->where(['botName' => $botNames])
+            ->indexBy('botName')
+            ->all();
+
         $now = Db::now();
+        $nextSortOrder = $this->nextSortOrder(AiCrawlerRuleRecord::class);
         $count = 0;
 
         foreach ($botNames as $botName) {
-            $record = AiCrawlerRuleRecord::findOne(['botName' => $botName]) ?? new AiCrawlerRuleRecord();
+            $record = $existingByName[$botName] ?? new AiCrawlerRuleRecord();
             $record->botName = $botName;
             $record->allowPaths = Json::encode([]);
             $record->disallowPaths = Json::encode($disallow ? ['/'] : []);
             $record->enabled = true;
             if ($record->isNewRecord) {
-                $record->sortOrder = $this->nextSortOrder(AiCrawlerRuleRecord::class);
+                $record->sortOrder = $nextSortOrder++;
                 $record->dateCreated = $now;
             }
             $record->dateUpdated = $now;
@@ -121,9 +132,7 @@ class AiCrawlerService extends Component
             $count++;
         }
 
-        if ($count > 0) {
-            $this->invalidateMemo();
-        }
+        $this->invalidateMemo();
 
         return $count;
     }

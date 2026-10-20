@@ -59,19 +59,19 @@ The rendered file at `/llms.txt` looks roughly:
 
 ## Phase 2 — AI crawler controls
 
-Beacon distinguishes **AI training crawlers** from **classic search crawlers** and gives you per-bot rules — and, since every bot also carries a **purpose** (`training`, `search index`, or `user agent`), a policy you can apply to a whole purpose at once instead of bot-by-bot.
+Beacon distinguishes **AI training crawlers** from **classic search crawlers** and gives you per-bot rules. Every bot also carries a **purpose** — `training`, `search index`, or `user agent`. Use the purpose to apply one policy to a whole group of bots, instead of setting each bot by hand.
 
 1. Visit `/admin/beacon/crawlers/ai-crawlers`.
-2. Use the **Restore defaults** button if you want the curated bot list (GPTBot, ClaudeBot, Google-Extended, Bytespider, etc.), each already tagged with its purpose.
+2. Use the **Restore defaults** button for the curated bot list (GPTBot, ClaudeBot, Google-Extended, Bytespider, etc.). Each default bot already has a purpose.
 3. For each bot, decide:
    - **Allow** — bot crawls normally
    - **Disallow** — listed in robots.txt with `Disallow: /`
    - **Disallow specific paths** — `Disallow: /private`, `/staging`, etc.
 4. Save. Beacon's `/robots.txt` immediately reflects the new rules.
 
-Instead of working bot-by-bot, filter the bot list by **Purpose** and use **Allow all** / **Disallow all** to apply a site-wide (no-path-restriction) policy to every bot of that purpose in one action — the fastest way to act on an editorial position like "no training, but let search and user-agent fetches through."
+To act on a whole group at once, filter the bot list by **Purpose**. Then click **Allow all** or **Disallow all**. This applies a site-wide policy to every bot with that purpose, with no path restrictions.
 
-You can also write **custom bot definitions**, each tagged with its own purpose. Each definition uses a user-agent regex; pathological patterns are rejected at save time and matched under a lowered backtrack limit.
+You can also write **custom bot definitions**, each with its own purpose. Each definition uses a user-agent regex. Beacon rejects pathological patterns at save time, and matches regex under a lowered backtrack limit.
 
 ### Operational guidance
 

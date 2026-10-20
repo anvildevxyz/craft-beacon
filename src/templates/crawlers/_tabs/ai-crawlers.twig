@@ -60,13 +60,6 @@
 
 <hr>
 
-{% set purposeOptions = [
-    { label: 'aiCrawlers.purpose.training.text'|t('beacon'), value: 'training' },
-    { label: 'aiCrawlers.purpose.searchIndex.text'|t('beacon'), value: 'searchIndex' },
-    { label: 'aiCrawlers.purpose.userAgent.text'|t('beacon'), value: 'userAgent' },
-] %}
-{% set purposeLabels = { training: purposeOptions[0].label, searchIndex: purposeOptions[1].label, userAgent: purposeOptions[2].label } %}
-
 <h2>{{ 'aiCrawlers.bots.heading'|t('beacon') }}</h2>
 <p class="instructions">{{ 'aiCrawlers.known.ai.crawlers.defaults.custom.text'|t('beacon') }}</p>
 <div class="buttons">
@@ -80,7 +73,7 @@
 
 <div class="flex beacon-space-bottom">
     <form method="get" action="{{ url('beacon/crawlers/ai-crawlers') }}">
-        {{ forms.select({
+        {{ forms.selectField({
             label: 'aiCrawlers.filter.purpose.label'|t('beacon'),
             name: 'purpose',
             value: purposeFilter,
@@ -137,7 +130,7 @@
                     <span class="status"></span> {{ 'aiCrawlers.custom.text'|t('beacon') }}
                 {% endif %}
             </td>
-            <td>{{ b.purpose ? purposeLabels[b.purpose.value] : 'common.emDash'|t('beacon') }}</td>
+            <td>{{ b.purpose ? b.purpose.label : 'common.emDash'|t('beacon') }}</td>
             <td class="thin">
                 <form method="post" action="" class="inline" data-confirm="{{ b.source == 'default' ? 'aiCrawlers.delete.default.bot.you.can.text'|t('beacon') : 'aiCrawlers.delete.bot.text'|t('beacon') }}">
                     {{ csrfInput() }}

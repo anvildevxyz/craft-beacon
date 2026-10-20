@@ -25,4 +25,19 @@ enum BotPurpose: string
             self::UserAgent => Craft::t('beacon', 'aiCrawlers.purpose.userAgent.text'),
         };
     }
+
+    /**
+     * `forms.select()`-ready `{label, value}` rows for every case, in
+     * declaration order. The single source for the purpose dropdown options
+     * on both the bots list filter and the bot edit form.
+     *
+     * @return list<array{label:string, value:string}>
+     */
+    public static function options(): array
+    {
+        return array_map(
+            static fn(self $purpose): array => ['label' => $purpose->label(), 'value' => $purpose->value],
+            self::cases(),
+        );
+    }
 }

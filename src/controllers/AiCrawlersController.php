@@ -42,6 +42,7 @@ class AiCrawlersController extends Controller
             'rules' => $plugin->aiCrawlers->getAllRules(),
             'bots' => $bots,
             'purposeFilter' => $purposeFilter?->value ?? '',
+            'purposeOptions' => BotPurpose::options(),
         ]);
     }
 
@@ -111,7 +112,10 @@ class AiCrawlersController extends Controller
         if ($botId !== null && $bot === null) {
             throw new NotFoundHttpException(Craft::t('beacon', 'flash.aiCrawlers.bot.not.found'));
         }
-        return $this->renderTemplate('beacon/ai-crawlers/_edit-bot', ['bot' => $bot]);
+        return $this->renderTemplate('beacon/ai-crawlers/_edit-bot', [
+            'bot' => $bot,
+            'purposeOptions' => BotPurpose::options(),
+        ]);
     }
 
     /**
