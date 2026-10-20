@@ -39,6 +39,14 @@
         on: bot ? bot.enabled : true,
     }) }}
 
+    {{ forms.selectField({
+        label: 'aiCrawlers.bot.purpose.label'|t('beacon'),
+        instructions: 'aiCrawlers.bot.purpose.instructions'|t('beacon'),
+        name: 'purpose',
+        value: bot.purpose.value ?? '',
+        options: [{ label: 'aiCrawlers.purpose.unset.text'|t('beacon'), value: '' }]|merge(purposeOptions),
+    }) }}
+
     {% if bot and bot.source == 'default' %}
         <p class="instructions"><strong>{{ 'aiCrawlers.bot.source.default.text'|t('beacon') }}</strong> {{ 'aiCrawlers.bot.bot.was.seeded.by.beacon.text'|t('beacon') }}</p>
     {% endif %}

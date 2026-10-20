@@ -3,6 +3,7 @@
 namespace anvildev\beacon\services;
 
 use anvildev\beacon\enums\AiBotSource;
+use anvildev\beacon\enums\BotPurpose;
 use anvildev\beacon\helpers\Db;
 use anvildev\beacon\helpers\RecordCache;
 use anvildev\beacon\helpers\SafeRegex;
@@ -32,22 +33,31 @@ class AiBotsService extends Component
     private ?array $allMemo = null;
 
     /**
-     * Curated default bot list. Update when AI bot operators add/rename crawlers.
-     * @var list<array{name:string, userAgentPattern:string}>
+     * Curated default bot list. Update when AI bot operators add/rename
+     * crawlers. `Claude-Web` (Anthropic's retired user-agent) is gone,
+     * replaced by the three crawlers Anthropic split it into; Perplexity's
+     * and Meta's user-triggered fetch agents and Meta's training/indexing
+     * crawlers are new additions.
+     *
+     * @var list<array{name:string, userAgentPattern:string, purpose:string}>
      */
     public const DEFAULT_BOTS = [
-        ['name' => 'GPTBot',            'userAgentPattern' => 'GPTBot/.*'],
-        ['name' => 'OAI-SearchBot',     'userAgentPattern' => 'OAI-SearchBot/.*'],
-        ['name' => 'ChatGPT-User',      'userAgentPattern' => 'ChatGPT-User/.*'],
-        ['name' => 'ClaudeBot',         'userAgentPattern' => 'ClaudeBot/.*'],
-        ['name' => 'Claude-Web',        'userAgentPattern' => 'Claude-Web/.*'],
-        ['name' => 'PerplexityBot',     'userAgentPattern' => 'PerplexityBot/.*'],
-        ['name' => 'Google-Extended',   'userAgentPattern' => 'Google-Extended'],
-        ['name' => 'Bytespider',        'userAgentPattern' => 'Bytespider'],
-        ['name' => 'Amazonbot',         'userAgentPattern' => 'Amazonbot/.*'],
-        ['name' => 'Applebot-Extended', 'userAgentPattern' => 'Applebot-Extended'],
-        ['name' => 'Diffbot',           'userAgentPattern' => 'Diffbot'],
-        ['name' => 'cohere-ai',         'userAgentPattern' => 'cohere-ai'],
+        ['name' => 'GPTBot',               'userAgentPattern' => 'GPTBot/.*',               'purpose' => BotPurpose::Training->value],
+        ['name' => 'OAI-SearchBot',        'userAgentPattern' => 'OAI-SearchBot/.*',        'purpose' => BotPurpose::SearchIndex->value],
+        ['name' => 'ChatGPT-User',         'userAgentPattern' => 'ChatGPT-User/.*',         'purpose' => BotPurpose::UserAgent->value],
+        ['name' => 'ClaudeBot',            'userAgentPattern' => 'ClaudeBot/.*',            'purpose' => BotPurpose::Training->value],
+        ['name' => 'Claude-SearchBot',     'userAgentPattern' => 'Claude-SearchBot/.*',     'purpose' => BotPurpose::SearchIndex->value],
+        ['name' => 'Claude-User',          'userAgentPattern' => 'Claude-User/.*',          'purpose' => BotPurpose::UserAgent->value],
+        ['name' => 'PerplexityBot',        'userAgentPattern' => 'PerplexityBot/.*',        'purpose' => BotPurpose::SearchIndex->value],
+        ['name' => 'Perplexity-User',      'userAgentPattern' => 'Perplexity-User/.*',      'purpose' => BotPurpose::UserAgent->value],
+        ['name' => 'Google-Extended',      'userAgentPattern' => 'Google-Extended',         'purpose' => BotPurpose::Training->value],
+        ['name' => 'Bytespider',           'userAgentPattern' => 'Bytespider',              'purpose' => BotPurpose::Training->value],
+        ['name' => 'Amazonbot',            'userAgentPattern' => 'Amazonbot/.*',            'purpose' => BotPurpose::SearchIndex->value],
+        ['name' => 'Applebot-Extended',    'userAgentPattern' => 'Applebot-Extended',       'purpose' => BotPurpose::Training->value],
+        ['name' => 'Diffbot',              'userAgentPattern' => 'Diffbot',                 'purpose' => BotPurpose::Training->value],
+        ['name' => 'cohere-ai',            'userAgentPattern' => 'cohere-ai',               'purpose' => BotPurpose::Training->value],
+        ['name' => 'Meta-ExternalAgent',   'userAgentPattern' => 'Meta-ExternalAgent/.*',   'purpose' => BotPurpose::Training->value],
+        ['name' => 'Meta-ExternalFetcher', 'userAgentPattern' => 'Meta-ExternalFetcher/.*', 'purpose' => BotPurpose::UserAgent->value],
     ];
 
     /** @return list<AiBot> */
@@ -107,8 +117,14 @@ class AiBotsService extends Component
     /**
      * @throws \yii\base\InvalidArgumentException when $userAgentPattern is not a safe, valid regex
      */
-    public function saveBot(?int $id, string $name, string $userAgentPattern, bool $enabled, string $source = AiBotSource::Custom->value): AiBot
-    {
+    public function saveBot(
+        ?int $id,
+        string $name,
+        string $userAgentPattern,
+        bool $enabled,
+        string $source = AiBotSource::Custom->value,
+        ?BotPurpose $purpose = null,
+    ): AiBot {
         $patternError = SafeRegex::validate($userAgentPattern);
         if ($patternError !== null) {
             throw new InvalidArgumentException("Invalid bot user-agent pattern: {$patternError}");
@@ -117,6 +133,7 @@ class AiBotsService extends Component
         $record->name = $name;
         $record->userAgentPattern = $userAgentPattern;
         $record->enabled = $enabled;
+        $record->purpose = $purpose?->value;
         if ($record->isNewRecord) {
             $record->source = $source;
             $record->sortOrder = $this->nextSortOrder(AiBotRecord::class);
@@ -156,6 +173,7 @@ class AiBotsService extends Component
             $record->userAgentPattern = $bot->userAgentPattern;
             $record->enabled = true;
             $record->source = AiBotSource::Default->value;
+            $record->purpose = $row['purpose'];
             $record->sortOrder = $i;
             $record->dateCreated = $now;
             $record->dateUpdated = $now;
@@ -178,6 +196,21 @@ class AiBotsService extends Component
             enabled: (bool) $r->enabled,
             source: (string) $r->source,
             sortOrder: (int) $r->sortOrder,
+            purpose: $r->purpose !== null ? BotPurpose::tryFrom((string) $r->purpose) : null,
         );
+    }
+
+    /**
+     * Names of every bot (default or custom) tagged with $purpose — the set a
+     * purpose-scoped bulk policy action applies to.
+     *
+     * @return list<string>
+     */
+    public function namesForPurpose(BotPurpose $purpose): array
+    {
+        return array_values(array_map(
+            static fn(AiBot $b): string => $b->name,
+            array_filter($this->getAllBots(), static fn(AiBot $b): bool => $b->purpose === $purpose),
+        ));
     }
 }

@@ -2,6 +2,8 @@
 
 namespace anvildev\beacon\models;
 
+use anvildev\beacon\enums\BotPurpose;
+
 class AiBot
 {
     public function __construct(
@@ -11,6 +13,7 @@ class AiBot
         public readonly bool $enabled,
         public readonly string $source,
         public readonly int $sortOrder,
+        public readonly ?BotPurpose $purpose = null,
     ) {
     }
 }

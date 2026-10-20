@@ -91,6 +91,52 @@ class AiCrawlerService extends Component
         $this->deleteRecordById(AiCrawlerRuleRecord::class, $id);
     }
 
+    /**
+     * Bulk-applies an allow/disallow policy to every name in $botNames,
+     * upserting one rule per name (matched against `AiCrawlerRule::$botName`).
+     * An allowed bot gets an explicit no-restrictions rule (rather than just
+     * deleting any existing rule) so the policy is visible and editable
+     * afterward, not inferred from a rule's absence. A disallowed bot's rule
+     * disallows `/`, blocking it site-wide.
+     *
+     * @param list<string> $botNames
+     */
+    public function applyPolicyToBots(array $botNames, bool $disallow): int
+    {
+        if ($botNames === []) {
+            return 0;
+        }
+
+        /** @var array<string, AiCrawlerRuleRecord> $existingByName */
+        $existingByName = AiCrawlerRuleRecord::find()
+            ->where(['botName' => $botNames])
+            ->indexBy('botName')
+            ->all();
+
+        $now = Db::now();
+        $nextSortOrder = $this->nextSortOrder(AiCrawlerRuleRecord::class);
+        $count = 0;
+
+        foreach ($botNames as $botName) {
+            $record = $existingByName[$botName] ?? new AiCrawlerRuleRecord();
+            $record->botName = $botName;
+            $record->allowPaths = Json::encode([]);
+            $record->disallowPaths = Json::encode($disallow ? ['/'] : []);
+            $record->enabled = true;
+            if ($record->isNewRecord) {
+                $record->sortOrder = $nextSortOrder++;
+                $record->dateCreated = $now;
+            }
+            $record->dateUpdated = $now;
+            $record->save(false);
+            $count++;
+        }
+
+        $this->invalidateMemo();
+
+        return $count;
+    }
+
     public function setRuleEnabled(int $id, bool $enabled): bool
     {
         return $this->setRecordEnabled(AiCrawlerRuleRecord::class, $id, $enabled);
