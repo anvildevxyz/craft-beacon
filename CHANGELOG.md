@@ -1,5 +1,10 @@
 # Changelog — Beacon
 
+## Unreleased
+
+### Added
+- GEO: `llms.txt` v2 discovery — entry pages and Markdown export responses now carry a `rel="describedby"` pointer back to `/llms.txt`, alongside the existing `rel="alternate"; type="text/markdown"` relation, as both an in-page `<link>` tag and a `Link:` HTTP header. Suppressed per-site when llms.txt is disabled. ([#48](https://github.com/anvildevxyz/craft-beacon/issues/48))
+
 ## 1.5.0 — 2026-09-24
 
 ### Added
