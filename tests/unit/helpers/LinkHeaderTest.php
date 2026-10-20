@@ -56,4 +56,17 @@ class LinkHeaderTest extends TestCase
             $response->headers->get('Link'),
         );
     }
+
+    public function testStripsAngleBracketsFromUrlsToPreventDelimiterBreakout(): void
+    {
+        $response = new Response();
+        LinkHeader::apply($response, [
+            ['url' => 'https://example.com/post>; rel="evil', 'rel' => 'canonical'],
+        ]);
+
+        $this->assertSame(
+            '<https://example.com/post; rel="evil>; rel="canonical"',
+            $response->headers->get('Link'),
+        );
+    }
 }

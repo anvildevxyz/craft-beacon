@@ -120,9 +120,9 @@ class BeaconVariable
         $llmsDescribedByUrl = $markdownAlternate !== null ? $this->resolveLlmsDescribedByUrl() : null;
         if ($markdownAlternate !== null) {
             $html .= sprintf('<link rel="alternate" type="text/markdown" href="%s">' . "\n", $h($markdownAlternate));
-            if ($llmsDescribedByUrl !== null) {
-                $html .= sprintf('<link rel="describedby" href="%s">' . "\n", $h($llmsDescribedByUrl));
-            }
+        }
+        if ($llmsDescribedByUrl !== null) {
+            $html .= sprintf('<link rel="describedby" href="%s">' . "\n", $h($llmsDescribedByUrl));
         }
         foreach ($meta->alternates as $alternate) {
             $html .= sprintf(
@@ -1017,9 +1017,9 @@ class BeaconVariable
         }
         if ($markdownAlternateUrl !== null) {
             $links[] = ['url' => $markdownAlternateUrl, 'rel' => 'alternate', 'type' => 'text/markdown'];
-            if ($llmsDescribedByUrl !== null) {
-                $links[] = ['url' => $llmsDescribedByUrl, 'rel' => 'describedby'];
-            }
+        }
+        if ($llmsDescribedByUrl !== null) {
+            $links[] = ['url' => $llmsDescribedByUrl, 'rel' => 'describedby'];
         }
         LinkHeader::apply($response, $links);
     }
