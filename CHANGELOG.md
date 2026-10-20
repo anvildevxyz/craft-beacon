@@ -6,6 +6,9 @@
 - GEO: `llms.txt` v2 discovery — entry pages and Markdown export responses now carry a `rel="describedby"` pointer back to `/llms.txt`, alongside the existing `rel="alternate"; type="text/markdown"` relation, as both an in-page `<link>` tag and a `Link:` HTTP header. Suppressed per-site when llms.txt is disabled. ([#48](https://github.com/anvildevxyz/craft-beacon/issues/48))
 - GEO: refreshed the default AI-bot list — `Claude-Web` is replaced by `Claude-User` and `Claude-SearchBot`, and `Perplexity-User`, `Meta-ExternalAgent`, `Meta-ExternalFetcher` are added — and every bot now carries a **purpose** (training / search index / user agent). The AI crawlers screen can filter by purpose and bulk-apply an Allow/Disallow crawler policy to every bot of one purpose at once. ([#49](https://github.com/anvildevxyz/craft-beacon/issues/49))
 
+### Changed
+- Docs: each GEO score pillar's "Research basis" line in `GEO_CONTENT_SCORING.md` now carries a source-type tag (peer-reviewed / preprint / industry test / vendor report / source unspecified), with a table explaining what each tag means. No scoring logic, weights, or behavior changed. ([#50](https://github.com/anvildevxyz/craft-beacon/issues/50))
+
 ## 1.5.0 — 2026-09-24
 
 ### Added

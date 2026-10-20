@@ -48,6 +48,20 @@ just the implementation. Default weights derive from each pillar's reported
 effect size; outbound citations carry the most weight, entity completeness and
 freshness the least.
 
+Each **Research basis** line below ends with a source-type tag. The tag shows
+how much weight to put on the number, not whether the pillar itself is useful.
+
+| Tag | What it means |
+|---|---|
+| `(peer-reviewed)` | A published, peer-reviewed study. The strongest evidence Beacon cites. |
+| `(preprint)` | A posted paper that has not (yet) gone through peer review. |
+| `(industry test, unreplicated)` | A named or unnamed party ran the test once; no outside study has repeated it. |
+| `(vendor report, unreplicated)` | A company published its own analysis of its own data; no outside study has repeated it. |
+| `(source unspecified)` | No named source backs the number yet. |
+
+Treat anything other than `(peer-reviewed)` as **directional, not precise**.
+Use it to decide which lever to pull, not to cite as fact.
+
 ### Freshness banding
 
 **What it measures.** How recently the entry was updated, mapped to a four-band
@@ -65,7 +79,7 @@ the point — the band reflects the entry's `dateUpdated`, and AI engines rarely
 cite content older than ~2 years.
 
 **Research basis.** GEO-16 framework (arXiv 2509.10762) — r = 0.68 correlation
-between metadata freshness and citation.
+between metadata freshness and citation. `(preprint)`
 
 ### Entity completeness
 
@@ -86,6 +100,7 @@ identifiers is attached.
 
 **Research basis.** Wikipedia accounts for roughly 47.9% of ChatGPT citation
 share — a strong knowledge-graph presence is foundational for traversal.
+`(source unspecified)`
 
 ### Claim-based headings
 
@@ -103,7 +118,7 @@ drill-down names the offending headings so you can target them. Heading
 classification respects the site language.
 
 **Research basis.** Industry tests (May 2026) report a ~2.8× citation lift for
-claim-shaped subheadings.
+claim-shaped subheadings. `(industry test, unreplicated)`
 
 ### Chunkability
 
@@ -119,7 +134,7 @@ section's question on its own, before drilling into subheadings. The drill-down
 names sections with out-of-range or missing leads.
 
 **Research basis.** Kopp Online — ~3.1× citation rate on short, self-contained
-passages.
+passages. `(vendor report, unreplicated)`
 
 ### Fact density
 
@@ -135,6 +150,7 @@ not a misleading zero).
 
 **Research basis.** Averi.ai analysis (April 2026) — ~4.2× citation rate above
 the 1:80 threshold. The target is configurable (see below).
+`(vendor report, unreplicated)`
 
 ### Outbound citation density
 
@@ -157,9 +173,10 @@ Internal links and links to unlisted domains don't count toward the score.
 publishers. As with fact density, entries under ~200 words are flagged too thin
 to score rather than scored zero.
 
-**Research basis.** Princeton GEO paper (arXiv 2311.09735) identified outbound
-citation density as the **+115% lever** — the single highest-leverage signal in
-the literature. It carries the most weight in the composite.
+**Research basis.** Princeton GEO paper (arXiv 2311.09735, published at KDD 2024)
+identified outbound citation density as the **+115% lever** — the single
+highest-leverage signal in the literature. It carries the most weight in the
+composite. `(peer-reviewed)`
 
 ## Configuration & tuning
 
