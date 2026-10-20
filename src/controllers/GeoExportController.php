@@ -61,7 +61,12 @@ class GeoExportController extends Controller
             throw new NotFoundHttpException();
         }
         $canonical = $element->getUrl();
-        $response = MarkdownResponse::build($markdown, is_string($canonical) ? $canonical : null, $element->dateUpdated);
+        $response = MarkdownResponse::build(
+            $markdown,
+            is_string($canonical) ? $canonical : null,
+            $element->dateUpdated,
+            siteId: (int) $element->siteId,
+        );
         $response->headers->set('X-Token-Estimate', (string) Plugin::$plugin->tokenEstimator->estimate($markdown));
         return $response;
     }
