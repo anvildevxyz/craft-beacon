@@ -59,8 +59,8 @@ how much weight to put on the number, not whether the pillar itself is useful.
 | `(vendor report, unreplicated)` | A company published its own analysis of its own data; no outside study has repeated it. |
 | `(source unspecified)` | No named source backs the number yet. |
 
-Treat anything other than `(peer-reviewed)` as **directional, not precise** —
-useful for deciding which lever to pull, not for citing as fact.
+Treat anything other than `(peer-reviewed)` as **directional, not precise**.
+Use it to decide which lever to pull, not to cite as fact.
 
 ### Freshness banding
 
