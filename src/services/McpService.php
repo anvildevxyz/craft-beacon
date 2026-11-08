@@ -180,6 +180,35 @@ class McpService extends Component
         ));
     }
 
+    /**
+     * Runs one tool the HTTP MCP server already exposes, as the current user.
+     * Craft's MCP server calls this. The HTTP server keeps its own dispatch.
+     *
+     * @param array<string, mixed> $arguments
+     * @return array<string, mixed>
+     */
+    public function callTool(string $name, array $arguments): array
+    {
+        $user = Craft::$app->getUser()->getIdentity();
+        try {
+            return match ($name) {
+                'beacon.get_entry_seo' => $this->getEntrySeo($arguments, $user),
+                'beacon.get_geo_score' => $this->getGeoScore($arguments, $user),
+                'beacon.list_redirects' => $this->listRedirects($arguments),
+                'beacon.list_404s' => $this->list404s($arguments),
+                'beacon.get_llms_txt' => $this->getLlmsTxt($arguments),
+                'beacon.create_redirect' => $this->createRedirect($arguments),
+                'beacon.delete_redirect' => $this->deleteRedirect($arguments),
+                'beacon.set_entry_meta' => $this->setEntryMeta($arguments, $user),
+                'beacon.recompute_geo_score' => $this->recomputeGeoScore($arguments, $user),
+                'beacon.submit_indexnow' => $this->submitIndexNow($arguments),
+                default => ['error' => 'Unknown Beacon tool.'],
+            };
+        } catch (McpRpcException $e) {
+            return ['error' => $e->getMessage()];
+        }
+    }
+
     // --- handlers -----------------------------------------------------------
 
     /**

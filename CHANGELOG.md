@@ -3,6 +3,7 @@
 ## Unreleased
 
 ### Added
+- Beacon’s existing MCP operations also register with Craft 5.12’s built-in server. The plugin’s own HTTP endpoint, tokens, and audit log are unchanged.
 - GEO: `llms.txt` v2 discovery — entry pages and Markdown export responses now carry a `rel="describedby"` pointer back to `/llms.txt`, alongside the existing `rel="alternate"; type="text/markdown"` relation, as both an in-page `<link>` tag and a `Link:` HTTP header. Suppressed per-site when llms.txt is disabled. ([#48](https://github.com/anvildevxyz/craft-beacon/issues/48))
 - GEO: refreshed the default AI-bot list — `Claude-Web` is replaced by `Claude-User` and `Claude-SearchBot`, and `Perplexity-User`, `Meta-ExternalAgent`, `Meta-ExternalFetcher` are added — and every bot now carries a **purpose** (training / search index / user agent). The AI crawlers screen can filter by purpose and bulk-apply an Allow/Disallow crawler policy to every bot of one purpose at once. ([#49](https://github.com/anvildevxyz/craft-beacon/issues/49))
 

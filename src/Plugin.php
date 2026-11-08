@@ -263,6 +263,7 @@ class Plugin extends BasePlugin
         parent::init();
         self::$plugin = $this;
         Craft::setAlias('@anvildev/beacon', $this->getBasePath());
+        $this->registerCraftMcp();
 
         if (Craft::$app->getRequest()->getIsConsoleRequest()) {
             $this->controllerNamespace = 'anvildev\\beacon\\console\\controllers';
@@ -1134,5 +1135,37 @@ class Plugin extends BasePlugin
         }
         $item['subnav'] = $subnav;
         return $item;
+    }
+
+    /**
+     * Registers Beacon's existing MCP operations with Craft's server (5.12+).
+     * The plugin's own HTTP endpoint is unchanged. Older Craft has no Mcp
+     * service, so the guard leaves those installs alone.
+     */
+    private function registerCraftMcp(): void
+    {
+        if (!class_exists(\craft\services\Mcp::class)) {
+            return;
+        }
+
+        Event::on(
+            \craft\services\Mcp::class,
+            \craft\services\Mcp::EVENT_REGISTER_CAPABILITY_TYPES,
+            static function(RegisterComponentTypesEvent $event): void {
+                $event->types[] = \anvildev\beacon\mcp\CraftTools::class;
+            },
+        );
+
+        if (!class_exists(\craft\mcp\AdminInstructions::class)) {
+            return;
+        }
+
+        Event::on(
+            \craft\mcp\AdminInstructions::class,
+            \craft\mcp\AdminInstructions::EVENT_COLLECT_INSTRUCTIONS,
+            static function(\craft\mcp\events\CollectingAdminInstructions $event): void {
+                $event->instructions[] = 'Use the beacon_* tools to read entry SEO and GEO scores, list redirects and 404s, and read llms.txt. Writes create or delete redirects, edit one entry’s meta, recompute a GEO score, or submit a URL to IndexNow.';
+            },
+        );
     }
 }
