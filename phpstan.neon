@@ -21,6 +21,12 @@ parameters:
         - vendor/craftcms/cms/bootstrap/console.php
     ignoreErrors:
         - '#Plugin::\$plugin#'
+        # Craft 5.12 MCP classes. This repo's lock is older, and the
+        # references are class_exists-guarded.
+        - '#Mcp\\Schema\\ToolAnnotations#'
+        - '#Mcp\\Capability\\Attribute\\#'
+        - '#craft\\mcp\\#'
+        - '#craft\\services\\Mcp#'
         # craftcms/commerce is an optional runtime dep (in `suggest`, guarded by
         # class_exists). Not installed during static analysis, so suppress
         # references in the integration boundary file only.
