@@ -1,6 +1,6 @@
 # Changelog — Beacon
 
-## Unreleased
+## 1.6.0 — 2026-11-08
 
 ### Added
 - Beacon’s existing MCP operations also register with Craft 5.12’s built-in server. The plugin’s own HTTP endpoint, tokens, and audit log are unchanged.
