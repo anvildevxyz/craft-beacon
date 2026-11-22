@@ -234,6 +234,12 @@ class Plugin extends BasePlugin
 
     public static ?Plugin $plugin = null;
 
+    /**
+     * Set once a request's 404 has been considered for a redirect, so the Yii
+     * and Laravel listeners cannot both record the hit.
+     */
+    private bool $missingRouteHandled = false;
+
     public bool $hasCpSettings = false;
     public bool $hasCpSection = true;
     public string $schemaVersion = '1.3.0';
@@ -955,77 +961,51 @@ class Plugin extends BasePlugin
             \craft\web\Response::EVENT_BEFORE_SEND,
             function(\yii\base\Event $event): void {
                 $response = $event->sender;
-                if (!$response instanceof \craft\web\Response) {
+                if (!$response instanceof \craft\web\Response || $response->getStatusCode() !== 404) {
                     return;
                 }
-                if ($response->getStatusCode() !== 404) {
+                $override = $this->missingRouteOverride();
+                if ($override === null) {
                     return;
                 }
-                $request = Craft::$app->getRequest();
-                if (!$request instanceof \craft\web\Request) {
-                    return;
+                $response->setStatusCode($override['status']);
+                if ($override['location'] !== null) {
+                    $response->headers->set('Location', $override['location']);
                 }
-                if ($request->getIsCpRequest() || $request->getIsActionRequest()) {
-                    return;
-                }
-
-                try {
-                    $uri = '/' . trim($request->getPathInfo(), '/');
-                    $qs = $request->getQueryString();
-                    if ($qs !== '') {
-                        $uri .= '?' . $qs;
-                    }
-                    $siteId = Craft::$app->getSites()->getCurrentSite()->id;
-                    $redirect = self::$plugin->redirects->findRedirect($siteId, $uri);
-                    if ($redirect !== null) {
-                        self::$plugin->redirects->bufferHit($redirect->id);
-                        $response->setStatusCode($redirect->statusCode);
-                        $response->headers->set('Location', $redirect->resolvedTarget);
-                        $response->content = '';
-                        $response->data = null;
-                        $response->stream = null;
-                        return;
-                    }
-                    // The `anyExist()` gate short-circuits before the throttle
-                    // rather than after it: on a site with no short links there
-                    // is no slug space to enumerate, so there is nothing for the
-                    // rate limiter to protect and its mutex round-trips are pure
-                    // overhead on every 404.
-                    $slug = ltrim($request->getPathInfo(), '/');
-                    if ($slug !== '' && self::$plugin->shortLinks->anyExist()) {
-                        try {
-                            self::$plugin->geoExportThrottle->enforce('short_link_resolve', 120);
-                        } catch (\yii\web\TooManyRequestsHttpException) {
-                            $response->setStatusCode(429);
-                            $response->content = '';
-                            $response->data = null;
-                            $response->stream = null;
-                            return;
-                        }
-                        $shortLink = self::$plugin->shortLinks->findBySlug($siteId, $slug);
-                        if ($shortLink !== null) {
-                            self::$plugin->shortLinks->recordClick($shortLink->id);
-                            $response->setStatusCode($shortLink->statusCode);
-                            $response->headers->set('Location', $shortLink->destination);
-                            $response->content = '';
-                            $response->data = null;
-                            $response->stream = null;
-                            return;
-                        }
-                    }
-                    if (self::$plugin->settings->get()->log404s) {
-                        self::$plugin->redirect404Log->record(
-                            $siteId,
-                            $uri,
-                            (string) ($request->getUserAgent() ?? ''),
-                            $request->getReferrer(),
-                        );
-                    }
-                } catch (\Throwable $e) {
-                    Craft::warning('Beacon: 404 redirect handler failed: ' . $e->getMessage(), 'beacon');
-                }
+                $response->content = '';
+                $response->data = null;
+                $response->stream = null;
             }
         );
+
+        // Craft 6 answers a front-end 404 with a Laravel response. The Yii
+        // EVENT_BEFORE_SEND listener above never runs for that response, so
+        // redirects and short links would stay 404. RequestHandled still sees
+        // the response before it is sent.
+        if (class_exists(\Illuminate\Foundation\Http\Events\RequestHandled::class)) {
+            LaravelEvent::listen(
+                \Illuminate\Foundation\Http\Events\RequestHandled::class,
+                function(\Illuminate\Foundation\Http\Events\RequestHandled $event): void {
+                    $response = $event->response;
+                    if (!$response instanceof \Symfony\Component\HttpFoundation\Response || $response->getStatusCode() !== 404) {
+                        return;
+                    }
+                    $override = $this->missingRouteOverride();
+                    if ($override !== null) {
+                        $response->setStatusCode($override['status']);
+                        if ($override['location'] !== null) {
+                            $response->headers->set('Location', $override['location']);
+                        }
+                        $response->setContent('');
+                    }
+                    // Yii's AFTER_SEND flush does not run for this Laravel
+                    // response, so persist buffered hits and 404 rows here.
+                    self::$plugin->redirects->flushHits();
+                    self::$plugin->redirect404Log->flush();
+                    self::$plugin->botLog->flush();
+                }
+            );
+        }
 
         Event::on(
             \craft\web\Response::class,
@@ -1193,5 +1173,81 @@ class Plugin extends BasePlugin
                 $event->instructions[] = 'Use the beacon_* tools to read entry SEO and GEO scores, list redirects and 404s, and read llms.txt. Writes create or delete redirects, edit one entry’s meta, recompute a GEO score, or submit a URL to IndexNow.';
             },
         );
+    }
+
+    /**
+     * Turns a front-end 404 into a redirect or short-link response.
+     *
+     * Called from both the Craft 5 Yii response event and Craft 6's
+     * RequestHandled listener. The flag keeps a request that trips both
+     * from counting the hit twice.
+     *
+     * @return array{status: int, location: ?string}|null
+     */
+    private function missingRouteOverride(): ?array
+    {
+        if ($this->missingRouteHandled) {
+            return null;
+        }
+
+        $request = Craft::$app->getRequest();
+        if (!$request instanceof \craft\web\Request) {
+            return null;
+        }
+        if ($request->getIsCpRequest() || $request->getIsActionRequest()) {
+            return null;
+        }
+
+        $this->missingRouteHandled = true;
+
+        try {
+            $uri = '/' . trim($request->getPathInfo(), '/');
+            $qs = $request->getQueryString();
+            if ($qs !== '') {
+                $uri .= '?' . $qs;
+            }
+            $siteId = Craft::$app->getSites()->getCurrentSite()->id;
+            $redirect = self::$plugin->redirects->findRedirect($siteId, $uri);
+            if ($redirect !== null) {
+                self::$plugin->redirects->bufferHit($redirect->id);
+                return ['status' => $redirect->statusCode, 'location' => $redirect->resolvedTarget];
+            }
+
+            // The anyExist() gate short-circuits before the throttle rather
+            // than after it: on a site with no short links there is no slug
+            // space to enumerate, so there is nothing for the rate limiter
+            // to protect and its mutex round-trips are pure overhead on
+            // every 404.
+            $slug = ltrim($request->getPathInfo(), '/');
+            if ($slug !== '' && self::$plugin->shortLinks->anyExist()) {
+                try {
+                    self::$plugin->geoExportThrottle->enforce('short_link_resolve', 120);
+                } catch (\Throwable $e) {
+                    $limited = ($e instanceof \yii\web\HttpException && $e->statusCode === 429)
+                        || (is_a($e, \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface::class, false) && $e->getStatusCode() === 429);
+                    if ($limited) {
+                        return ['status' => 429, 'location' => null];
+                    }
+                    throw $e;
+                }
+                $shortLink = self::$plugin->shortLinks->findBySlug($siteId, $slug);
+                if ($shortLink !== null) {
+                    self::$plugin->shortLinks->recordClick($shortLink->id);
+                    return ['status' => $shortLink->statusCode, 'location' => $shortLink->destination];
+                }
+            }
+            if (self::$plugin->settings->get()->log404s) {
+                self::$plugin->redirect404Log->record(
+                    $siteId,
+                    $uri,
+                    (string) ($request->getUserAgent() ?? ''),
+                    $request->getReferrer(),
+                );
+            }
+        } catch (\Throwable $e) {
+            Craft::warning('Beacon: 404 redirect handler failed: ' . $e->getMessage(), 'beacon');
+        }
+
+        return null;
     }
 }

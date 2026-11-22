@@ -9,7 +9,6 @@ use anvildev\beacon\models\TrackingScript;
 use anvildev\beacon\Plugin;
 use Craft;
 use craft\web\Controller;
-use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 /**
@@ -44,7 +43,7 @@ class TrackingController extends Controller
         $plugin = Plugin::$plugin;
 
         if ($uid !== null) {
-            $record = $plugin->tracking->findByUid($uid) ?? throw new NotFoundHttpException();
+            $record = $plugin->tracking->findByUid($uid) ?? throw Http::abortNotFound();
             $script = new TrackingScript([
                 'uid' => $record->uid,
                 'name' => $record->name,
@@ -59,7 +58,7 @@ class TrackingController extends Controller
         }
 
         $providerImpl = $plugin->trackingRegistry->get($script->provider)
-            ?? throw new NotFoundHttpException(Craft::t('beacon', 'flash.tracking.unknown.provider', ['provider' => $script->provider]));
+            ?? throw Http::abortNotFound(Craft::t('beacon', 'flash.tracking.unknown.provider', ['provider' => $script->provider]));
 
         return $this->renderTemplate('beacon/tracking/_edit', [
             'script' => $script,

@@ -15,7 +15,6 @@ use Craft;
 use craft\enums\PropagationMethod;
 use craft\helpers\UrlHelper;
 use craft\web\Controller;
-use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\web\UploadedFile;
 
@@ -57,7 +56,7 @@ class RedirectsController extends Controller
             if ($redirectId !== null) {
                 $redirect = Plugin::$plugin->redirects->findById($redirectId);
                 if ($redirect === null) {
-                    throw new NotFoundHttpException();
+                    throw Http::abortNotFound();
                 }
             } else {
                 $redirect = new RedirectElement();

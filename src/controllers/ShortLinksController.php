@@ -9,7 +9,6 @@ use Craft;
 use craft\enums\PropagationMethod;
 use craft\helpers\DateTimeHelper;
 use craft\web\Controller;
-use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 class ShortLinksController extends Controller
@@ -47,7 +46,7 @@ class ShortLinksController extends Controller
             if ($shortLinkId !== null) {
                 $shortLink = $this->findShortLinkById($shortLinkId, $site->id);
                 if ($shortLink === null) {
-                    throw new NotFoundHttpException();
+                    throw Http::abortNotFound();
                 }
             } else {
                 $shortLink = new ShortLinkElement();
@@ -84,7 +83,7 @@ class ShortLinksController extends Controller
         if ($id) {
             $shortLink = $this->findShortLinkById((int) $id, $siteId);
             if ($shortLink === null) {
-                throw new NotFoundHttpException();
+                throw Http::abortNotFound();
             }
         } else {
             $shortLink = new ShortLinkElement();

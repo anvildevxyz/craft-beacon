@@ -12,7 +12,6 @@ use craft\elements\Entry;
 use craft\web\Controller;
 use yii\base\Action;
 use yii\web\ForbiddenHttpException;
-use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 /**
@@ -80,7 +79,7 @@ class GeoScoreController extends Controller
             ?? ($element !== null ? Plugin::$plugin->geoScore->compute($element, $siteId, persist: false) : null);
 
         if ($score === null) {
-            throw new NotFoundHttpException(Craft::t('beacon', 'flash.geoScore.no.geo.score.exists.entry'));
+            throw Http::abortNotFound(Craft::t('beacon', 'flash.geoScore.no.geo.score.exists.entry'));
         }
 
         return $this->renderTemplate('beacon/_geo-score/drill-down', [

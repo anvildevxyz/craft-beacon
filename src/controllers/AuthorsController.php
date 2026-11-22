@@ -8,7 +8,6 @@ use anvildev\beacon\helpers\Http;
 use anvildev\beacon\helpers\Strings;
 use Craft;
 use craft\web\Controller;
-use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 class AuthorsController extends Controller
@@ -35,7 +34,7 @@ class AuthorsController extends Controller
     {
         $author = $authorId !== null ? AuthorElement::find()->id($authorId)->one() : new AuthorElement();
         if (!$author) {
-            throw new NotFoundHttpException();
+            throw Http::abortNotFound();
         }
         return $this->renderTemplate('beacon/authors/_edit', ['author' => $author]);
     }

@@ -2,11 +2,11 @@
 
 namespace anvildev\beacon\controllers;
 
+use anvildev\beacon\helpers\Http;
 use anvildev\beacon\helpers\RawResponse;
 use anvildev\beacon\Plugin;
 use Craft;
 use craft\web\Controller;
-use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 class ExtraSitemapsController extends Controller
@@ -85,7 +85,7 @@ class ExtraSitemapsController extends Controller
     private function xml(?string $xml, array $cacheTags = []): Response
     {
         if ($xml === null) {
-            throw new NotFoundHttpException();
+            throw Http::abortNotFound();
         }
         return RawResponse::build('application/xml; charset=UTF-8', $xml, cacheTags: $cacheTags);
     }

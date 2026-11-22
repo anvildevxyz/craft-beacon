@@ -2,11 +2,11 @@
 
 namespace anvildev\beacon\controllers;
 
+use anvildev\beacon\helpers\Http;
 use anvildev\beacon\helpers\RawResponse;
 use anvildev\beacon\Plugin;
 use Craft;
 use craft\web\Controller;
-use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 /**
@@ -43,7 +43,7 @@ class SitemapController extends Controller
 
         $xml = Plugin::$plugin->publicFiles->sitemapPart($site, $part);
         if ($xml === null) {
-            throw new NotFoundHttpException();
+            throw Http::abortNotFound();
         }
         return $this->xmlResponse($xml, $tags);
     }

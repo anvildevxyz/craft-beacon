@@ -11,7 +11,6 @@ use craft\elements\Entry;
 use craft\web\Controller;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
-use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 /**
@@ -68,7 +67,7 @@ class SeoFieldController extends Controller
             ->siteId($siteId ?? '*')
             ->one();
         if (!$entry instanceof Entry) {
-            throw new NotFoundHttpException(Craft::t('beacon', 'error.seoField.entry.not.found', ['id' => $entryId]));
+            throw Http::abortNotFound(Craft::t('beacon', 'error.seoField.entry.not.found', ['id' => $entryId]));
         }
         return $entry;
     }

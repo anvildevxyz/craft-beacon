@@ -12,7 +12,6 @@ use Craft;
 use craft\elements\Entry;
 use craft\web\Controller;
 use yii\base\Action;
-use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 /**
@@ -138,7 +137,7 @@ class LinksController extends Controller
         /** @var Entry|null $entry */
         $entry = Entry::find()->id($entryId)->siteId($siteId)->status(null)->one();
         if ($entry === null) {
-            throw new NotFoundHttpException('Entry not found');
+            throw Http::abortNotFound('Entry not found');
         }
 
         $inbound = [];

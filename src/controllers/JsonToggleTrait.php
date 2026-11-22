@@ -3,7 +3,6 @@
 namespace anvildev\beacon\controllers;
 
 use anvildev\beacon\helpers\Http;
-use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 /**
@@ -27,7 +26,7 @@ trait JsonToggleTrait
         $request = Http::request();
         $enabled = (bool) $request->getRequiredBodyParam('enabled');
         if (!$apply((int) $request->getRequiredBodyParam($idParam), $enabled)) {
-            throw new NotFoundHttpException($missingMessage);
+            throw Http::abortNotFound($missingMessage);
         }
         if ($afterSuccess !== null) {
             $afterSuccess();

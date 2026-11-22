@@ -5,14 +5,14 @@ namespace anvildev\beacon\services;
 use anvildev\beacon\helpers\Http;
 use Craft;
 use yii\base\Component;
-use yii\web\TooManyRequestsHttpException;
 
 class GeoExportThrottleService extends Component
 {
     private const DEFAULT_MAX_PER_MINUTE = 60;
 
     /**
-     * @throws TooManyRequestsHttpException
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException on Craft 6 when the limit is exceeded
+     * @throws \yii\web\HttpException on Craft 5 when the limit is exceeded
      */
     public function enforce(string $bucket = 'geo_export', int $maxPerMinute = self::DEFAULT_MAX_PER_MINUTE): void
     {
@@ -29,12 +29,12 @@ class GeoExportThrottleService extends Component
         // the same pre-bump count, pass the threshold check, and write back the
         // same +1 value (effective limit becomes N+concurrency instead of N).
         if (!$mutex->acquire($mutexKey, 1)) {
-            throw new TooManyRequestsHttpException('Rate limit exceeded.');
+            Http::abort(429, 'Rate limit exceeded.');
         }
         try {
             $count = (int) $cache->get($cacheKey);
             if ($count >= $maxPerMinute) {
-                throw new TooManyRequestsHttpException('Rate limit exceeded.');
+                Http::abort(429, 'Rate limit exceeded.');
             }
             $cache->set($cacheKey, $count + 1, 60);
         } finally {

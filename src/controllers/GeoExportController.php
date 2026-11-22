@@ -2,6 +2,7 @@
 
 namespace anvildev\beacon\controllers;
 
+use anvildev\beacon\helpers\Http;
 use anvildev\beacon\helpers\MarkdownResponse;
 use anvildev\beacon\helpers\SeoFieldReader;
 use anvildev\beacon\integrations\CommerceIntegration;
@@ -9,7 +10,6 @@ use anvildev\beacon\Plugin;
 use Craft;
 use craft\base\ElementInterface;
 use craft\web\Controller;
-use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\web\TooManyRequestsHttpException;
 
@@ -28,10 +28,19 @@ class GeoExportController extends Controller
      * @throws NotFoundHttpException
      * @throws TooManyRequestsHttpException
      */
-    public function actionIndex(int $id): Response
+    public function actionIndex(): Response
     {
         Plugin::$plugin->geoExportThrottle->enforce('geo_export_route');
-        return $this->buildResponse($this->findExportable('id', $id));
+
+        // Craft 6's site-route fallback does not merge the query string into
+        // Yii action parameters (a bare `int $id` argument 400s even when
+        // `?id=` is present). Read it off the request on both versions.
+        $id = Http::request()->getQueryParam('id');
+        if (!is_numeric($id)) {
+            throw Http::abortNotFound();
+        }
+
+        return $this->buildResponse($this->findExportable('id', (int) $id));
     }
 
     /**
@@ -50,7 +59,7 @@ class GeoExportController extends Controller
         Plugin::$plugin->geoExportThrottle->enforce('geo_export_md');
         $settings = Plugin::$plugin->settings->get();
         if (!$settings->geoMarkdownEnabled || !$settings->geoMarkdownMdSuffixEnabled) {
-            throw new NotFoundHttpException();
+            throw Http::abortNotFound();
         }
         return $this->buildResponse($this->findExportable('uri', $uri));
     }
@@ -58,7 +67,7 @@ class GeoExportController extends Controller
     private function buildResponse(?ElementInterface $element): Response
     {
         if ($element === null || SeoFieldReader::isNoIndexFor($element) || ($markdown = $this->resolveMarkdown($element)) === null) {
-            throw new NotFoundHttpException();
+            throw Http::abortNotFound();
         }
         $canonical = $element->getUrl();
         $response = MarkdownResponse::build(

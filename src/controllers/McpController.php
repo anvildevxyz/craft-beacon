@@ -10,7 +10,6 @@ use anvildev\beacon\services\mcp\McpServer;
 use Craft;
 use craft\elements\User;
 use craft\web\Controller;
-use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 /**
@@ -30,7 +29,7 @@ class McpController extends Controller
     public function actionIndex(): Response
     {
         if (!Plugin::$plugin->settings->get()->mcpEnabled) {
-            throw new NotFoundHttpException();
+            throw Http::abortNotFound();
         }
 
         $this->requirePostRequest();

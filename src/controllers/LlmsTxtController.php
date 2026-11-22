@@ -2,11 +2,11 @@
 
 namespace anvildev\beacon\controllers;
 
+use anvildev\beacon\helpers\Http;
 use anvildev\beacon\helpers\RawResponse;
 use anvildev\beacon\Plugin;
 use Craft;
 use craft\web\Controller;
-use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 /**
@@ -30,7 +30,7 @@ class LlmsTxtController extends Controller
         $body = Plugin::$plugin->publicFiles->llmsTxt($site);
         if ($body === null) {
             Craft::info("llms.txt disabled for siteId={$site->id}", 'beacon');
-            throw new NotFoundHttpException();
+            throw Http::abortNotFound();
         }
 
         return RawResponse::build(
@@ -52,7 +52,7 @@ class LlmsTxtController extends Controller
         $result = Plugin::$plugin->publicFiles->llmsFull($site);
         if ($result === null) {
             Craft::info("llms-full.txt unavailable for siteId={$site->id}", 'beacon');
-            throw new NotFoundHttpException();
+            throw Http::abortNotFound();
         }
         $body = $result->markdown;
 

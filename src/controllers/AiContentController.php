@@ -12,7 +12,6 @@ use craft\elements\Entry;
 use craft\web\Controller;
 use yii\web\BadRequestHttpException;
 use yii\web\ForbiddenHttpException;
-use yii\web\NotFoundHttpException;
 use yii\web\Response;
 use yii\web\TooManyRequestsHttpException;
 
@@ -72,7 +71,7 @@ class AiContentController extends Controller
         $assetId = (int) $request->getRequiredBodyParam('assetId');
         $asset = Asset::find()->id($assetId)->one();
         if (!$asset instanceof Asset) {
-            throw new NotFoundHttpException(Craft::t('beacon', 'error.seoField.entry.not.found', ['id' => $assetId]));
+            throw Http::abortNotFound(Craft::t('beacon', 'error.seoField.entry.not.found', ['id' => $assetId]));
         }
         $this->requireCanView($asset);
 
@@ -120,7 +119,7 @@ class AiContentController extends Controller
             ->siteId('*')
             ->one();
         if (!$entry instanceof Entry) {
-            throw new NotFoundHttpException(Craft::t('beacon', 'error.seoField.entry.not.found', ['id' => $entryId]));
+            throw Http::abortNotFound(Craft::t('beacon', 'error.seoField.entry.not.found', ['id' => $entryId]));
         }
         $this->requireCanView($entry);
         return $entry;

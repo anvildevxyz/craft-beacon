@@ -16,7 +16,6 @@ use craft\elements\Entry;
 use craft\helpers\Json;
 use craft\web\Controller;
 use yii\web\BadRequestHttpException;
-use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 class SchemasController extends Controller
@@ -53,7 +52,7 @@ class SchemasController extends Controller
             if ($schemaId !== null) {
                 $schema = $schemas->findById($schemaId);
                 if (!$schema) {
-                    throw new NotFoundHttpException();
+                    throw Http::abortNotFound();
                 }
             } else {
                 $schema = $schemas->newRecord();

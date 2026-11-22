@@ -12,7 +12,6 @@ use anvildev\beacon\Plugin;
 use Craft;
 use craft\web\Controller;
 use yii\web\BadRequestHttpException;
-use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 class AiCrawlersController extends Controller
@@ -56,7 +55,7 @@ class AiCrawlersController extends Controller
         $plugin = Plugin::$plugin;
         $rule = $ruleId !== null ? $plugin->aiCrawlers->findRule($ruleId) : null;
         if ($ruleId !== null && $rule === null) {
-            throw new NotFoundHttpException(Craft::t('beacon', 'flash.aiCrawlers.rule.not.found'));
+            throw Http::abortNotFound(Craft::t('beacon', 'flash.aiCrawlers.rule.not.found'));
         }
         return $this->renderTemplate('beacon/ai-crawlers/_edit-rule', [
             'rule' => $rule,
@@ -110,7 +109,7 @@ class AiCrawlersController extends Controller
     {
         $bot = $botId !== null ? Plugin::$plugin->aiBots->findBot($botId) : null;
         if ($botId !== null && $bot === null) {
-            throw new NotFoundHttpException(Craft::t('beacon', 'flash.aiCrawlers.bot.not.found'));
+            throw Http::abortNotFound(Craft::t('beacon', 'flash.aiCrawlers.bot.not.found'));
         }
         return $this->renderTemplate('beacon/ai-crawlers/_edit-bot', [
             'bot' => $bot,

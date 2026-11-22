@@ -3,10 +3,10 @@
 namespace anvildev\beacon\controllers;
 
 use anvildev\beacon\enums\RenderCacheType;
+use anvildev\beacon\helpers\Http;
 use anvildev\beacon\Plugin;
 use craft\models\Site;
 use craft\web\Controller;
-use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 class AdsTxtController extends Controller
@@ -28,7 +28,7 @@ class AdsTxtController extends Controller
             'text/plain; charset=UTF-8',
             'beacon-ads',
             static fn(Site $site): string => Plugin::$plugin->publicFiles->adsTxt($site)
-                ?? throw new NotFoundHttpException(),
+                ?? throw Http::abortNotFound(),
         );
     }
 }

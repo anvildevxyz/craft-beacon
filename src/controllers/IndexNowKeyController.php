@@ -2,11 +2,11 @@
 
 namespace anvildev\beacon\controllers;
 
+use anvildev\beacon\helpers\Http;
 use anvildev\beacon\helpers\RawResponse;
 use anvildev\beacon\Plugin;
 use Craft;
 use craft\web\Controller;
-use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 /**
@@ -37,7 +37,7 @@ class IndexNowKeyController extends Controller
         $configured = trim((string) Plugin::$plugin->siteSettings->getWebmaster($site->id)->indexNowKey);
 
         if ($configured === '' || !hash_equals($configured, $key)) {
-            throw new NotFoundHttpException();
+            throw Http::abortNotFound();
         }
 
         return RawResponse::build(

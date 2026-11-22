@@ -8,7 +8,6 @@ use anvildev\beacon\Plugin;
 use Craft;
 use craft\helpers\UrlHelper;
 use craft\web\Controller;
-use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 /**
@@ -74,7 +73,7 @@ class Redirect404sController extends Controller
 
         $action = (string) $request->getRequiredBodyParam('bulkAction');
         if ($action !== 'markHandled') {
-            throw new NotFoundHttpException();
+            throw Http::abortNotFound();
         }
 
         $count = Plugin::$plugin->redirect404Log->bulkMarkHandled($ids, $siteId);

@@ -6,7 +6,6 @@ use anvildev\beacon\helpers\BeaconPermissions;
 use anvildev\beacon\helpers\Http;
 use anvildev\beacon\Plugin;
 use Craft;
-use yii\web\NotFoundHttpException;
 
 /**
  * Guards CP actions behind the Links feature master toggle
@@ -28,7 +27,7 @@ trait RequiresLinksEnabledTrait
         }
 
         if (Http::request()->getAcceptsJson()) {
-            throw new NotFoundHttpException(Craft::t('beacon', 'links.disabled'));
+            throw Http::abortNotFound(Craft::t('beacon', 'links.disabled'));
         }
 
         Craft::$app->getSession()->setNotice(Craft::t('beacon', 'links.disabled.notice'));

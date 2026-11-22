@@ -2,12 +2,12 @@
 
 namespace anvildev\beacon\controllers;
 
+use anvildev\beacon\helpers\Http;
 use anvildev\beacon\helpers\RawResponse;
 use anvildev\beacon\Plugin;
 use Craft;
 use craft\helpers\Json;
 use craft\web\Controller;
-use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 /**
@@ -31,7 +31,7 @@ class TdmRepController extends Controller
         $scopes = $plugin->aiUsage->gatherSectionScopes($site->id, $settings->sectionSeoDefaults);
 
         if (!$plugin->aiUsage->hasAnyRestrictive($settings->aiUsagePolicy, $scopes['policies'])) {
-            throw new NotFoundHttpException();
+            throw Http::abortNotFound();
         }
 
         $manifest = $plugin->aiUsage->tdmRepManifest(

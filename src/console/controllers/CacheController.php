@@ -146,7 +146,16 @@ class CacheController extends Controller
     {
         try {
             $invoke();
-        } catch (NotFoundHttpException) {
+        } catch (\Throwable $e) {
+            // Craft 5 throws yii\web\NotFoundHttpException. Craft 6 throws
+            // Symfony's, so Laravel renders a real 404 (see Http::abortNotFound()).
+            // is_a() with autoload disabled stays safe on Craft 5, where the
+            // Symfony class is not installed.
+            $isNotFound = $e instanceof NotFoundHttpException
+                || is_a($e, 'Symfony\\Component\\HttpKernel\\Exception\\NotFoundHttpException', false);
+            if (!$isNotFound) {
+                throw $e;
+            }
         }
     }
 }

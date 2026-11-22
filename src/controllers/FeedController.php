@@ -2,6 +2,7 @@
 
 namespace anvildev\beacon\controllers;
 
+use anvildev\beacon\helpers\Http;
 use anvildev\beacon\helpers\RawResponse;
 use anvildev\beacon\Plugin;
 use anvildev\beacon\services\FeedService;
@@ -9,7 +10,6 @@ use Craft;
 use craft\elements\Entry;
 use craft\models\Site;
 use craft\web\Controller;
-use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 class FeedController extends Controller
@@ -75,11 +75,11 @@ class FeedController extends Controller
         $site = Craft::$app->getSites()->getCurrentSite();
         $feeds = Plugin::$plugin->feeds;
         if (!$feeds->sectionExists($section)) {
-            throw new NotFoundHttpException();
+            throw Http::abortNotFound();
         }
         $entries = $feeds->fetchEntries($site->id, $section);
         if ($entries === []) {
-            throw new NotFoundHttpException();
+            throw Http::abortNotFound();
         }
         return [$site, $feeds, $entries, (string) $site->getBaseUrl()];
     }
