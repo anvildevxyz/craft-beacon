@@ -70,11 +70,29 @@ final class RedirectActivityWidget extends Widget
         $plugin = Plugin::$plugin;
         $thresholdDays = $plugin->settings->get()->staleThresholdDays;
 
-        /** @var list<RedirectElement> $recentRecords */
-        $recentRecords = RedirectElement::find()
+        $recentQuery = RedirectElement::find()
             ->siteId($siteId)
-            ->status(null)
-            ->andWhere(['not', ['beacon_redirects.lastHit' => null]])
+            ->status(null);
+
+        // Craft 6's legacy andWhere() shim (CraftCms\Yii2Adapter\Mixins\
+        // ElementQueryMixin) mis-renders any condition that compiles with
+        // zero bound params — a pure null check like this one — into
+        // garbled SQL. whereNotNull() is the real Laravel builder method
+        // and bypasses that shim entirely. It's reached via ElementQuery's
+        // __call()-forwarding to the underlying Illuminate builder, not a
+        // declared method, so method_exists() on the query returns false
+        // even on Craft 6 — check for the native class instead. Doesn't
+        // exist on Craft 5's Yii-based ElementQuery, so this falls back to
+        // the original (unaffected there) call. See
+        // RedirectService::recentlyHit() for the live-reproduced error.
+        if (class_exists(\CraftCms\Cms\Element\Queries\ElementQuery::class)) {
+            $recentQuery->whereNotNull('beacon_redirects.lastHit');
+        } else {
+            $recentQuery->andWhere(['not', ['beacon_redirects.lastHit' => null]]);
+        }
+
+        /** @var list<RedirectElement> $recentRecords */
+        $recentRecords = $recentQuery
             ->andWhere(['>=', 'beacon_redirects.lastHit', $since])
             ->orderBy(['beacon_redirects.lastHit' => SORT_DESC])
             ->limit(10)
