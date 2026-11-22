@@ -132,6 +132,9 @@ use craft\web\Application as WebApplication;
 use craft\web\twig\variables\CraftVariable;
 use craft\web\UrlManager;
 use craft\web\View;
+use CraftCms\Cms\Mcp\CapabilityRegistry;
+use CraftCms\Cms\Mcp\Events\CollectingAdminInstructions as NativeCollectingAdminInstructions;
+use Illuminate\Support\Facades\Event as LaravelEvent;
 use yii\base\Event;
 
 /**
@@ -1144,6 +1147,29 @@ class Plugin extends BasePlugin
      */
     private function registerCraftMcp(): void
     {
+        // Craft 6 replaced the whole registration mechanism, not just the
+        // namespace: craft\services\Mcp doesn't exist at all (class_exists()
+        // on it is false, not a fatal — it just means this guard needs
+        // checking first), and a plugin registers its tool types by calling
+        // register(...$types) on a container-resolved singleton instead of
+        // listening for an event. The admin-instructions hook kept the same
+        // shape but also switched mechanism: it's a real Laravel event now,
+        // dispatched through the global event() helper, not a Yii one.
+        if (class_exists(CapabilityRegistry::class)) {
+            app(CapabilityRegistry::class)->register(
+                \anvildev\beacon\mcp\CraftTools::class,
+            );
+
+            LaravelEvent::listen(
+                NativeCollectingAdminInstructions::class,
+                static function(NativeCollectingAdminInstructions $event): void {
+                    $event->instructions[] = 'Use the beacon_* tools to read entry SEO and GEO scores, list redirects and 404s, and read llms.txt. Writes create or delete redirects, edit one entry’s meta, recompute a GEO score, or submit a URL to IndexNow.';
+                },
+            );
+
+            return;
+        }
+
         if (!class_exists(\craft\services\Mcp::class)) {
             return;
         }

@@ -5,6 +5,7 @@ namespace anvildev\beacon\mcp;
 use anvildev\beacon\helpers\BeaconPermissions;
 use anvildev\beacon\Plugin;
 use craft\mcp\attributes\RequiresPermission;
+use CraftCms\Cms\Mcp\Attributes\RequiresPermission as NativeRequiresPermission;
 use Mcp\Capability\Attribute\McpTool;
 use Mcp\Schema\ToolAnnotations;
 
@@ -25,6 +26,7 @@ class CraftTools
         annotations: new ToolAnnotations(readOnlyHint: true),
     )]
     #[RequiresPermission(BeaconPermissions::VIEW_DASHBOARD)]
+    #[NativeRequiresPermission(BeaconPermissions::VIEW_DASHBOARD)]
     public function getEntrySeo(int $entryId, ?int $siteId = null): array
     {
         return $this->call('beacon.get_entry_seo', $entryId, $siteId);
@@ -39,6 +41,7 @@ class CraftTools
         annotations: new ToolAnnotations(readOnlyHint: true),
     )]
     #[RequiresPermission(BeaconPermissions::VIEW_DASHBOARD)]
+    #[NativeRequiresPermission(BeaconPermissions::VIEW_DASHBOARD)]
     public function getGeoScore(int $entryId, ?int $siteId = null): array
     {
         return $this->call('beacon.get_geo_score', $entryId, $siteId);
@@ -53,6 +56,7 @@ class CraftTools
         annotations: new ToolAnnotations(readOnlyHint: true),
     )]
     #[RequiresPermission(BeaconPermissions::VIEW_DASHBOARD)]
+    #[NativeRequiresPermission(BeaconPermissions::VIEW_DASHBOARD)]
     public function listRedirects(?int $siteId = null, ?int $limit = null): array
     {
         return $this->call('beacon.list_redirects', null, $siteId, ['limit' => $limit]);
@@ -67,6 +71,7 @@ class CraftTools
         annotations: new ToolAnnotations(readOnlyHint: true),
     )]
     #[RequiresPermission(BeaconPermissions::VIEW_DASHBOARD)]
+    #[NativeRequiresPermission(BeaconPermissions::VIEW_DASHBOARD)]
     public function list404s(?int $siteId = null, ?int $limit = null): array
     {
         return $this->call('beacon.list_404s', null, $siteId, ['limit' => $limit]);
@@ -81,6 +86,7 @@ class CraftTools
         annotations: new ToolAnnotations(readOnlyHint: true),
     )]
     #[RequiresPermission(BeaconPermissions::VIEW_DASHBOARD)]
+    #[NativeRequiresPermission(BeaconPermissions::VIEW_DASHBOARD)]
     public function getLlmsTxt(?int $siteId = null): array
     {
         return $this->call('beacon.get_llms_txt', null, $siteId);
@@ -95,6 +101,7 @@ class CraftTools
         annotations: new ToolAnnotations(destructiveHint: true),
     )]
     #[RequiresPermission(BeaconPermissions::EDIT_REDIRECTS)]
+    #[NativeRequiresPermission(BeaconPermissions::EDIT_REDIRECTS)]
     public function createRedirect(string $sourceUrl, string $destinationUrl, ?int $siteId = null, ?int $statusCode = null, ?string $type = null): array
     {
         return $this->call('beacon.create_redirect', null, $siteId, [
@@ -114,6 +121,7 @@ class CraftTools
         annotations: new ToolAnnotations(destructiveHint: true),
     )]
     #[RequiresPermission(BeaconPermissions::EDIT_REDIRECTS)]
+    #[NativeRequiresPermission(BeaconPermissions::EDIT_REDIRECTS)]
     public function deleteRedirect(int $id): array
     {
         return $this->call('beacon.delete_redirect', null, null, ['id' => $id]);
@@ -128,6 +136,7 @@ class CraftTools
         annotations: new ToolAnnotations(destructiveHint: true),
     )]
     #[RequiresPermission(BeaconPermissions::EDIT_SETTINGS)]
+    #[NativeRequiresPermission(BeaconPermissions::EDIT_SETTINGS)]
     public function setEntryMeta(int $entryId, ?int $siteId = null, ?string $title = null, ?string $description = null, ?string $canonical = null, ?bool $noindex = null): array
     {
         return $this->call('beacon.set_entry_meta', $entryId, $siteId, [
@@ -147,6 +156,7 @@ class CraftTools
         annotations: new ToolAnnotations(destructiveHint: true),
     )]
     #[RequiresPermission(BeaconPermissions::EDIT_GEO_SCORE)]
+    #[NativeRequiresPermission(BeaconPermissions::EDIT_GEO_SCORE)]
     public function recomputeGeoScore(int $entryId, ?int $siteId = null): array
     {
         return $this->call('beacon.recompute_geo_score', $entryId, $siteId);
@@ -161,6 +171,7 @@ class CraftTools
         annotations: new ToolAnnotations(destructiveHint: true),
     )]
     #[RequiresPermission(BeaconPermissions::EDIT_SETTINGS)]
+    #[NativeRequiresPermission(BeaconPermissions::EDIT_SETTINGS)]
     public function submitIndexNow(string $url, ?int $siteId = null): array
     {
         return $this->call('beacon.submit_indexnow', null, $siteId, ['url' => $url]);
