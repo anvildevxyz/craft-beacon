@@ -13,7 +13,7 @@ modules:
   config:
     \craft\test\Craft:
       configFile: 'tests/_craft/config/test.php'
-      entryUrl: 'https://craft-plugin-dev.ddev.site/index.php'
+      entryUrl: 'https://craft-6-plugin-dev.ddev.site/index.php'
       projectConfig: {}
       migrations: []
       plugins:
