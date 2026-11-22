@@ -47,7 +47,7 @@
                     <tr>
                         <td>{{ token.name }}</td>
                         <td><code>{{ token.tokenPrefix }}…</code></td>
-                        <td>{{ token.lastUsedAt ? token.lastUsedAt : '—' }}</td>
+                        <td>{{ token.getAttribute('lastUsedAt') ? token.getAttribute('lastUsedAt') : '—' }}</td>
                         <td class="thin">
                             <form method="post" accept-charset="UTF-8">
                                 {{ csrfInput() }}

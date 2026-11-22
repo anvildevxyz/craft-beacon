@@ -1,7 +1,7 @@
 {% extends '_layouts/cp.twig' %}
 {% set selectedSubnavItem = 'schemas' %}
 {% import '_includes/forms.twig' as forms %}
-{% set title = schema.id ? ('schemas.edit.edit.schema.text'|t('beacon')) : ('schemas.edit.new.schema.text'|t('beacon')) %}
+{% set title = schema.getAttribute('id') ? ('schemas.edit.edit.schema.text'|t('beacon')) : ('schemas.edit.new.schema.text'|t('beacon')) %}
 {% set fullPageForm = true %}
 {% set crumbs = [
     { label: 'nav.beacon'|t('beacon'), url: cpUrl('beacon') },
@@ -25,7 +25,7 @@
 
 {% block content %}
     <input type="hidden" name="action" value="beacon/schemas/save">
-    <input type="hidden" name="schemaId" value="{{ schema.id }}">
+    <input type="hidden" name="schemaId" value="{{ schema.getAttribute('id') }}">
     {{ redirectInput('beacon/schemas') }}
     {{ csrfInput() }}
 
@@ -36,7 +36,7 @@
         label: 'schemas.edit.entryTypeHandle.label'|t('beacon'),
         id: 'entryTypeHandle',
         name: 'entryTypeHandle',
-        value: schema.entryTypeHandle,
+        value: schema.getAttribute('entryTypeHandle'),
         options: entryTypes,
         required: true,
         first: true,
@@ -71,7 +71,7 @@
         <div id="beacon-schema-builder"
              data-beacon-schema-builder
              data-registry="{{ schemaProperties|json_encode|e('html_attr') }}"
-             data-mapping="{{ (schema.mapping ?? '{}')|e('html_attr') }}"
+             data-mapping="{{ (schema.getAttribute('mapping') ?? '{}')|e('html_attr') }}"
              data-type-select="#schemaType"
              data-entry-type-select="#entryTypeHandle"
              data-suggest-action="{{ suggestUrl }}"
@@ -81,7 +81,7 @@
         {{ forms.textarea({
             name: 'mapping',
             id: 'mapping',
-            value: schema.mapping ?? '{}',
+            value: schema.getAttribute('mapping') ?? '{}',
             rows: 10,
             class: 'code',
             placeholder: '{}',
@@ -98,11 +98,11 @@
             label: 'field.enabled'|t('beacon'),
             id: 'enabled',
             name: 'enabled',
-            on: schema.enabled ?? true,
+            on: schema.getAttribute('enabled') ?? true,
         }) }}
     </div>
 
-    {% if schema.id %}
+    {% if schema.getAttribute('id') %}
         <div class="meta read-only">
             <div class="data">
                 <h5 class="heading">{{ 'schemas.edit.sort.order.text'|t('beacon') }}</h5>
