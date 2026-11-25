@@ -117,7 +117,7 @@ class ExtraSitemapsService extends Component
         // single query per page instead of one query per entry (avoids an N+1
         // on cold media-sitemap regeneration of large sites).
         $page = [];
-        foreach ($entries->each(500) as $entry) {
+        foreach ($entries->lazy(500) as $entry) {
             assert($entry instanceof Entry);
             $page[] = $entry;
             if (count($page) >= 500) {

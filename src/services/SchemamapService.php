@@ -61,7 +61,7 @@ final class SchemamapService extends Component
                 ->orderBy(['dateUpdated' => SORT_DESC])
                 ->limit(null);
 
-            foreach ($entries->each(500) as $entry) {
+            foreach ($entries->lazy(500) as $entry) {
                 assert($entry instanceof Entry);
                 $url = SeoFieldReader::indexableUrl($entry);
                 if ($url === null) {

@@ -50,7 +50,7 @@ final class CommerceIntegration
                         ->siteId($siteId)
                         ->status(Product::STATUS_LIVE)
                         ->limit(null)
-                        ->each(500) as $product
+                        ->lazy(500) as $product
                 ) {
                     // Gate on the shared noindex check (same as Entry sections via
                     // SitemapController::collectEntries) so a noindex product is excluded.

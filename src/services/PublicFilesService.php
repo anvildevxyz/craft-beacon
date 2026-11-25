@@ -273,7 +273,7 @@ class PublicFilesService extends Component
             ->limit(null);
 
         $result = [];
-        foreach ($query->each(500) as $entry) {
+        foreach ($query->lazy(500) as $entry) {
             assert($entry instanceof Entry);
             $url = SeoFieldReader::indexableUrl($entry);
             if ($url === null) {
@@ -310,7 +310,7 @@ class PublicFilesService extends Component
                 ->status(Entry::STATUS_LIVE)
                 ->orderBy(['dateUpdated' => SORT_DESC])
                 ->limit(5000);
-            foreach ($entries->each(500) as $entry) {
+            foreach ($entries->lazy(500) as $entry) {
                 assert($entry instanceof Entry);
                 $url = SeoFieldReader::indexableUrl($entry);
                 if ($url === null) {
