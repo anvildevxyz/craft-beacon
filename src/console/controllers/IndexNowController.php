@@ -164,7 +164,7 @@ class IndexNowController extends Controller
     private function submitQuery(EntryQuery $query, Site $site, string $label): int
     {
         $urls = [];
-        foreach ($query->each(500) as $entry) {
+        foreach ($query->lazy(500) as $entry) {
             assert($entry instanceof Entry);
             $url = SeoFieldReader::indexableUrl($entry);
             if ($url !== null) {
