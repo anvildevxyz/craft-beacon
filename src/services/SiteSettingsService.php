@@ -13,12 +13,14 @@ use anvildev\beacon\models\LlmsSettings;
 use anvildev\beacon\models\RobotsSettings;
 use anvildev\beacon\models\SitemapSettings;
 use anvildev\beacon\models\WebmasterSettings;
+use anvildev\beacon\models\WebMcpSettings;
 use anvildev\beacon\records\AdsSettingsRecord;
 use anvildev\beacon\records\HumansSettingsRecord;
 use anvildev\beacon\records\LlmsSettingsRecord;
 use anvildev\beacon\records\RobotsSettingsRecord;
 use anvildev\beacon\records\SitemapSettingsRecord;
 use anvildev\beacon\records\WebmasterSettingsRecord;
+use anvildev\beacon\records\WebMcpSettingsRecord;
 use craft\base\Element;
 use craft\elements\Entry;
 use yii\base\Component;
@@ -34,7 +36,7 @@ class SiteSettingsService extends Component
      * `findOne` GraphQL queries would otherwise run per entry per kind down to
      * one per (kind, siteId) per request. Save paths invalidate the relevant slot.
      *
-     * @var array<string, AdsSettings|BreadcrumbSettings|HumansSettings|LlmsSettings|RobotsSettings|SitemapSettings|WebmasterSettings>
+     * @var array<string, AdsSettings|BreadcrumbSettings|HumansSettings|LlmsSettings|RobotsSettings|SitemapSettings|WebMcpSettings|WebmasterSettings>
      */
     private array $cache = [];
 
@@ -160,6 +162,27 @@ class SiteSettingsService extends Component
             siteId: $siteId,
             enabled: (bool) $record->enabled,
             body: $record->body,
+        );
+    }
+
+    /**
+     * Returns the site's browser-side AI-agent tools (`/webmcp.js`) settings,
+     * seeding a default DB row on first access.
+     */
+    public function getWebMcp(int $siteId): WebMcpSettings
+    {
+        $key = $this->cacheKey('webmcp', $siteId);
+        if (isset($this->cache[$key])) {
+            $cached = $this->cache[$key];
+            assert($cached instanceof WebMcpSettings);
+            return $cached;
+        }
+        $record = WebMcpSettingsRecord::findOne(['siteId' => $siteId])
+            ?? $this->seedWebMcp($siteId);
+
+        return $this->cache[$key] = new WebMcpSettings(
+            siteId: $siteId,
+            enabled: (bool) $record->enabled,
         );
     }
 
@@ -406,6 +429,19 @@ class SiteSettingsService extends Component
     }
 
     /**
+     * Persists the site's browser-side AI-agent tools settings and
+     * invalidates the cached slot.
+     */
+    public function saveWebMcp(WebMcpSettings $s): void
+    {
+        $record = WebMcpSettingsRecord::findOne(['siteId' => $s->siteId])
+            ?? $this->seedWebMcp($s->siteId);
+        $record->enabled = $s->enabled;
+        $this->touchAndSave($record);
+        $this->invalidate('webmcp', $s->siteId);
+    }
+
+    /**
      * Persists the site's ads.txt settings and invalidates the cached slot.
      */
     public function saveAds(AdsSettings $s): void
@@ -433,8 +469,8 @@ class SiteSettingsService extends Component
 
     /**
      * Creates default DB rows for every per-site settings kind (sitemap, llms,
-     * robots, humans, ads, webmaster). Called when a new site is added so each
-     * site has a baseline row to edit.
+     * robots, humans, ads, webmaster, webmcp). Called when a new site is added
+     * so each site has a baseline row to edit.
      */
     public function seedDefaultsForSite(int $siteId): void
     {
@@ -445,6 +481,7 @@ class SiteSettingsService extends Component
             $this->seedHumans($siteId);
             $this->seedAds($siteId);
             $this->seedWebmaster($siteId);
+            $this->seedWebMcp($siteId);
         });
     }
 
@@ -546,6 +583,13 @@ class SiteSettingsService extends Component
         return $this->seedRecord(HumansSettingsRecord::class, $siteId, function(HumansSettingsRecord $r): void {
             $r->enabled = false;
             $r->body = null;
+        });
+    }
+
+    private function seedWebMcp(int $siteId): WebMcpSettingsRecord
+    {
+        return $this->seedRecord(WebMcpSettingsRecord::class, $siteId, function(WebMcpSettingsRecord $r): void {
+            $r->enabled = false;
         });
     }
 

@@ -1,5 +1,10 @@
 # Changelog — Beacon
 
+## Unreleased
+
+### Added
+- GEO: an opt-in, unauthenticated browser-side AI-agent tools script, served at `/webmcp.js` per site. Exposes read-only tools — search site content, fetch a page's structured content (title, description, GEO Markdown), and list public sections — for an AI agent running in a visitor's browser. `navigateTo` is purely client-side with a same-origin check; no tool can write or mutate data. Off by default; enable per site under **Crawlers → WebMCP**. ([#59](https://github.com/anvildevxyz/craft-beacon/issues/59))
+
 ## 1.6.0 — 2026-11-08
 
 ### Added

@@ -24,6 +24,33 @@ class GeoMarkdownExportService extends Component
     }
 
     /**
+     * Pre-generated row first, on-demand fallback (write-through) second —
+     * the shared resolution {@see \anvildev\beacon\controllers\GeoExportController},
+     * {@see \anvildev\beacon\web\GeoMarkdownNegotiator}, and
+     * {@see \anvildev\beacon\services\WebMcpService} all use to serve an
+     * element's Markdown from {@see GeoMarkdownStore}.
+     */
+    public function resolveMarkdown(ElementInterface $element): ?string
+    {
+        $store = Plugin::$plugin->geoMarkdownStore;
+        $siteId = (int) $element->siteId;
+        $elementId = (int) $element->id;
+
+        $row = $store->find($siteId, $elementId);
+        if ($row !== null && is_string($row['markdown']) && $row['markdown'] !== '') {
+            $store->touchRequested($siteId, $elementId);
+            return $row['markdown'];
+        }
+
+        $markdown = $this->exportElement($element);
+        if ($markdown === null) {
+            return null;
+        }
+        $store->put($siteId, $elementId, $markdown);
+        return $markdown;
+    }
+
+    /**
      * Build exportable Markdown for a live public element, or null when disallowed.
      * Returning null is the load-bearing signal: callers (GeoExportController,
      * GeoMarkdownNegotiator) translate it into a 404 — Markdown is a representation

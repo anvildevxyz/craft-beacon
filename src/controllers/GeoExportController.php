@@ -57,7 +57,11 @@ class GeoExportController extends Controller
 
     private function buildResponse(?ElementInterface $element): Response
     {
-        if ($element === null || SeoFieldReader::isNoIndexFor($element) || ($markdown = $this->resolveMarkdown($element)) === null) {
+        if ($element === null || SeoFieldReader::isNoIndexFor($element)) {
+            throw new NotFoundHttpException();
+        }
+        $markdown = Plugin::$plugin->geoMarkdownExport->resolveMarkdown($element);
+        if ($markdown === null) {
             throw new NotFoundHttpException();
         }
         $canonical = $element->getUrl();
@@ -74,28 +78,5 @@ class GeoExportController extends Controller
     private function findExportable(string $by, int|string $value): ?ElementInterface
     {
         return CommerceIntegration::findLiveMarkdownElement($by, $value, Craft::$app->getSites()->getCurrentSite()->id);
-    }
-
-    /**
-     * Pre-generated row first, on-demand fallback (write-through) second.
-     */
-    private function resolveMarkdown(ElementInterface $element): ?string
-    {
-        $store = Plugin::$plugin->geoMarkdownStore;
-        $siteId = (int) $element->siteId;
-        $elementId = (int) $element->id;
-
-        $row = $store->find($siteId, $elementId);
-        if ($row !== null && is_string($row['markdown']) && $row['markdown'] !== '') {
-            $store->touchRequested($siteId, $elementId);
-            return $row['markdown'];
-        }
-
-        $markdown = Plugin::$plugin->geoMarkdownExport->exportElement($element);
-        if ($markdown === null) {
-            return null;
-        }
-        $store->put($siteId, $elementId, $markdown);
-        return $markdown;
     }
 }

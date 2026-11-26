@@ -78,6 +78,7 @@ use anvildev\beacon\services\SitemapService;
 use anvildev\beacon\services\SiteSettingsService;
 use anvildev\beacon\services\TrackingProviderRegistry;
 use anvildev\beacon\services\TrackingService;
+use anvildev\beacon\services\WebMcpService;
 use anvildev\beacon\services\WikidataService;
 use anvildev\beacon\tracking\providers\CustomScriptProvider;
 use anvildev\beacon\tracking\providers\FacebookPixelProvider;
@@ -179,6 +180,7 @@ use yii\base\Event;
  * @property-read McpService $mcp
  * @property-read McpTokenService $mcpTokens
  * @property-read WikidataService $wikidata
+ * @property-read WebMcpService $webMcp
  * @property-read \anvildev\beacon\services\Links $links
  */
 class Plugin extends BasePlugin
@@ -347,6 +349,7 @@ class Plugin extends BasePlugin
             'tokenEstimator' => HeuristicTokenEstimator::class,
             'wikidata' => WikidataService::class,
             'links' => Links::class,
+            'webMcp' => WebMcpService::class,
         ]);
 
         Craft::$app->getProjectConfig()
@@ -541,6 +544,7 @@ class Plugin extends BasePlugin
                     'beacon/crawlers/robots' => 'beacon/robots-settings/index',
                     'beacon/crawlers/humans-txt' => 'beacon/humans-settings/index',
                     'beacon/crawlers/ads-txt' => 'beacon/ads-settings/index',
+                    'beacon/crawlers/webmcp' => 'beacon/web-mcp-settings/index',
                     'beacon/tracking' => 'beacon/tracking/index',
                     'beacon/tracking/new' => 'beacon/tracking/edit',
                     'beacon/tracking/<uid:[\w-]+>' => 'beacon/tracking/edit',
@@ -581,6 +585,10 @@ class Plugin extends BasePlugin
                     '.well-known/tdmrep.json' => 'beacon/tdm-rep/index',
                     'humans.txt' => 'beacon/humans-txt/index',
                     'ads.txt' => 'beacon/ads-txt/index',
+                    'webmcp.js' => 'beacon/web-mcp/index',
+                    'beacon/webmcp/search' => 'beacon/web-mcp/search',
+                    'beacon/webmcp/page' => 'beacon/web-mcp/page',
+                    'beacon/webmcp/sections' => 'beacon/web-mcp/sections',
                     'geo/export' => 'beacon/geo-export/index',
                     'beacon/mcp' => 'beacon/mcp/index',
                     'beacon/schemamap.json' => 'beacon/schemamap/index',

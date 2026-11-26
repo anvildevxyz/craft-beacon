@@ -45,7 +45,7 @@ final class BeaconPermissions
             self::EDIT_SCHEMAS => ['label' => $t('Edit schemas')],
             self::EDIT_SITEMAP => ['label' => $t('Edit sitemap')],
             self::EDIT_TRACKING => ['label' => $t('Edit tracking')],
-            self::EDIT_CRAWLERS => ['label' => $t('Edit crawler settings (AI crawlers, llms.txt, robots.txt, humans.txt, ads.txt)')],
+            self::EDIT_CRAWLERS => ['label' => $t('Edit crawler settings (AI crawlers, llms.txt, robots.txt, humans.txt, ads.txt, WebMCP)')],
             self::EDIT_SETTINGS => ['label' => $t('Edit Beacon settings')],
             self::EDIT_GEO_SCORE => ['label' => $t('Manually recompute GEO scores (drill-down recompute button)')],
             self::USE_AI_GENERATION => ['label' => $t('Use AI content generation (Generate buttons in the SEO field)')],

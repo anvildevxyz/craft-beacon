@@ -26,6 +26,15 @@ final class CommerceIntegration
         return class_exists(Product::class);
     }
 
+    /**
+     * Whether `$handle` is a synthetic scope placeholder (e.g. `__products__`)
+     * rather than a real Craft section handle.
+     */
+    public static function isPlaceholderHandle(string $handle): bool
+    {
+        return str_starts_with($handle, '__') && str_ends_with($handle, '__');
+    }
+
     public static function register(): void
     {
         if (!self::isInstalled()) {

@@ -6,6 +6,7 @@ use anvildev\beacon\enums\RenderCacheType;
 use anvildev\beacon\events\RegisterSitemapUrlsEvent;
 use anvildev\beacon\helpers\Assets;
 use anvildev\beacon\helpers\SeoFieldReader;
+use anvildev\beacon\integrations\CommerceIntegration;
 use anvildev\beacon\models\AiCrawlerRule;
 use anvildev\beacon\models\SitemapSettings;
 use anvildev\beacon\Plugin;
@@ -300,7 +301,7 @@ class PublicFilesService extends Component
         foreach ($sectionHandles as $handle) {
             // Skip Commerce/integration placeholder handles (e.g. __products__) — they
             // cause QueryAbortedException in Craft's ElementQuery.
-            if (str_starts_with($handle, '__') && str_ends_with($handle, '__')) {
+            if (CommerceIntegration::isPlaceholderHandle($handle)) {
                 continue;
             }
             $list = [];
