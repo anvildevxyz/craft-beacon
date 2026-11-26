@@ -141,8 +141,14 @@ class WebMcpService extends Component
      */
     private function uriFromUrl(string $url, Site $site): string
     {
-        $path = trim((string) (parse_url($url, PHP_URL_PATH) ?? $url), '/');
-        $base = trim((string) (parse_url((string) ($site->getBaseUrl() ?? ''), PHP_URL_PATH) ?? ''), '/');
+        // parse_url() returns false (not null) for a malformed URL, which `??`
+        // does not catch — an explicit is_string() check is required so a
+        // bad input resolves to the empty/home path rather than to the raw,
+        // unparsed URL string being used as the path.
+        $rawPath = parse_url($url, PHP_URL_PATH);
+        $path = trim(is_string($rawPath) ? $rawPath : '', '/');
+        $rawBase = parse_url((string) ($site->getBaseUrl() ?? ''), PHP_URL_PATH);
+        $base = trim(is_string($rawBase) ? $rawBase : '', '/');
 
         if ($base !== '' && ($path === $base || str_starts_with($path, $base . '/'))) {
             $path = trim(substr($path, strlen($base)), '/');
@@ -194,10 +200,16 @@ class WebMcpService extends Component
 
           window.beaconWebMcp = {
             searchContent: function (query, limit) {
-              var params = new URLSearchParams({ q: query, limit: String(limit || 10) });
+              if (typeof query !== 'string' || query === '') {
+                return Promise.reject(new Error('Beacon WebMCP: searchContent(query) requires a non-empty query string.'));
+              }
+              var params = new URLSearchParams({ q: query, limit: String(typeof limit === 'number' ? limit : 10) });
               return getJson(endpoints.search + '?' + params.toString());
             },
             getPage: function (url) {
+              if (typeof url !== 'string' || url === '') {
+                return Promise.reject(new Error('Beacon WebMCP: getPage(url) requires a non-empty URL string.'));
+              }
               var params = new URLSearchParams({ url: url });
               return getJson(endpoints.page + '?' + params.toString());
             },

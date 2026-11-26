@@ -469,8 +469,8 @@ class SiteSettingsService extends Component
 
     /**
      * Creates default DB rows for every per-site settings kind (sitemap, llms,
-     * robots, humans, ads, webmaster). Called when a new site is added so each
-     * site has a baseline row to edit.
+     * robots, humans, ads, webmaster, webmcp). Called when a new site is added
+     * so each site has a baseline row to edit.
      */
     public function seedDefaultsForSite(int $siteId): void
     {
@@ -481,6 +481,7 @@ class SiteSettingsService extends Component
             $this->seedHumans($siteId);
             $this->seedAds($siteId);
             $this->seedWebmaster($siteId);
+            $this->seedWebMcp($siteId);
         });
     }
 

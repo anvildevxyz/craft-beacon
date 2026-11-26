@@ -45,6 +45,26 @@ class WebMcpServiceLogicTest extends TestCase
         $this->assertSame('__home__', $this->invoke($service, 'uriFromUrl', ['', $site]));
     }
 
+    public function testUriFromUrlFallsBackToHomeForAUrlWithNoPathComponentAtAll(): void
+    {
+        $service = $this->service();
+        $site = $this->site('https://example.test');
+
+        // parse_url() returns null (not '') for a bare "scheme://host" URL —
+        // must not fall through to using the whole URL string as the path.
+        $this->assertSame('__home__', $this->invoke($service, 'uriFromUrl', ['https://example.test', $site]));
+    }
+
+    public function testUriFromUrlDoesNotCrashOnAMalformedUrl(): void
+    {
+        $service = $this->service();
+        $site = $this->site('https://example.test');
+
+        // parse_url() returns false (not null) for a malformed URL — `??`
+        // alone would not catch this; must not throw or emit a PHP warning.
+        $this->assertSame('__home__', $this->invoke($service, 'uriFromUrl', ['http:///', $site]));
+    }
+
     public function testUriFromUrlLeavesAPathAloneWhenItDoesNotShareTheSiteBasePath(): void
     {
         $service = $this->service();
