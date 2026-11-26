@@ -91,18 +91,10 @@ final class GeoMarkdownNegotiator
 
         $siteId = (int) $element->siteId;
         $elementId = (int) $element->id;
-        $store = $plugin->geoMarkdownStore;
-        $row = $store->find($siteId, $elementId);
-        if ($row !== null && is_string($row['markdown']) && $row['markdown'] !== '') {
-            $markdown = $row['markdown'];
-            $store->touchRequested($siteId, $elementId);
-        } else {
-            $markdown = $plugin->geoMarkdownExport->exportElement($element);
-            if ($markdown === null) {
-                self::debug('GEO negotiation skipped: element not exportable');
-                return;
-            }
-            $store->put($siteId, $elementId, $markdown);
+        $markdown = $plugin->geoMarkdownExport->resolveMarkdown($element);
+        if ($markdown === null) {
+            self::debug('GEO negotiation skipped: element not exportable');
+            return;
         }
 
         Http::response()->clear();

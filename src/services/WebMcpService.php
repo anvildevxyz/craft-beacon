@@ -62,9 +62,6 @@ class WebMcpService extends Component
 
         foreach ($entries->each(50) as $entry) {
             assert($entry instanceof Entry);
-            if (SeoFieldReader::isNoIndexFor($entry)) {
-                continue;
-            }
             $url = SeoFieldReader::indexableUrl($entry);
             if ($url === null) {
                 continue;
@@ -90,7 +87,7 @@ class WebMcpService extends Component
     {
         $uri = $this->uriFromUrl($url, $site);
         $element = CommerceIntegration::findLiveMarkdownElement('uri', $uri, $site->id);
-        if ($element === null || SeoFieldReader::isNoIndexFor($element)) {
+        if ($element === null) {
             return null;
         }
 
@@ -99,7 +96,7 @@ class WebMcpService extends Component
             return null;
         }
 
-        $markdown = $this->resolveMarkdown($element, (int) $site->id, (int) $element->id);
+        $markdown = Plugin::$plugin->geoMarkdownExport->resolveMarkdown($element);
         if ($markdown === null) {
             return null;
         }
@@ -125,7 +122,7 @@ class WebMcpService extends Component
         foreach ($settings->includedSectionHandles() as $handle) {
             // Skip Commerce/integration placeholder handles (e.g. __products__) —
             // they have no matching craft\models\Section to read a name from.
-            if (str_starts_with($handle, '__') && str_ends_with($handle, '__')) {
+            if (CommerceIntegration::isPlaceholderHandle($handle)) {
                 continue;
             }
             $section = Craft::$app->getEntries()->getSectionByHandle($handle);
@@ -135,27 +132,6 @@ class WebMcpService extends Component
             $rows[] = ['handle' => $handle, 'name' => (string) $section->name];
         }
         return $rows;
-    }
-
-    /**
-     * Pre-generated row first, on-demand fallback (write-through) second —
-     * the same resolution GeoExportController uses for `.md` requests.
-     */
-    private function resolveMarkdown(\craft\base\ElementInterface $element, int $siteId, int $elementId): ?string
-    {
-        $store = Plugin::$plugin->geoMarkdownStore;
-        $row = $store->find($siteId, $elementId);
-        if ($row !== null && is_string($row['markdown']) && $row['markdown'] !== '') {
-            $store->touchRequested($siteId, $elementId);
-            return $row['markdown'];
-        }
-
-        $markdown = Plugin::$plugin->geoMarkdownExport->exportElement($element);
-        if ($markdown === null) {
-            return null;
-        }
-        $store->put($siteId, $elementId, $markdown);
-        return $markdown;
     }
 
     /**

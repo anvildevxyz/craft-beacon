@@ -59,7 +59,6 @@ class WebMcpController extends Controller
     public function actionSearch(): Response
     {
         $site = $this->requireEnabledSite();
-        Plugin::$plugin->geoExportThrottle->enforce('webmcp_search');
 
         $query = (string) Http::request()->getQueryParam('q', '');
         $limit = max(1, min(25, (int) Http::request()->getQueryParam('limit', 10)));
@@ -77,7 +76,6 @@ class WebMcpController extends Controller
     public function actionPage(): Response
     {
         $site = $this->requireEnabledSite();
-        Plugin::$plugin->geoExportThrottle->enforce('webmcp_page');
 
         $url = (string) Http::request()->getQueryParam('url', '');
         $page = $url !== '' ? Plugin::$plugin->webMcp->page($site, $url) : null;
@@ -97,17 +95,19 @@ class WebMcpController extends Controller
     public function actionSections(): Response
     {
         $site = $this->requireEnabledSite();
-        Plugin::$plugin->geoExportThrottle->enforce('webmcp_sections');
 
         return $this->asJson(['sections' => Plugin::$plugin->webMcp->sections($site)]);
     }
 
     /**
-     * Resolves the current site and 404s when the script is disabled for
-     * it — the JSON tools are unreachable (and otherwise undiscoverable)
-     * without the script that calls them.
+     * Resolves the current site, 404s when the script is disabled for it —
+     * the JSON tools are unreachable (and otherwise undiscoverable) without
+     * the script that calls them — and rate-limits the call under a bucket
+     * derived from the current action (`webmcp_search`, `webmcp_page`,
+     * `webmcp_sections`).
      *
      * @throws NotFoundHttpException when disabled for this site
+     * @throws TooManyRequestsHttpException on rate-limit breach
      */
     private function requireEnabledSite(): Site
     {
@@ -115,6 +115,7 @@ class WebMcpController extends Controller
         if (!Plugin::$plugin->siteSettings->getWebMcp($site->id)->enabled) {
             throw new NotFoundHttpException();
         }
+        Plugin::$plugin->geoExportThrottle->enforce('webmcp_' . ($this->action?->id ?? 'unknown'));
         return $site;
     }
 }
