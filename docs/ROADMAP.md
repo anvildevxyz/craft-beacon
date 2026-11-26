@@ -14,7 +14,7 @@ Items are ordered by implementation priority within each track. Check off each i
 - [x] **Image sitemap and video sitemap** — `sitemap-images.xml` and `sitemap-videos.xml` endpoints (in addition to the existing news sitemap), respecting the same per-section on/off toggles as the main sitemap.
 - [ ] **Dynamic OG image generation** — generate `og:image` on-demand from a configurable template (entry title + site logo overlay at minimum); serve via `/beacon/og/<uid>` with HTTP caching headers; path configurable to point to a custom Twig template.
 - [ ] **Site-wide SEO audit** — background crawl of all public URLs to surface: duplicate `<title>` / `<meta description>`, missing meta, 0-inbound-link orphan pages, broken internal links, redirect chains longer than 2 hops. Results visible in a new Audit CP section with filters and bulk-fix actions.
-- [ ] **Per-entry-type default meta field mapping** (#61) — a CP-configurable tier, per Section/Entry Type, that defaults the SEO title, description, image, OG type, and Twitter card type from a chosen native field, sitting between the sitewide template and the per-entry override.
+- [ ] **Per-entry-type default meta field mapping** (#61) — lets admins default SEO title, description, image, OG type, and Twitter card type per Section or Entry Type. This tier sits between the sitewide template and the per-entry override.
 - [ ] **Whole-sitemap registration event** (#62) — an event letting another plugin/module register a fully separate, standalone sitemap (own route and `<urlset>`), alongside the existing URL-push event.
 - [ ] **Flat-array meta tag output helper** (#63) — a helper returning all resolved meta as a flat array of tag descriptors, for JS head-management libraries that don't want to go through GraphQL.
 
@@ -22,8 +22,8 @@ Items are ordered by implementation priority within each track. Check off each i
 
 ## Track 2 — GEO / AI visibility (extend the lead)
 
-- [x] **AI-visibility tracking panel** — periodically send benchmark prompts to ChatGPT, Perplexity, Claude, and Gemini APIs; record whether the site is cited (URL match + domain match); chart citation rate over time in the Dashboard. Credentials stored in plugin settings per provider.
-- [x] **Content-licensing signals** — add `LLM-Content-Policy` header and `X-Robots-Tag` variant support for Cloudflare's Content Signals spec; surface a per-section "AI usage license" dropdown (index / no-train / no-generative-ai) that writes the appropriate signals to the sitemap and robots.txt.
+- [x] **AI-visibility tracking panel** — periodically sends benchmark prompts through one configured AI provider. Detects citation by URL and domain match, and charts citation rate over time in the Dashboard. Per-engine multi-provider support is a documented follow-up.
+- [x] **Content-licensing signals** — surfaces an AI-usage policy dropdown (index / no-train / no-generative-ai) as a sitewide default with a per-entry override. Writes robots meta, `X-Robots-Tag`, Content Signals in robots.txt, a TDMRep manifest, and a `Content-Usage` header.
 - [x] **MCP server** — expose entries, meta fields, GEO scores, redirects, and sitemap state as MCP tools/resources so AI coding agents and editorial agents can read and update SEO data programmatically. Served from `/beacon/mcp`, and also registered with Craft's own built-in MCP server.
 - [ ] **Browser-side AI-agent tools script** (#59) — an opt-in, unauthenticated script exposing read-only in-page tools (search, get page, list sections, navigate) for an AI agent running in a visitor's browser.
 - [ ] **AI-chat deep-link Twig helpers** (#60) — helpers that build a URL opening an entry's Markdown export directly inside a major AI chat assistant, for "ask AI about this page" links.
