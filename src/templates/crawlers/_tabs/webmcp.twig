@@ -1,0 +1,18 @@
+{% import '_includes/forms.twig' as forms %}
+
+<input type="hidden" name="action" value="beacon/web-mcp-settings/save">
+<input type="hidden" name="siteId" value="{{ site.id }}">
+{{ redirectInput('beacon/crawlers/webmcp?site=' ~ site.handle) }}
+{{ csrfInput() }}
+
+{% include 'beacon/_includes/site-selector' with { sites, site, baseUrl: cpUrl('beacon/crawlers/webmcp') } only %}
+
+<p class="instructions">{{ 'webMcp.intro.text'|t('beacon') }}</p>
+
+{{ forms.lightswitchField({
+    label: 'field.enabled'|t('beacon'),
+    instructions: 'webMcp.enabled.instructions'|t('beacon'),
+    name: 'enabled',
+    on: settings.enabled,
+    first: true,
+}) }}

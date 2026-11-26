@@ -9,4 +9,5 @@ enum RenderCacheType: string
     case Humans = 'humans';
     case Ads = 'ads';
     case Schemamap = 'schemamap';
+    case WebMcp = 'webmcp';
 }

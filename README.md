@@ -90,6 +90,7 @@ Beacon is fully CP-driven. All configuration lives in DB tables managed via `/ad
 - **Robots** — per-site robots.txt config (User-agent rules, sitemap URL)
 - **humans.txt** — per-site humans.txt body (enabled toggle + free-form body)
 - **ads.txt** — per-site ads.txt content (enabled toggle + asset picker with body fallback)
+- **WebMCP** — per-site opt-in toggle for the browser-side AI-agent tools script
 - **AI crawlers** — global AI crawler rules + AI bot list (with restore-defaults)
 - **Settings** — title template, Organization (JSON-LD), Open Graph + Twitter defaults, behavior toggles (auto-redirect, stale threshold, bot logging, bot log retention), hreflang, GEO Markdown export, Commerce sitemap, Pagination
 
@@ -109,6 +110,12 @@ Beacon registers these site URLs automatically (overridable in `config/routes.ph
 - **`GET /ads.txt`** — IAB Tech Lab ads.txt format (per-site, served from asset or fallback body)
 - **`GET /beacon/schemamap.json`** — site-level JSON-LD graph listing every public entry as a `WebPage` under a site `Collection`, plus `WebSite` + `Organization` identity nodes (a one-request discovery surface for AI agents)
 - **`GET /geo/export?id=<id>`** (and `GET /<uri>.md`) — per-URL Markdown export, with optional `Accept: text/markdown` negotiation
+- **`GET /webmcp.js`** — opt-in, per-site browser-side AI-agent tools script (off by default). Declares three read-only tools backed by the JSON endpoints below, plus a client-side-only `navigateTo`:
+  - **`GET /beacon/webmcp/search?q=&limit=`** — searches live, indexable entries; returns `{results: [{title, url, snippet}]}`
+  - **`GET /beacon/webmcp/page?url=`** — resolves a URL to its live entry and returns `{title, url, description, markdown}` (reuses the GEO Markdown export)
+  - **`GET /beacon/webmcp/sections`** — lists the sitemap's included sections as `{sections: [{handle, name}]}`
+
+  All three 404 when WebMCP is disabled for the site, and are rate-limited per IP.
 
 Sitemap extensibility: hook `\anvildev\beacon\Plugin::EVENT_REGISTER_SITEMAP_URLS` (event class `\anvildev\beacon\events\RegisterSitemapUrlsEvent` → `pushUrl($loc, $lastmod?, $changefreq?, $priority?)`). Duplicate `loc` values: last registration wins.
 

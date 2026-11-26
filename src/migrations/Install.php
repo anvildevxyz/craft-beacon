@@ -44,6 +44,7 @@ class Install extends Migration
         $this->dropTableIfExists('{{%beacon_ai_visibility_results}}');
         $this->dropTableIfExists('{{%beacon_benchmark_prompts}}');
         $this->dropTableIfExists('{{%beacon_tracking_scripts}}');
+        $this->dropTableIfExists('{{%beacon_webmcp_settings}}');
         $this->dropTableIfExists('{{%beacon_webmaster_settings}}');
         $this->dropTableIfExists('{{%beacon_ads_settings}}');
         $this->dropTableIfExists('{{%beacon_humans_settings}}');
@@ -555,6 +556,15 @@ class Install extends Migration
             'uid' => $this->uid(),
         ]);
 
+        $this->createTable('{{%beacon_webmcp_settings}}', [
+            'id' => $this->primaryKey(),
+            'siteId' => $this->integer()->notNull()->unique(),
+            'enabled' => $this->boolean()->notNull()->defaultValue(false),
+            'dateCreated' => $this->dateTime()->notNull(),
+            'dateUpdated' => $this->dateTime()->notNull(),
+            'uid' => $this->uid(),
+        ]);
+
         $this->createTable('{{%beacon_tracking_scripts}}', [
             'id' => $this->primaryKey(),
             'name' => $this->string(255)->notNull(),
@@ -654,6 +664,7 @@ class Install extends Migration
         $this->addForeignKey(null, '{{%beacon_ads_settings}}', ['siteId'], '{{%sites}}', ['id'], 'CASCADE');
         $this->addForeignKey(null, '{{%beacon_ads_settings}}', ['assetId'], '{{%assets}}', ['id'], 'SET NULL');
         $this->addForeignKey(null, '{{%beacon_webmaster_settings}}', ['siteId'], '{{%sites}}', ['id'], 'CASCADE');
+        $this->addForeignKey(null, '{{%beacon_webmcp_settings}}', ['siteId'], '{{%sites}}', ['id'], 'CASCADE');
     }
 
     private function fixUtf8Mb4Columns(): void
@@ -762,6 +773,12 @@ class Install extends Migration
 
             $this->insert('{{%beacon_webmaster_settings}}', [
                 'siteId' => $siteId,
+                ...$meta,
+            ]);
+
+            $this->insert('{{%beacon_webmcp_settings}}', [
+                'siteId' => $siteId,
+                'enabled' => false,
                 ...$meta,
             ]);
         }
