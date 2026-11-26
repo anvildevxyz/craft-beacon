@@ -3,6 +3,7 @@
 namespace anvildev\beacon\console\controllers;
 
 use anvildev\beacon\console\SiteHandleResolverTrait;
+use anvildev\beacon\helpers\ElementBatch;
 use anvildev\beacon\helpers\SeoFieldReader;
 use anvildev\beacon\helpers\Strings;
 use anvildev\beacon\models\WebmasterSettings;
@@ -164,7 +165,7 @@ class IndexNowController extends Controller
     private function submitQuery(EntryQuery $query, Site $site, string $label): int
     {
         $urls = [];
-        foreach ($query->lazy(500) as $entry) {
+        foreach (ElementBatch::each($query) as $entry) {
             assert($entry instanceof Entry);
             $url = SeoFieldReader::indexableUrl($entry);
             if ($url !== null) {

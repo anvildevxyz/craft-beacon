@@ -3,6 +3,7 @@
 namespace anvildev\beacon\integrations;
 
 use anvildev\beacon\events\RegisterSitemapUrlsEvent;
+use anvildev\beacon\helpers\ElementBatch;
 use anvildev\beacon\helpers\SeoFieldReader;
 use anvildev\beacon\models\SitemapSettings;
 use anvildev\beacon\Plugin;
@@ -45,13 +46,12 @@ final class CommerceIntegration
                 // Hoist changefreq/priority once — loop body would otherwise re-index per product.
                 ['changefreq' => $changefreq, 'priority' => $priority] = $sitemap->resolveForSection(self::SCOPE);
 
-                foreach (
-                    Product::find()
-                        ->siteId($siteId)
-                        ->status(Product::STATUS_LIVE)
-                        ->limit(null)
-                        ->lazy(500) as $product
-                ) {
+                $products = Product::find()
+                    ->siteId($siteId)
+                    ->status(Product::STATUS_LIVE)
+                    ->limit(null);
+
+                foreach (ElementBatch::each($products) as $product) {
                     // Gate on the shared noindex check (same as Entry sections via
                     // SitemapController::collectEntries) so a noindex product is excluded.
                     $url = SeoFieldReader::indexableUrl($product);

@@ -2,6 +2,7 @@
 
 namespace anvildev\beacon\services;
 
+use anvildev\beacon\helpers\ElementBatch;
 use anvildev\beacon\helpers\IdentityTypes;
 use anvildev\beacon\helpers\SeoFieldReader;
 use anvildev\beacon\Plugin;
@@ -61,7 +62,7 @@ final class SchemamapService extends Component
                 ->orderBy(['dateUpdated' => SORT_DESC])
                 ->limit(null);
 
-            foreach ($entries->lazy(500) as $entry) {
+            foreach (ElementBatch::each($entries) as $entry) {
                 assert($entry instanceof Entry);
                 $url = SeoFieldReader::indexableUrl($entry);
                 if ($url === null) {

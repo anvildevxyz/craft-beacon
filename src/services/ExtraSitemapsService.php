@@ -2,6 +2,7 @@
 
 namespace anvildev\beacon\services;
 
+use anvildev\beacon\helpers\ElementBatch;
 use anvildev\beacon\helpers\SeoFieldReader;
 use anvildev\beacon\helpers\Xml;
 use craft\db\Query;
@@ -117,7 +118,7 @@ class ExtraSitemapsService extends Component
         // single query per page instead of one query per entry (avoids an N+1
         // on cold media-sitemap regeneration of large sites).
         $page = [];
-        foreach ($entries->lazy(500) as $entry) {
+        foreach (ElementBatch::each($entries) as $entry) {
             assert($entry instanceof Entry);
             $page[] = $entry;
             if (count($page) >= 500) {

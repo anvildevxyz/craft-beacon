@@ -5,6 +5,7 @@ namespace anvildev\beacon\services;
 use anvildev\beacon\enums\RenderCacheType;
 use anvildev\beacon\events\RegisterSitemapUrlsEvent;
 use anvildev\beacon\helpers\Assets;
+use anvildev\beacon\helpers\ElementBatch;
 use anvildev\beacon\helpers\SeoFieldReader;
 use anvildev\beacon\models\AiCrawlerRule;
 use anvildev\beacon\models\SitemapSettings;
@@ -273,7 +274,7 @@ class PublicFilesService extends Component
             ->limit(null);
 
         $result = [];
-        foreach ($query->lazy(500) as $entry) {
+        foreach (ElementBatch::each($query) as $entry) {
             assert($entry instanceof Entry);
             $url = SeoFieldReader::indexableUrl($entry);
             if ($url === null) {
@@ -310,7 +311,7 @@ class PublicFilesService extends Component
                 ->status(Entry::STATUS_LIVE)
                 ->orderBy(['dateUpdated' => SORT_DESC])
                 ->limit(5000);
-            foreach ($entries->lazy(500) as $entry) {
+            foreach (ElementBatch::each($entries) as $entry) {
                 assert($entry instanceof Entry);
                 $url = SeoFieldReader::indexableUrl($entry);
                 if ($url === null) {
